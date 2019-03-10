@@ -1,0 +1,204 @@
+body {
+    color: #666;
+    font-family: 'Nunito', sans-serif !important;
+    font-size: 14px;
+    /*background-color: #f2f3f8;*/
+}
+
+a {
+    color: #666;
+}
+
+h1, h2, h3, h4, h5 {
+    color: #333;
+    font-family: 'Nunito', sans-serif;
+    font-weight: 600;
+}
+
+h1 {
+    font-size: 26px;
+}
+
+h2 {
+    font-size: 26px;
+}
+
+h3 {
+    font-size: 16px;
+}
+
+.navbar-brand {
+    font-family: 'Pacifico', cursive;
+    font-size: 30px;
+}
+
+.navbar-brand .small {
+
+    font-family: 'Nunito', sans-serif;
+    font-size: 14px;
+    color: #666;
+}
+
+.navbar-darkish {
+
+    background-color: #cdcdcd;
+    -webkit-box-shadow: 0px 0px 14px 0px rgba(82,63,105,0.05);
+    -moz-box-shadow: 0px 0px 14px 0px rgba(82,63,105,0.05);
+    box-shadow: 0px 0px 14px 0px rgba(82,63,105,0.05);
+}
+
+.navbar-white {
+
+    box-shadow: 0 3px 8px 0 rgba(116, 129, 141, 0.1);
+    border-bottom: 1px solid #d4dadf;
+    background-color: #FFFFFF;
+}
+
+.table thead tr th {
+
+    border-top: 0;
+    padding-bottom: 0;
+    text-transform: uppercase;
+    font-size: 12px;
+}
+
+.table tbody tr td {
+    border-color: #eaeaea;
+}
+
+.table tbody tr.hidden-image, .table tbody tr.hidden-image a, .table tbody tr.hidden-image code {
+    color: rgba(0, 0, 0, 0.3)
+}
+
+.table tbody tr td.image-name {
+
+    font-weight: 600;
+    font-size: 16px;
+}
+
+code {
+
+    background-color: #efefef;
+    border-radius: 2px;
+    color: #333;
+    font-size: 12px;
+    padding: 5px;
+}
+
+.container--image-list {
+    margin-top: 50px;
+}
+
+/*
+.container--white {
+
+    background-color: #FFF;
+
+    -webkit-box-shadow: 0px 0px 14px 0px rgba(82,63,105,0.05);
+    -moz-box-shadow: 0px 0px 14px 0px rgba(82,63,105,0.05);
+    box-shadow: 0px 0px 14px 0px rgba(82,63,105,0.05);
+
+    border-radius: 5px;
+}
+*/
+
+.number, .version-mask {
+    font-family: monospace;
+}
+
+.col--shaded {
+
+    background-color: #fff;
+    border-radius: 1px;
+    border: 1px solid #efefef;
+}
+
+.btn-xsm {
+
+    padding: .20rem .45rem;
+    font-size: .700rem;
+    line-height: 1.4;
+    border-radius: .2rem;
+}
+
+.btn-clickable {
+    cursor: pointer;
+}
+
+.tablesorter-header {
+    cursor: pointer;
+
+}
+
+.tablesorter-header:focus {
+    outline: none;
+}
+
+/*
+*****
+iOS Switches copied from: https://codepen.io/aorcsik/pen/OPMyQp
+*****
+*/
+
+/* The switch - the box around the slider */
+.switch {
+    position: relative;
+    display: inline-block;
+    width: 44px;
+    height: 26px;
+    margin: 0;
+}
+
+/* Hide default HTML checkbox */
+.switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+/* The slider */
+.slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #ccc;
+    -webkit-transition: .4s;
+    transition: .4s;
+}
+
+.slider:before {
+    position: absolute;
+    content: "";
+    height: 18px;
+    width: 18px;
+    left: 4px;
+    bottom: 4px;
+    background-color: white;
+    -webkit-transition: .4s;
+    transition: .4s;
+}
+
+input:checked + .slider {
+    background-color: #2196F3;
+}
+
+input:focus + .slider {
+    box-shadow: 0 0 1px #2196F3;
+}
+
+input:checked + .slider:before {
+    -webkit-transform: translateX(18px);
+    -ms-transform: translateX(18px);
+    transform: translateX(18px);
+}
+
+.slider.round {
+    border-radius: 26px;
+}
+
+.slider.round:before {
+    border-radius: 50%;
+}
