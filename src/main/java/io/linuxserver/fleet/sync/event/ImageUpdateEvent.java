@@ -15,20 +15,32 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package io.linuxserver.fleet.thread;
+package io.linuxserver.fleet.sync.event;
 
-import io.linuxserver.fleet.delegate.SynchronisationDelegate;
+import io.linuxserver.fleet.model.Image;
 
-public class SynchroniseAllRepositoriesTask extends FleetTask {
+public class ImageUpdateEvent {
 
-    private final SynchronisationDelegate synchronisationDelegate;
+    private final Image image;
+    private final int currentPosition;
+    private final int totalImages;
 
-    public SynchroniseAllRepositoriesTask(SynchronisationDelegate synchronisationDelegate) {
-        this.synchronisationDelegate = synchronisationDelegate;
+    public ImageUpdateEvent(Image image, int currentPosition, int totalImages) {
+
+        this.image = image;
+        this.currentPosition = currentPosition;
+        this.totalImages = totalImages;
     }
 
-    @Override
-    protected void executeTask() {
-        synchronisationDelegate.synchronise();
+    public Image getImage() {
+        return image;
+    }
+
+    public int getCurrentPosition() {
+        return currentPosition;
+    }
+
+    public int getTotalImages() {
+        return totalImages;
     }
 }

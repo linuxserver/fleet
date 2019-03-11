@@ -74,9 +74,9 @@ public class FleetBeans {
         repositoryDelegate      = new RepositoryDelegate(new DefaultRepositoryDAO(databaseConnection));
         dockerHubDelegate       = new DockerHubDelegate(new DockerHubV2Client(properties.getDockerHubCredentials()));
         authenticationDelegate  = new PropertiesAuthenticationDelegate(properties.getAppUsername(), properties.getAppPassword());
-        synchronisationDelegate = new SynchronisationDelegate(imageDelegate, repositoryDelegate, dockerHubDelegate);
         webServer               = new WebServer(properties.getAppPort());
         taskManager             = new TaskManager();
+        synchronisationDelegate = new SynchronisationDelegate(imageDelegate, repositoryDelegate, dockerHubDelegate);
     }
 
     public FleetProperties getProperties() {

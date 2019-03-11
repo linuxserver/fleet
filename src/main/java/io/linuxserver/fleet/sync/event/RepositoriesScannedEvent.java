@@ -15,20 +15,20 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package io.linuxserver.fleet.thread;
+package io.linuxserver.fleet.sync.event;
 
-import io.linuxserver.fleet.delegate.SynchronisationDelegate;
+import java.util.Collections;
+import java.util.List;
 
-public class SynchroniseAllRepositoriesTask extends FleetTask {
+public class RepositoriesScannedEvent {
 
-    private final SynchronisationDelegate synchronisationDelegate;
+    private final List<String> repositories;
 
-    public SynchroniseAllRepositoriesTask(SynchronisationDelegate synchronisationDelegate) {
-        this.synchronisationDelegate = synchronisationDelegate;
+    public RepositoriesScannedEvent(List<String> repositories) {
+        this.repositories = Collections.unmodifiableList(repositories);
     }
 
-    @Override
-    protected void executeTask() {
-        synchronisationDelegate.synchronise();
+    public List<String> getRepositories() {
+        return repositories;
     }
 }

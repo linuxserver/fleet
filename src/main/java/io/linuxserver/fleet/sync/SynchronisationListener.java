@@ -15,20 +15,18 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package io.linuxserver.fleet.thread;
+package io.linuxserver.fleet.sync;
 
-import io.linuxserver.fleet.delegate.SynchronisationDelegate;
+import io.linuxserver.fleet.sync.event.ImageUpdateEvent;
+import io.linuxserver.fleet.sync.event.RepositoriesScannedEvent;
 
-public class SynchroniseAllRepositoriesTask extends FleetTask {
+public interface SynchronisationListener {
 
-    private final SynchronisationDelegate synchronisationDelegate;
+    void onSynchronisationStart();
 
-    public SynchroniseAllRepositoriesTask(SynchronisationDelegate synchronisationDelegate) {
-        this.synchronisationDelegate = synchronisationDelegate;
-    }
+    void onRepositoriesScanned(RepositoriesScannedEvent event);
 
-    @Override
-    protected void executeTask() {
-        synchronisationDelegate.synchronise();
-    }
+    void onImageUpdated(ImageUpdateEvent event);
+
+    void onSynchronisationFinish();
 }

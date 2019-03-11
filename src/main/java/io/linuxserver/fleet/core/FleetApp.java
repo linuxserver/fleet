@@ -44,8 +44,6 @@ class FleetApp {
         migrateDatabase();
         configureWeb();
         scheduleSync();
-
-        // beans.getSynchronisationDelegate().synchronise();
     }
 
     private void migrateDatabase() {

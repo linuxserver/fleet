@@ -15,8 +15,8 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package io.linuxserver.fleet.delegate;
+package io.linuxserver.fleet.sync;
 
-public interface SynchronisationListener {
-    void onEvent(Object eventMessage);
+public interface SynchronisationState {
+    void synchronise(SynchronisationContext context);
 }

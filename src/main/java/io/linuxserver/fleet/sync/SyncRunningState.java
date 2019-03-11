@@ -15,20 +15,20 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package io.linuxserver.fleet.thread;
+package io.linuxserver.fleet.sync;
 
-import io.linuxserver.fleet.delegate.SynchronisationDelegate;
+import io.linuxserver.fleet.delegate.DockerHubDelegate;
+import io.linuxserver.fleet.delegate.ImageDelegate;
+import io.linuxserver.fleet.delegate.RepositoryDelegate;
 
-public class SynchroniseAllRepositoriesTask extends FleetTask {
+public class SyncRunningState extends AbstractSyncState implements SynchronisationState {
 
-    private final SynchronisationDelegate synchronisationDelegate;
-
-    public SynchroniseAllRepositoriesTask(SynchronisationDelegate synchronisationDelegate) {
-        this.synchronisationDelegate = synchronisationDelegate;
+    public SyncRunningState(ImageDelegate imageDelegate, RepositoryDelegate repositoryDelegate, DockerHubDelegate dockerHubDelegate) {
+        super(imageDelegate, repositoryDelegate, dockerHubDelegate);
     }
 
     @Override
-    protected void executeTask() {
-        synchronisationDelegate.synchronise();
+    public void synchronise(SynchronisationContext context) {
+
     }
 }

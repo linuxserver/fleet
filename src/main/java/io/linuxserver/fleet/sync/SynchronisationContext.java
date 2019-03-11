@@ -15,20 +15,17 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package io.linuxserver.fleet.thread;
+package io.linuxserver.fleet.sync;
 
-import io.linuxserver.fleet.delegate.SynchronisationDelegate;
+public interface SynchronisationContext {
 
-public class SynchroniseAllRepositoriesTask extends FleetTask {
+    void synchronise();
 
-    private final SynchronisationDelegate synchronisationDelegate;
+    void setState(SynchronisationState state);
 
-    public SynchroniseAllRepositoriesTask(SynchronisationDelegate synchronisationDelegate) {
-        this.synchronisationDelegate = synchronisationDelegate;
-    }
+    SynchronisationState getState();
 
-    @Override
-    protected void executeTask() {
-        synchronisationDelegate.synchronise();
-    }
+    void setListener(SynchronisationListener listener);
+
+    SynchronisationListener getListener();
 }
