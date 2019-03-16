@@ -46,6 +46,8 @@ class PropertiesLoader extends BaseRuntimeLoader {
 
         try {
 
+            createConfigFileIfNotProvided();
+
             Properties properties = new Properties();
             properties.load(new FileInputStream(FleetRuntime.CONFIG_BASE + "/fleet.properties"));
 
@@ -61,6 +63,23 @@ class PropertiesLoader extends BaseRuntimeLoader {
 
             LOGGER.error("Unable to load config! Check JVM args and config directory", e);
             throw new RuntimeException(e);
+        }
+    }
+
+    private void createConfigFileIfNotProvided() {
+
+        try {
+
+            File configFile = new File(FleetRuntime.CONFIG_BASE + "/fleet.properties");
+            if (!configFile.exists()) {
+
+                if (!configFile.createNewFile()) {
+                    throw new RuntimeException("Unable to create base config for fleet.");
+                }
+            }
+
+        } catch (IOException e) {
+            throw new RuntimeException("Unable to create base config for fleet.", e);
         }
     }
 
@@ -94,7 +113,7 @@ class PropertiesLoader extends BaseRuntimeLoader {
      * @return
      *      All application properties.
      */
-    protected FleetProperties getProperties() {
+    FleetProperties getProperties() {
         return properties;
     }
 

@@ -30,42 +30,62 @@ public class FleetProperties {
     }
 
     public String getDatabaseDriverClassName() {
-        return properties.getProperty("fleet.database.driver");
+        return getStringProperty("fleet.database.driver");
     }
 
     public String getDatabaseUrl() {
-        return properties.getProperty("fleet.database.url");
+        return getStringProperty("fleet.database.url");
     }
 
     public String getDatabaseUsername() {
-        return properties.getProperty("fleet.database.username");
+        return getStringProperty("fleet.database.username");
     }
 
     public String getDatabasePassword() {
-        return properties.getProperty("fleet.database.password");
+        return getStringProperty("fleet.database.password");
     }
 
     public String getAppUsername() {
-        return properties.getProperty("fleet.admin.username");
+        return getStringProperty("fleet.admin.username");
     }
 
     public String getAppPassword() {
-        return properties.getProperty("fleet.admin.password");
+        return getStringProperty("fleet.admin.password");
     }
 
     public int getAppPort() {
-        return Integer.parseInt(properties.getProperty("fleet.app.port"));
+        return Integer.parseInt(getStringProperty("fleet.app.port"));
     }
 
     public int getRefreshIntervalInMinutes() {
-        return Integer.parseInt(properties.getProperty("fleet.refresh.interval"));
+        return Integer.parseInt(getStringProperty("fleet.refresh.interval"));
     }
 
     public DockerHubCredentials getDockerHubCredentials() {
 
-        String username = properties.getProperty("fleet.dockerhub.username");
-        String password = properties.getProperty("fleet.dockerhub.password");
+        String username = getStringProperty("fleet.dockerhub.username");
+        String password = getStringProperty("fleet.dockerhub.password");
 
         return new DockerHubCredentials(username, password);
+    }
+
+    /**
+     * <p>
+     * Obtains the property value from three separate sources: first from the config file. If not present, it will look
+     * at the JVM runtime. If that is not present, it will finally check the system environment.
+     * </p>
+     */
+    private String getStringProperty(String propertyKey) {
+
+        String property = properties.getProperty(propertyKey);
+        if (null == property) {
+
+            property = System.getProperty(propertyKey);
+            if (null == property) {
+                property = System.getenv(propertyKey);
+            }
+        }
+
+        return property;
     }
 }

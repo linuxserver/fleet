@@ -53,6 +53,9 @@ public class WebServer {
         path("/admin", configureAuthorisationRoute("/getImage"));
 
         after("/api/v1/*", (request, response) -> {
+
+            response.header("Access-Control-Allow-Origin", "*");
+            response.header("Access-Control-Allow-Methods", "GET");
             response.header("Content-Type", "application/json");
         });
 
