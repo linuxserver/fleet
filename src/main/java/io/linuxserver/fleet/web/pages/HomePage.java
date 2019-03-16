@@ -21,7 +21,8 @@ import io.linuxserver.fleet.delegate.ImageDelegate;
 import io.linuxserver.fleet.delegate.RepositoryDelegate;
 import io.linuxserver.fleet.model.Repository;
 import io.linuxserver.fleet.model.RepositoryWithImages;
-import spark.*;
+import spark.ModelAndView;
+import spark.Request;
 
 import java.util.ArrayList;
 import java.util.HashMap;

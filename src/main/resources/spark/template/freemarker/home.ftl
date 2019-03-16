@@ -1,31 +1,31 @@
 <#import "./base.ftl" as base>
 
-<@base.base title="Image Status">
+<@base.base title="Image Status" context="home">
 
     <#if populatedRepositories?size &gt; 0>
         <#list populatedRepositories as populatedRepository>
 
-            <div class="container container--white mt-3">
+            <div class="container">
 
                 <div class="row">
-                    <div class="col-12 p-3">
+                    <div class="col-12">
                         <h2><a href="https://hub.docker.com/r/${populatedRepository.repository.name}">${populatedRepository.repository.name}</a></h2>
                     </div>
                 </div>
 
                 <#if populatedRepository.everyImageStable>
-                    <div class="row">
-                        <div class="col-12 p-3">
+                    <div class="row my-2">
+                        <div class="col-12">
                             <div class="alert alert-success">
-                                <i class="fas fa-check"></i>&nbsp; No issues reported
+                                <i class="fas fa-check"></i> No issues reported
                             </div>
                         </div>
                     </div>
                 <#else>
-                    <div class="row">
-                        <div class="col-12 p-3">
+                    <div class="row my-2">
+                        <div class="col-12">
                             <div class="alert alert-warning">
-                                <i class="fas fa-exclamation-triangle"></i>&nbsp; Some instability reported
+                                <i class="fas fa-exclamation-triangle"></i> Some instability reported
                             </div>
                         </div>
                     </div>

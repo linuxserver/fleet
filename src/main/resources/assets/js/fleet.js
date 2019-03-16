@@ -203,5 +203,71 @@ var imageListManager = (function($) {
 
 }(jQuery));
 
+var synchronisationManager = (function($) {
+
+    var onMessage = function(event) {
+
+        var data = JSON.parse(event.data);
+
+        if (data.messageType === 'SYNC_START') {
+
+            $('#force-sync').prop('disabled', true);
+            $('.progress--sync__currentImage').text('Synchronisation started.');
+        }
+
+        if (data.messageType === 'IMAGE_UPDATED') {
+
+            $('#force-sync').prop('disabled', true);
+
+            $('.progress--sync').show();
+            $('.progress--sync__bar').css('width', ((data.data.currentPosition / data.data.totalImages) * 100) + '%');
+            $('.progress--sync__currentImage').text('(' + data.data.currentPosition + '/' + data.data.totalImages +') ' + data.data.image.name);
+
+        } else if (data.messageType === 'SYNC_END') {
+
+            $('.progress--sync').hide();
+            $('.progress--sync__currentImage').empty();
+            $('#force-sync').prop('disabled', false);
+        }
+    };
+
+    var startSynchronisation = function() {
+
+        var request = {
+            url: '/admin/forceSync',
+            method: 'POST'
+        };
+
+        ajaxManager.call(request, function() { console.log('Trigger complete.') });
+    };
+
+    var init = function() {
+
+        var socket = new WebSocket(buildSocketUrl('/admin/ws/sync'));
+        socket.onmessage = onMessage;
+
+        $('#force-sync').on('click', startSynchronisation);
+    };
+
+    var buildSocketUrl = function(socketPath) {
+
+        var loc = window.location, base_uri;
+        if (loc.protocol === 'https:') {
+            base_uri = 'wss:';
+        } else {
+            base_uri = 'ws:';
+        }
+
+        base_uri += '//' + loc.host + socketPath;
+
+        return base_uri;
+    }
+
+    return {
+        init: init
+    }
+
+}(jQuery));
+
 imageListManager.init();
 repositoryManager.init();

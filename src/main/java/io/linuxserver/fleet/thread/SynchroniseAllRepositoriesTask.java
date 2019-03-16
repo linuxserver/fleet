@@ -19,6 +19,11 @@ package io.linuxserver.fleet.thread;
 
 import io.linuxserver.fleet.delegate.SynchronisationDelegate;
 
+/**
+ * <p>
+ * Asynchronous way to trigger a new synchronisation via the {@link SynchronisationDelegate}
+ * </p>
+ */
 public class SynchroniseAllRepositoriesTask extends FleetTask {
 
     private final SynchronisationDelegate synchronisationDelegate;

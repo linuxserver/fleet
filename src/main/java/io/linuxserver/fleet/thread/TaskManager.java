@@ -28,19 +28,15 @@ public class TaskManager {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(TaskManager.class);
 
-    private final ScheduledExecutorService executorService = Executors.newScheduledThreadPool(10);
+    private static final ScheduledExecutorService EXECUTOR_SERVICE = Executors.newSingleThreadScheduledExecutor();
 
     public void scheduleRecurringTask(FleetTask task, int interval, TimeUnit timeUnit) {
 
         LOGGER.info("Scheduling task " + task);
-        executorService.scheduleAtFixedRate(task, 0, interval, timeUnit);
+        EXECUTOR_SERVICE.scheduleAtFixedRate(task, 0, interval, timeUnit);
     }
 
     public void runTaskOnce(FleetTask task) {
-        start(task);
-    }
-
-    private void start(FleetTask task) {
         new Thread(task).start();
     }
 }

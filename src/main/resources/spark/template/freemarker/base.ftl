@@ -1,4 +1,4 @@
-<#macro base title>
+<#macro base title context>
 
     <!DOCTYPE html>
     <html>
@@ -74,6 +74,10 @@
             $(function() {
                 $("table.table--sortable").tablesorter();
             });
+
+            <#if context='admin'>
+            synchronisationManager.init();
+            </#if>
 
         </script>
 

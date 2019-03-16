@@ -30,18 +30,19 @@ import static spark.Spark.*;
 
 public class WebServer {
 
-    private final int appPort;
+    private boolean started;
 
     public WebServer(int appPort) {
-        this.appPort = appPort;
-    }
-
-    public void start() {
 
         port(appPort);
 
         staticFiles.location("/assets");
         staticFiles.expireTime(600);
+    }
+
+    public void start() {
+
+        started = true;
 
         path("/admin", configureAuthorisationRoute(""));
         path("/admin", configureAuthorisationRoute("/repositories"));
@@ -59,6 +60,15 @@ public class WebServer {
             response.header("Content-Type", "application/json");
             response.status(exception.getStatusCode());
         });
+    }
+
+    public void addWebSocket(String path, Object object) {
+
+        if (started) {
+            throw new IllegalStateException("Server has already started! Add a web socket before starting");
+        }
+
+        webSocket(path, object);
     }
 
     public void addPage(String path, TemplateViewRoute page) {

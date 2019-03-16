@@ -15,20 +15,29 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package io.linuxserver.fleet.sync;
+package io.linuxserver.fleet.web.websocket;
 
-import io.linuxserver.fleet.delegate.DockerHubDelegate;
-import io.linuxserver.fleet.delegate.ImageDelegate;
-import io.linuxserver.fleet.delegate.RepositoryDelegate;
+public class WebSocketMessage {
 
-public class SyncRunningState extends AbstractSyncState implements SynchronisationState {
-
-    public SyncRunningState(ImageDelegate imageDelegate, RepositoryDelegate repositoryDelegate, DockerHubDelegate dockerHubDelegate) {
-        super(imageDelegate, repositoryDelegate, dockerHubDelegate);
+    public enum MessageType {
+        FORCE_SYNC, CONNECTED, DISCONNECTED, SYNC_START, SYNC_END, SYNC_SKIP, REPOSITORIES_SCANNED, IMAGE_UPDATED
     }
 
-    @Override
-    public void synchronise(SynchronisationContext context) {
+    private final MessageType messageType;
+    private final Object data;
 
+    public WebSocketMessage(MessageType messageType, Object data) {
+
+        this.messageType = messageType;
+        this.data = data;
+    }
+
+
+    public MessageType getMessageType() {
+        return messageType;
+    }
+
+    public Object getData() {
+        return data;
     }
 }

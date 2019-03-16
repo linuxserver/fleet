@@ -17,7 +17,13 @@
 
 package io.linuxserver.fleet.delegate;
 
-import io.linuxserver.fleet.sync.*;
+import io.linuxserver.fleet.sync.DefaultLoggingSyncListener;
+import io.linuxserver.fleet.sync.DefaultSynchronisationState;
+import io.linuxserver.fleet.sync.SynchronisationContext;
+import io.linuxserver.fleet.sync.SynchronisationListener;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * <p>
@@ -28,37 +34,56 @@ import io.linuxserver.fleet.sync.*;
  */
 public class SynchronisationDelegate implements SynchronisationContext {
 
-    private SynchronisationState    state;
-    private SynchronisationListener listener;
+    private final ImageDelegate         imageDelegate;
+    private final RepositoryDelegate    repositoryDelegate;
+    private final DockerHubDelegate     dockerHubDelegate;
+
+    private List<SynchronisationListener> listeners;
 
     public SynchronisationDelegate(ImageDelegate imageDelegate, RepositoryDelegate repositoryDelegate, DockerHubDelegate dockerHubDelegate) {
 
-        this.state = new SyncIdleState(imageDelegate, repositoryDelegate, dockerHubDelegate);
-        setListener(new DefaultLoggingSyncListener());
+        this.imageDelegate = imageDelegate;
+        this.repositoryDelegate = repositoryDelegate;
+        this.dockerHubDelegate = dockerHubDelegate;
+
+        this.listeners = new ArrayList<>();
+        registerListener(new DefaultLoggingSyncListener());
     }
 
+    /**
+     * <p>
+     * Starts a new synchronisation. This uses the statically assigned synchronisation state
+     * to determine whether or not a synchronisation will actually take place. Consider triggering
+     * this via {@link io.linuxserver.fleet.thread.SynchroniseAllRepositoriesTask}.
+     * </p>
+     */
     @Override
     public void synchronise() {
-        state.synchronise(this);
+        DefaultSynchronisationState.instance().synchronise(this);
     }
 
     @Override
-    public void setState(SynchronisationState state) {
-        this.state = state;
+    public void registerListener(SynchronisationListener listener) {
+        listeners.add(listener);
     }
 
     @Override
-    public SynchronisationState getState() {
-        return state;
+    public List<SynchronisationListener> getListeners() {
+        return listeners;
     }
 
     @Override
-    public void setListener(SynchronisationListener listener) {
-        this.listener = listener;
+    public ImageDelegate getImageDelegate() {
+        return imageDelegate;
     }
 
     @Override
-    public SynchronisationListener getListener() {
-        return listener;
+    public RepositoryDelegate getRepositoryDelegate() {
+        return repositoryDelegate;
+    }
+
+    @Override
+    public DockerHubDelegate getDockerHubDelegate() {
+        return dockerHubDelegate;
     }
 }

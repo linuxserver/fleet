@@ -15,39 +15,38 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package io.linuxserver.fleet.sync;
+package io.linuxserver.fleet.web.websocket;
 
+import io.linuxserver.fleet.sync.SynchronisationListener;
 import io.linuxserver.fleet.sync.event.ImageUpdateEvent;
 import io.linuxserver.fleet.sync.event.RepositoriesScannedEvent;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.eclipse.jetty.websocket.api.annotations.WebSocket;
 
-public class DefaultLoggingSyncListener implements SynchronisationListener {
-
-    private final Logger LOGGER = LoggerFactory.getLogger(DefaultLoggingSyncListener.class);
+@WebSocket
+public class SynchronisationWebSocket extends AbstractWebSocket implements SynchronisationListener {
 
     @Override
     public void onSynchronisationStart() {
-        LOGGER.info("Sync started");
+        broadcast(new WebSocketMessage(WebSocketMessage.MessageType.SYNC_START, "Sync started."));
     }
 
     @Override
     public void onRepositoriesScanned(RepositoriesScannedEvent event) {
-        LOGGER.info("Found repositories: {}", event.getRepositories());
+        broadcast(new WebSocketMessage(WebSocketMessage.MessageType.REPOSITORIES_SCANNED, event));
     }
 
     @Override
     public void onImageUpdated(ImageUpdateEvent event) {
-        LOGGER.info("({}/{}) {}.", event.getCurrentPosition(), event.getTotalImages(), event.getImage().getName());
+        broadcast(new WebSocketMessage(WebSocketMessage.MessageType.IMAGE_UPDATED, event));
     }
 
     @Override
     public void onSynchronisationFinish() {
-        LOGGER.info("Sync finished.");
+        broadcast(new WebSocketMessage(WebSocketMessage.MessageType.SYNC_END, "Sync finished."));
     }
 
     @Override
     public void onSynchronisationSkipped() {
-        LOGGER.info("Sync process already running, so will skip.");
+        broadcast(new WebSocketMessage(WebSocketMessage.MessageType.SYNC_SKIP, "Sync skipped."));
     }
 }

@@ -20,13 +20,56 @@ package io.linuxserver.fleet.sync;
 import io.linuxserver.fleet.sync.event.ImageUpdateEvent;
 import io.linuxserver.fleet.sync.event.RepositoriesScannedEvent;
 
+/**
+ * <p>
+ * Allows for the receiving of messages from the synchronisation process at
+ * specific stages.
+ * </p>
+ */
 public interface SynchronisationListener {
 
+    /**
+     * <p>
+     * Triggered when the synchronisation process starts
+     * </p>
+     */
     void onSynchronisationStart();
 
+    /**
+     * <p>
+     * Triggered when the synchronisation process has successfully scanned for all known
+     * repositories against the Docker Hub user.
+     * </p>
+     *
+     * @param event
+     *      The list of all found repositories
+     */
     void onRepositoriesScanned(RepositoriesScannedEvent event);
 
+    /**
+     * <p>
+     * Triggered when the synchronisation process as successfully scanned and updated a single
+     * image from Docker Hub, and is about to save it back to the internal database. This will
+     * contain the updated version of the image.
+     * </p>
+     *
+     * @param event
+     *      The new view of the image. This also contains positional information pertaining to
+     *      how far in the overall list the image is.
+     */
     void onImageUpdated(ImageUpdateEvent event);
 
+    /**
+     * <p>
+     * Triggered when the synchronisation process has finished.
+     * </p>
+     */
     void onSynchronisationFinish();
+
+    /**
+     * <p>
+     * Triggered when a calling task forces a synchronisation but a process is already running.
+     * </p>
+     */
+    void onSynchronisationSkipped();
 }

@@ -1,6 +1,6 @@
 <#import "./base.ftl" as base>
 
-<@base.base title="Log In">
+<@base.base title="Log In" context="login">
 
     <div class="container container--white mt-3">
 

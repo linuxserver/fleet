@@ -58,6 +58,8 @@ public class FleetBeans {
 
     private final TaskManager taskManager;
 
+    private final TaskDelegate taskDelegate;
+
     /**
      * Ensures the database is kept up to date.
      */
@@ -77,6 +79,8 @@ public class FleetBeans {
         webServer               = new WebServer(properties.getAppPort());
         taskManager             = new TaskManager();
         synchronisationDelegate = new SynchronisationDelegate(imageDelegate, repositoryDelegate, dockerHubDelegate);
+
+        taskDelegate            = new TaskDelegate(this);
     }
 
     public FleetProperties getProperties() {
@@ -113,5 +117,9 @@ public class FleetBeans {
 
     public TaskManager getTaskManager() {
         return taskManager;
+    }
+
+    public TaskDelegate getTaskDelegate() {
+        return taskDelegate;
     }
 }

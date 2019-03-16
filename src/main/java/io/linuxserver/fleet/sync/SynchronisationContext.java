@@ -17,15 +17,23 @@
 
 package io.linuxserver.fleet.sync;
 
+import io.linuxserver.fleet.delegate.DockerHubDelegate;
+import io.linuxserver.fleet.delegate.ImageDelegate;
+import io.linuxserver.fleet.delegate.RepositoryDelegate;
+
+import java.util.List;
+
 public interface SynchronisationContext {
 
     void synchronise();
 
-    void setState(SynchronisationState state);
+    void registerListener(SynchronisationListener listener);
 
-    SynchronisationState getState();
+    List<SynchronisationListener> getListeners();
 
-    void setListener(SynchronisationListener listener);
+    ImageDelegate getImageDelegate();
 
-    SynchronisationListener getListener();
+    RepositoryDelegate getRepositoryDelegate();
+
+    DockerHubDelegate getDockerHubDelegate();
 }

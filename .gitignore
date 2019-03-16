@@ -23,6 +23,7 @@
 hs_err_pid*
 
 .idea/
+bin/
 build/
 out/
 *.iml

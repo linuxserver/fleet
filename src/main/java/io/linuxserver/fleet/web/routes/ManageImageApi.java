@@ -18,7 +18,6 @@
 package io.linuxserver.fleet.web.routes;
 
 import io.linuxserver.fleet.delegate.ImageDelegate;
-import io.linuxserver.fleet.exception.SaveException;
 import io.linuxserver.fleet.model.Image;
 import io.linuxserver.fleet.model.api.ApiResponse;
 import io.linuxserver.fleet.model.api.FleetApiException;

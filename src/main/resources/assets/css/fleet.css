@@ -1,12 +1,9 @@
 body {
     color: #666;
-    font-family: 'Nunito', sans-serif !important;
-    font-size: 14px;
-    /*background-color: #f2f3f8;*/
 }
 
 a {
-    color: #666;
+    color: #333;
 }
 
 h1, h2, h3, h4, h5 {
@@ -15,28 +12,10 @@ h1, h2, h3, h4, h5 {
     font-weight: 600;
 }
 
-h1 {
-    font-size: 26px;
-}
-
-h2 {
-    font-size: 26px;
-}
-
-h3 {
-    font-size: 16px;
-}
-
 .navbar-brand {
+
     font-family: 'Pacifico', cursive;
     font-size: 30px;
-}
-
-.navbar-brand .small {
-
-    font-family: 'Nunito', sans-serif;
-    font-size: 14px;
-    color: #666;
 }
 
 .navbar-darkish {
@@ -64,6 +43,10 @@ h3 {
 
 .table tbody tr td {
     border-color: #eaeaea;
+}
+
+.table tbody tr td a {
+    font-family: 'Nunito', sans-serif !important;
 }
 
 .table tbody tr.hidden-image, .table tbody tr.hidden-image a, .table tbody tr.hidden-image code {
@@ -132,6 +115,10 @@ code {
 
 .tablesorter-header:focus {
     outline: none;
+}
+
+i.fas, i.far {
+    margin-right: 5px;
 }
 
 /*

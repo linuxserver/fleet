@@ -17,11 +17,11 @@
 
 package io.linuxserver.fleet.core;
 
-import io.linuxserver.fleet.thread.SynchroniseAllRepositoriesTask;
 import io.linuxserver.fleet.web.pages.HomePage;
 import io.linuxserver.fleet.web.pages.LoginPage;
 import io.linuxserver.fleet.web.pages.ManageRepositoriesPage;
 import io.linuxserver.fleet.web.routes.*;
+import io.linuxserver.fleet.web.websocket.SynchronisationWebSocket;
 
 import java.util.concurrent.TimeUnit;
 
@@ -52,21 +52,24 @@ class FleetApp {
 
     private void configureWeb() {
 
+        SynchronisationWebSocket synchronisationWebSocket = new SynchronisationWebSocket();
+        beans.getSynchronisationDelegate().registerListener(synchronisationWebSocket);
+
+        beans.getWebServer().addWebSocket("/admin/ws/sync", synchronisationWebSocket);
         beans.getWebServer().start();
-        beans.getWebServer().addPage("/", new HomePage(beans.getRepositoryDelegate(), beans.getImageDelegate()));
-        beans.getWebServer().addPage("/admin", new ManageRepositoriesPage(beans.getRepositoryDelegate()));
-        beans.getWebServer().addPage("/admin/login", new LoginPage());
-        beans.getWebServer().addPostRoute("/admin/login", new LoginRoute(beans.getAuthenticationDelegate()));
-        beans.getWebServer().addPostRoute("/admin/logout", new LogoutRoute());
-        beans.getWebServer().addGetApi("/api/v1/images", new AllImagesApi(beans.getRepositoryDelegate(), beans.getImageDelegate()));
-        beans.getWebServer().addPostApi("/admin/manageImage", new ManageImageApi(beans.getImageDelegate()));
-        beans.getWebServer().addPostApi("/admin/manageRepository", new ManageRepositoryApi(beans.getRepositoryDelegate()));
+
+        beans.getWebServer().addPage(       "/",                        new HomePage(beans.getRepositoryDelegate(), beans.getImageDelegate()));
+        beans.getWebServer().addGetApi(     "/api/v1/images",           new AllImagesApi(beans.getRepositoryDelegate(), beans.getImageDelegate()));
+        beans.getWebServer().addPage(       "/admin",                   new ManageRepositoriesPage(beans.getRepositoryDelegate()));
+        beans.getWebServer().addPage(       "/admin/login",             new LoginPage());
+        beans.getWebServer().addPostRoute(  "/admin/login",             new LoginRoute(beans.getAuthenticationDelegate()));
+        beans.getWebServer().addPostRoute(  "/admin/logout",            new LogoutRoute());
+        beans.getWebServer().addPostApi(    "/admin/manageImage",       new ManageImageApi(beans.getImageDelegate()));
+        beans.getWebServer().addPostApi(    "/admin/manageRepository",  new ManageRepositoryApi(beans.getRepositoryDelegate()));
+        beans.getWebServer().addPostApi(    "/admin/forceSync",         new ForceSyncApi(beans.getTaskDelegate()));
     }
 
     private void scheduleSync() {
-
-        beans.getTaskManager().scheduleRecurringTask(
-            new SynchroniseAllRepositoriesTask(beans.getSynchronisationDelegate()), beans.getProperties().getRefreshIntervalInMinutes(), TimeUnit.MINUTES
-        );
+        beans.getTaskDelegate().scheduleSynchronisationTask(beans.getProperties().getRefreshIntervalInMinutes(), TimeUnit.MINUTES);
     }
 }
