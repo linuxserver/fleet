@@ -12,8 +12,6 @@ For administrators of the application, Fleet provides a way to manage which repo
 
 All repositories for the user are automatically retrieved upon start up, and by default not synchronised. The administration page allows you to toggle which repositories are synchronised (and thus displayed on the main page).
 
-![](doc/repo_list.png)
-
 #### Version Mask
 
 Depending on how an image gets built, its versioned tag may contain extraneous information, or wrap the inner application's version with build information. If you wish to represent the image's "version" as the wrapped application's version instead, you can apply a version mask using standard REGEX, which will pull out the specific part of the tag you wish to used for the version. Multiple capture groups are supported, and will be concatenated in match order.
@@ -21,10 +19,6 @@ Depending on how an image gets built, its versioned tag may contain extraneous i
 ### Images
 
 Each image in a repository is by default shown on the main page, along with their current version and build status (which is a manually set flag). When logged in, users are able to manually configure the visiblity and status of each image:
-
-![](doc/admin_image_list.png)
-
-![](doc/actions.png)
 
 #### Version Mask
 
