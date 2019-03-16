@@ -9,9 +9,7 @@
             <link rel="shortcut icon" type="image/png" href="/images/favicon-32x32.png"/>
 
             <link href="https://fonts.googleapis.com/css?family=Pacifico|Nunito" rel="stylesheet" />
-            <link rel="stylesheet" type="text/css" href="/css/fontawesome-all.css" />
-            <link rel="stylesheet" type="text/css" href="/css/bootstrap.min.css" />
-            <link rel="stylesheet" type="text/css" href="/css/fleet.css" />
+            <link rel="stylesheet" type="text/css" href="/css/all.min.css" />
 
         </head>
 
@@ -53,11 +51,7 @@
 
         </body>
 
-        <script type="text/javascript" src="/js/jquery-3.3.1.min.js"></script>
-        <script type="text/javascript" src="/js/jquery.tablesorter.js"></script>
-        <script type="text/javascript" src="/js/bootstrap.bundle.min.js"></script>
-        <script type="text/javascript" src="/js/fleet.js"></script>
-
+        <script type="text/javascript" src="/js/all.min.js"></script>
         <script type="text/javascript">
 
             jQuery.tablesorter.addParser({

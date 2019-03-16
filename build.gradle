@@ -1,6 +1,7 @@
 plugins {
     id 'java'
     id 'com.eriwen.gradle.js' version '2.14.1'
+    id 'com.eriwen.gradle.css' version '2.14.0'
 }
 
 sourceCompatibility = 1.8
@@ -54,20 +55,18 @@ jar {
     }
 }
 
-javascript.source {
-
-    prod {
-        js {
-            srcDir 'src/main/resources/assets/js'
-            include '*.js'
-        }
-    }
-}
-
 combineJs {
 
     encoding = "UTF-8"
-    source = javascript.source.prod.js.files
+
+    source = [
+        'src/main/resources/assets/js/jquery-3.3.1.min.js',
+        'src/main/resources/assets/js/bootstrap.bundle.min.js',
+        'src/main/resources/assets/js/fontawesome-all.min.js',
+        'src/main/resources/assets/js/jquery.tablesorter.js',
+        'src/main/resources/assets/js/fleet.js'
+    ]
+
     dest = file('src/main/resources/assets/js/all.js')
 }
 
@@ -75,4 +74,26 @@ minifyJs {
 
     source = combineJs
     dest = file('src/main/resources/assets/js/all.min.js')
+    closure {
+        warningLevel = 'QUIET'
+    }
 }
+
+combineCss {
+
+    source = [
+        'src/main/resources/assets/css/bootstrap.min.css',
+        'src/main/resources/assets/css/fleet.css',
+        'src/main/resources/assets/css/fontawesome-all.css'
+    ]
+
+    dest = file('src/main/resources/assets/css/all.css')
+}
+
+minifyCss {
+
+    source = combineCss
+    dest = file('src/main/resources/assets/css/all.min.css')
+}
+
+build.dependsOn minifyCss, minifyJs
