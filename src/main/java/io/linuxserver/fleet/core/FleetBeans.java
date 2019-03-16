@@ -33,32 +33,15 @@ import io.linuxserver.fleet.web.WebServer;
  */
 public class FleetBeans {
 
-    /**
-     * Contains all runtime properties that get loaded into the application on start-up
-     */
-    private final FleetProperties   properties;
-
-    /**
-     * Facade layer which handles delegation for image management.
-     */
-    private final ImageDelegate     imageDelegate;
-
-    private final RepositoryDelegate repositoryDelegate;
-
-    private final AuthenticationDelegate authenticationDelegate;
-
-    /**
-     * Facade layer for interaction with the Docker Hub APIs.
-     */
-    private final DockerHubDelegate dockerHubDelegate;
-
-    private final SynchronisationDelegate synchronisationDelegate;
-
-    private final WebServer webServer;
-
-    private final TaskManager taskManager;
-
-    private final TaskDelegate taskDelegate;
+    private final FleetProperties           properties;
+    private final ImageDelegate             imageDelegate;
+    private final RepositoryDelegate        repositoryDelegate;
+    private final AuthenticationDelegate    authenticationDelegate;
+    private final DockerHubDelegate         dockerHubDelegate;
+    private final SynchronisationDelegate   synchronisationDelegate;
+    private final WebServer                 webServer;
+    private final TaskManager               taskManager;
+    private final TaskDelegate              taskDelegate;
 
     /**
      * Ensures the database is kept up to date.

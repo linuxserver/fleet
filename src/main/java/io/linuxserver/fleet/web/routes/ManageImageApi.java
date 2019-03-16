@@ -59,6 +59,10 @@ public class ManageImageApi implements Route {
                 case UNSTABLE:
                     image.withUnstable(Action.UNSTABLE.equals(action));
                     break;
+                case MASK:
+                    String versionMask = cleanParam(request.queryParams("versionMask"));
+                    image.withVersionMask(versionMask);
+                    break;
             }
 
             imageDelegate.saveImage(image);
@@ -69,6 +73,14 @@ public class ManageImageApi implements Route {
         } catch (Exception e) {
             throw new FleetApiException(500, e.getMessage(), e);
         }
+    }
+
+    private String cleanParam(String param) {
+
+        if ("".equalsIgnoreCase(param))
+            return null;
+
+        return param;
     }
 
     public enum Action {

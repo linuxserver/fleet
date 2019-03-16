@@ -31,6 +31,7 @@ import java.util.List;
 
 import static io.linuxserver.fleet.db.dao.Utils.setNullableInt;
 import static io.linuxserver.fleet.db.dao.Utils.setNullableLong;
+import static io.linuxserver.fleet.db.dao.Utils.setNullableString;
 
 public class DefaultImageDAO implements ImageDAO {
 
@@ -113,24 +114,25 @@ public class DefaultImageDAO implements ImageDAO {
 
         try (Connection connection = databaseConnection.getConnection()) {
 
-            CallableStatement call = connection.prepareCall("{CALL Image_Save(?,?,?,?,?,?,?,?,?,?)");
+            CallableStatement call = connection.prepareCall("{CALL Image_Save(?,?,?,?,?,?,?,?,?,?,?)");
             setNullableInt(call, 1, image.getId());
             call.setInt(2, image.getRepositoryId());
             call.setString(3, image.getName());
             setNullableLong(call, 4, image.getPullCount());
             call.setString(5, image.getVersion());
-            call.setBoolean(6, image.isHidden());
-            call.setBoolean(7, image.isUnstable());
+            setNullableString(call, 6, image.getVersionMask());
+            call.setBoolean(7, image.isHidden());
+            call.setBoolean(8, image.isUnstable());
 
-            call.registerOutParameter(8, Types.INTEGER);
             call.registerOutParameter(9, Types.INTEGER);
-            call.registerOutParameter(10, Types.VARCHAR);
+            call.registerOutParameter(10, Types.INTEGER);
+            call.registerOutParameter(11, Types.VARCHAR);
 
             call.executeUpdate();
 
-            int imageId             = call.getInt(8);
-            int status              = call.getInt(9);
-            String statusMessage    = call.getString(10);
+            int imageId             = call.getInt(9);
+            int status              = call.getInt(10);
+            String statusMessage    = call.getString(11);
 
             if (InsertUpdateStatus.OK == status)
                 return new InsertUpdateResult<>(fetchImage(imageId), status, statusMessage);

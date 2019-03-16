@@ -17,6 +17,7 @@
 
 package io.linuxserver.fleet.sync;
 
+import io.linuxserver.fleet.dockerhub.DockerHubException;
 import io.linuxserver.fleet.exception.SaveException;
 import io.linuxserver.fleet.model.DockerHubImage;
 import io.linuxserver.fleet.model.Image;
@@ -82,11 +83,19 @@ public class DefaultSynchronisationState implements SynchronisationState {
 
             onStart(context);
 
-            List<String> repositories = context.getDockerHubDelegate().fetchAllRepositories();
-            onRepositoryScanned(context, repositories);
+            try {
 
-            for (String repositoryName : repositories)
-                synchroniseRepository(repositoryName, context);
+                List<String> repositories = context.getDockerHubDelegate().fetchAllRepositories();
+                onRepositoryScanned(context, repositories);
+
+                for (String repositoryName : repositories)
+                    synchroniseRepository(repositoryName, context);
+
+            } catch (DockerHubException e) {
+
+                LOGGER.error("Synchronisation process failed on the first step. Will skip for now.", e);
+                onSkip(context);
+            }
 
             onFinish(context);
 

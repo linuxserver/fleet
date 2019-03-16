@@ -14,18 +14,18 @@
                 </div>
 
                 <#if populatedRepository.everyImageStable>
-                    <div class="row my-2">
+                    <div class="row my-3">
                         <div class="col-12">
-                            <div class="alert alert-success">
-                                <i class="fas fa-check"></i> No issues reported
+                            <div class="fleet-alert fleet-alert--success">
+                                <i class="fas fa-check text-success"></i> No issues reported
                             </div>
                         </div>
                     </div>
                 <#else>
-                    <div class="row my-2">
+                    <div class="row my-3">
                         <div class="col-12">
-                            <div class="alert alert-warning">
-                                <i class="fas fa-exclamation-triangle"></i> Some instability reported
+                            <div class="fleet-alert fleet-alert--warning">
+                                <i class="fas fa-exclamation-triangle text-warning"></i> Some instability reported
                             </div>
                         </div>
                     </div>
@@ -51,7 +51,7 @@
 
                                     <#list populatedRepository.images as image>
                                         <#if !image.hidden || __AUTHENTICATED_USER?has_content>
-                                            <tr <#if image.hidden>class="hidden-image"</#if> data-image-id="#{image.id}">
+                                            <tr <#if image.hidden>class="hidden-image"</#if> data-image-id="#{image.id}" data-image-name="${image.name}">
                                                 <td class="image-name">
                                                     <a target="_blank" href="https://hub.docker.com/r/${populatedRepository.repository.name}/${image.name}">${image.name}</a>
                                                 </td>
@@ -90,7 +90,7 @@
                                                                 <#else>
                                                                     <button type="button" class="image--mark-unstable dropdown-item btn-clickable">Mark as unstable</button>
                                                                 </#if>
-                                                                <button type="button" class="dropdown-item btn-clickable">Apply version mask</button>
+                                                                <button type="button" class="dropdown-item btn-clickable" data-toggle="modal" data-target="#update-image-version-mask">Apply version mask</button>
                                                             </div>
                                                         </div>
                                                     </td>
@@ -107,6 +107,27 @@
             </div>
 
         </#list>
+
+        <#if __AUTHENTICATED_USER?has_content>
+
+            <div class="modal" id="update-image-version-mask" tabindex="-1" role="dialog">
+                <div class="modal-dialog modal-dialog-centered" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header" id="selected-mask-image-name"></div>
+                        <div class="modal-body">
+                            <div class="input-group">
+                                <input type="text" class="form-control version-mask" id="image-version-mask" />
+                                <div class="input-group-append">
+                                    <button class="btn btn-secondary" type="button" id="submit-version-mask-change">Update</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </#if>
+
     <#else>
 
         <div class="container">

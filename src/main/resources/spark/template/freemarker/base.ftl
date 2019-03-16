@@ -76,7 +76,12 @@
             });
 
             <#if context='admin'>
+            repositoryManager.init();
             synchronisationManager.init();
+            </#if>
+
+            <#if context='home'>
+            imageListManager.init();
             </#if>
 
         </script>

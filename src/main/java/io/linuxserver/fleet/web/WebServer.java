@@ -49,8 +49,14 @@ public class WebServer {
         path("/admin", configureAuthorisationRoute("/images"));
         path("/admin", configureAuthorisationRoute("/manageImage"));
         path("/admin", configureAuthorisationRoute("/manageRepository"));
+        path("/admin", configureAuthorisationRoute("/forceSync"));
+        path("/admin", configureAuthorisationRoute("/getImage"));
 
         after("/api/v1/*", (request, response) -> {
+            response.header("Content-Type", "application/json");
+        });
+
+        after("/admin/getImage", (request, response) -> {
             response.header("Content-Type", "application/json");
         });
 

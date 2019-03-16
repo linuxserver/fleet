@@ -12,6 +12,10 @@ h1, h2, h3, h4, h5 {
     font-weight: 600;
 }
 
+h2 {
+    margin-bottom: 20px;
+}
+
 .navbar-brand {
 
     font-family: 'Pacifico', cursive;
@@ -72,18 +76,31 @@ code {
     margin-top: 50px;
 }
 
-/*
-.container--white {
+.fleet-alert {
 
     background-color: #FFF;
 
-    -webkit-box-shadow: 0px 0px 14px 0px rgba(82,63,105,0.05);
-    -moz-box-shadow: 0px 0px 14px 0px rgba(82,63,105,0.05);
-    box-shadow: 0px 0px 14px 0px rgba(82,63,105,0.05);
+    -webkit-box-shadow: 0px 0px 5px 0px rgba(82,63,105,0.05);
+    -moz-box-shadow: 0px 0px 5px 0px rgba(82,63,105,0.05);
+    box-shadow: 0px 0px 5px 0px rgba(82,63,105,0.05);
 
-    border-radius: 5px;
+    padding: 10px;
+    border: 1px solid #d4dadf;
+
+    font-size: 0.9rem;
 }
-*/
+
+.fleet-alert.fleet-alert--success {
+    border-left: 3px solid #28a745;
+}
+
+.fleet-alert.fleet-alert--warning {
+    border-left: 3px solid #ffc107;
+}
+
+.fleet-alert.fleet-alert--info {
+    border-left: 3px solid #17a2b8;
+}
 
 .number, .version-mask {
     font-family: monospace;

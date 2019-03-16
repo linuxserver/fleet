@@ -65,6 +65,7 @@ class FleetApp {
         beans.getWebServer().addPostRoute(  "/admin/login",             new LoginRoute(beans.getAuthenticationDelegate()));
         beans.getWebServer().addPostRoute(  "/admin/logout",            new LogoutRoute());
         beans.getWebServer().addPostApi(    "/admin/manageImage",       new ManageImageApi(beans.getImageDelegate()));
+        beans.getWebServer().addGetApi(     "/admin/getImage",          new GetImageApi(beans.getImageDelegate()));
         beans.getWebServer().addPostApi(    "/admin/manageRepository",  new ManageRepositoryApi(beans.getRepositoryDelegate()));
         beans.getWebServer().addPostApi(    "/admin/forceSync",         new ForceSyncApi(beans.getTaskDelegate()));
     }

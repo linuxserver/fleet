@@ -66,7 +66,7 @@ class DockerHubAuthenticator {
 
         LOGGER.info("Unable to refresh token.");
 
-        throw new RuntimeException("Unable to authenticate with Docker Hub. Check credentials");
+        throw new DockerHubException("Unable to authenticate with Docker Hub. Check credentials");
     }
 
     synchronized String getCurrentToken() {

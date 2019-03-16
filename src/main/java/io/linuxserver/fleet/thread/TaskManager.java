@@ -17,6 +17,7 @@
 
 package io.linuxserver.fleet.thread;
 
+import io.linuxserver.fleet.core.FleetRuntime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -32,8 +33,13 @@ public class TaskManager {
 
     public void scheduleRecurringTask(FleetTask task, int interval, TimeUnit timeUnit) {
 
+        int initalDelay = 0;
+        if (FleetRuntime.SKIP_SYNC_ON_STARTUP) {
+            initalDelay = interval;
+        }
+
         LOGGER.info("Scheduling task " + task);
-        EXECUTOR_SERVICE.scheduleAtFixedRate(task, 0, interval, timeUnit);
+        EXECUTOR_SERVICE.scheduleAtFixedRate(task, initalDelay, interval, timeUnit);
     }
 
     public void runTaskOnce(FleetTask task) {

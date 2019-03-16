@@ -20,7 +20,7 @@ var ajaxManager = (function($) {
     var handleError = function(jqXHR, textStatus, handleError) {
 
         var error = JSON.parse(jqXHR.responseText);
-        console.log(error);
+        console.error(error);
     };
 
     var call = function(param, onDone) {
@@ -145,6 +145,32 @@ var imageListManager = (function($) {
         });
     };
 
+    var showImageVersionMask = function(event) {
+
+        var modal   = $(this);
+        var option  = $(event.relatedTarget);
+        var row     = getImageRow(option);
+        var imageId = getImageId(row);
+
+        modal.find('#selected-mask-image-name').text('Version mask for ' + getImageName(row));
+        modal.find('#submit-version-mask-change').data('image-id', imageId);
+
+        getImageMask(imageId, function(image) {
+            modal.find('#image-version-mask').val(image.data.versionMask);
+        });
+    };
+
+    var submitVersionMaskChange = function() {
+
+        var button = $(this);
+        var request = buildRequest('MASK', button.data('image-id'));
+        request.data.versionMask = $('#image-version-mask').val();
+
+        ajaxManager.call(request, function() {
+            $('#update-image-version-mask').modal("hide");
+        });
+    };
+
     var buildRequest = function(action, imageId) {
 
         return  {
@@ -189,12 +215,29 @@ var imageListManager = (function($) {
         return parseInt(row.data('image-id'));
     };
 
+    var getImageName = function(row) {
+        return row.data('image-name');
+    };
+
+    var getImageMask = function(imageId, callback) {
+
+        var request = {
+            url: '/admin/getImage?imageId=' + imageId,
+            method: 'GET'
+        };
+
+        ajaxManager.call(request, callback);
+    };
+
     var init = function() {
 
         $('.admin-actions').on('click', '.image--show', showImage);
         $('.admin-actions').on('click', '.image--hide', hideImage);
         $('.admin-actions').on('click', '.image--mark-stable', markImageStable);
         $('.admin-actions').on('click', '.image--mark-unstable', markImageUnstable);
+
+        $('#update-image-version-mask').on('show.bs.modal', showImageVersionMask);
+        $('#submit-version-mask-change').on('click', submitVersionMaskChange);
     };
 
     return {
@@ -268,6 +311,3 @@ var synchronisationManager = (function($) {
     }
 
 }(jQuery));
-
-imageListManager.init();
-repositoryManager.init();

@@ -178,6 +178,7 @@ CREATE PROCEDURE `Image_Save`
     in_name         VARCHAR(255),
     in_pull_count   BIGINT,
     in_version      VARCHAR(100),
+    in_version_mask VARCHAR(255),
     in_hidden       TINYINT,
     in_unstable     TINYINT,
 
@@ -195,6 +196,7 @@ BEGIN
             `name`,
             `pulls`,
             `latest_version`,
+            `version_mask`,
             `hidden`,
             `unstable`
         )
@@ -204,6 +206,7 @@ BEGIN
             in_name,
             in_pull_count,
             in_version,
+            in_version_mask,
             in_hidden,
             in_unstable
         );
@@ -217,6 +220,7 @@ BEGIN
             `name`              = in_name,
             `pulls`             = in_pull_count,
             `latest_version`    = in_version,
+            `version_mask`      = in_version_mask,
             `hidden`            = in_hidden,
             `unstable`          = in_unstable
         WHERE

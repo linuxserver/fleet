@@ -17,6 +17,7 @@
 
 package io.linuxserver.fleet.db.migration;
 
+import io.linuxserver.fleet.core.FleetRuntime;
 import io.linuxserver.fleet.db.PoolingDatabaseConnection;
 import org.flywaydb.core.Flyway;
 import org.flywaydb.core.api.FlywayException;
@@ -46,6 +47,10 @@ public class DatabaseVersion {
     public void migrate() {
 
         try {
+
+            if (FleetRuntime.NUKE_DATABASE) {
+                flyway.clean();
+            }
 
             flyway.migrate();
 

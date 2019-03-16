@@ -14,8 +14,8 @@
                     the repository-level version mask for all images.
                 </p>
 
-                <div class="alert alert-info">
-                    <i class="fas fa-info-circle"></i> Any non-synchronised repositories will <i>not</i> be displayed on the main status page, nor will they appear in the API.
+                <div class="fleet-alert fleet-alert--info">
+                    <i class="fas fa-info-circle text-info"></i> Any non-synchronised repositories will <i>not</i> be displayed on the main status page, nor will they appear in the API.
                 </div>
             </div>
         </div>
