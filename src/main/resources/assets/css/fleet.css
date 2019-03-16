@@ -37,6 +37,18 @@ h2 {
     background-color: #FFFFFF;
 }
 
+.nav--repositories .nav-item .nav-link {
+
+    font-family: 'Nunito', cursive;
+    font-weight: 600;
+    color: #eaeaea;
+    font-size: 1.6rem;
+}
+
+.nav--repositories .nav-item .nav-link.active {
+    color: #333;
+}
+
 .table thead tr th {
 
     border-top: 0;

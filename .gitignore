@@ -29,4 +29,5 @@ out/
 *.iml
 config/fleet.properties
 src/main/resources/assets/js/all*.js
+src/main/resources/assets/css/all*.css
 .gradle/
