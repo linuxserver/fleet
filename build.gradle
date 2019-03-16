@@ -96,4 +96,13 @@ minifyCss {
     dest = file('src/main/resources/assets/css/all.min.css')
 }
 
-build.dependsOn minifyCss, minifyJs
+task configureLogConfiguration(type: Copy) {
+
+    def logFile = project.hasProperty('env') ? "${env}" : 'local'
+
+    from "config/log4j2.${logFile}.xml"
+    into 'src/main/resources'
+    rename "log4j2.${logFile}.xml", 'log4j2.xml'
+}
+
+build.dependsOn minifyCss, minifyJs, configureLogConfiguration

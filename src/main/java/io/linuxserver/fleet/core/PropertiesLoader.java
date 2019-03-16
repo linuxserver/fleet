@@ -34,7 +34,7 @@ import java.util.Properties;
  *
  * @author Josh Stark
  */
-public class PropertiesLoader extends BaseRuntimeLoader {
+class PropertiesLoader extends BaseRuntimeLoader {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(PropertiesLoader.class);
 
@@ -53,8 +53,8 @@ public class PropertiesLoader extends BaseRuntimeLoader {
 
             printProperties();
 
-            if (!createStaticFileDirectory()) {
-                throw new RuntimeException("Unable to create the static files location for Fleet. Check permissions");
+            if (!createStaticFileDirectory() || !createLogsDirectory()) {
+                throw new RuntimeException("Unable to create config sub directories for Fleet. Check permissions");
             }
 
         } catch (IOException e) {
@@ -73,6 +73,17 @@ public class PropertiesLoader extends BaseRuntimeLoader {
         }
 
         return staticFilesDir.mkdir();
+    }
+
+    private boolean createLogsDirectory() {
+
+        File logsDirectory = new File(FleetRuntime.CONFIG_BASE + "/logs");
+
+        if (logsDirectory.exists()) {
+            return true;
+        }
+
+        return logsDirectory.mkdir();
     }
 
     /**
