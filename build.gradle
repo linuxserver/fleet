@@ -1,5 +1,6 @@
 plugins {
     id 'java'
+    id 'com.eriwen.gradle.js' version '2.14.1'
 }
 
 sourceCompatibility = 1.8
@@ -8,6 +9,8 @@ targetCompatibility = 1.8
 repositories {
     mavenCentral()
 }
+
+version = '1.0.0'
 
 dependencies {
 
@@ -38,4 +41,38 @@ dependencies {
     // Unit Testing
     testCompile 'junit:junit:4.11'
     testCompile 'org.mockito:mockito-all:1.10.19'
+}
+
+jar {
+
+    manifest {
+        attributes "Main-Class": "io.linuxserver.fleet.core.Main"
+    }
+
+    from {
+        configurations.compile.collect { it.isDirectory() ? it : zipTree(it) }
+    }
+}
+
+javascript.source {
+
+    prod {
+        js {
+            srcDir 'src/main/resources/assets/js'
+            include '*.js'
+        }
+    }
+}
+
+combineJs {
+
+    encoding = "UTF-8"
+    source = javascript.source.prod.js.files
+    dest = file('src/main/resources/assets/js/all.js')
+}
+
+minifyJs {
+
+    source = combineJs
+    dest = file('src/main/resources/assets/js/all.min.js')
 }
