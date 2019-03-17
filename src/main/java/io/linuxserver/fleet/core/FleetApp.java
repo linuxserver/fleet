@@ -62,9 +62,9 @@ class FleetApp {
 
         beans.getWebServer().addPage(       "/",                        new HomePage(beans.getRepositoryDelegate(), beans.getImageDelegate()));
         beans.getWebServer().addGetApi(     "/api/v1/images",           new AllImagesApi(beans.getRepositoryDelegate(), beans.getImageDelegate()));
+        beans.getWebServer().addPage(       "/setup",                   new SetupPage());
+        beans.getWebServer().addPostRoute(  "/setup",                   new RegisterInitialUserRoute(beans.getUserDelegate()));
         beans.getWebServer().addPage(       "/admin",                   new ManageRepositoriesPage(beans.getRepositoryDelegate()));
-        beans.getWebServer().addPage(       "/admin/setup",             new SetupPage());
-        beans.getWebServer().addPostRoute(  "/admin/setup",             new RegisterInitialUserRoute(beans.getUserDelegate()));
         beans.getWebServer().addPage(       "/admin/login",             new LoginPage());
         beans.getWebServer().addPostRoute(  "/admin/login",             new LoginRoute(beans.getAuthenticationDelegate()));
         beans.getWebServer().addPostRoute(  "/admin/logout",            new LogoutRoute());

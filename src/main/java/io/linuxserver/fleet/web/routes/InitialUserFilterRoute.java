@@ -35,7 +35,7 @@ public class InitialUserFilterRoute implements Filter {
     private static final String FLEET_USER_UNDEFINED = "fleet.user.undefined";
 
     private static final String[] PATH_EXEMPTIONS = {
-        "/assets", "/admin/setup"
+        "/assets", "/setup"
     };
 
     private final UserDelegate userDelegate;
@@ -52,12 +52,12 @@ public class InitialUserFilterRoute implements Filter {
 
         if (databaseAuthenticationEnabled) {
 
-            if (!initialUserNeedsConfiguring() && "/admin/setup".equals(request.pathInfo())) {
+            if (!initialUserNeedsConfiguring() && "/setup".equals(request.pathInfo())) {
                 halt(401);
             }
 
             else if (initialUserNeedsConfiguring() && !pathIsExempted(request.pathInfo())) {
-                response.redirect("/admin/setup");
+                response.redirect("/setup");
             }
         }
     }

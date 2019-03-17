@@ -44,7 +44,7 @@ public class RegisterInitialUserRoute implements Route {
 
         if (!verifyPassword.equals(password)) {
 
-            response.redirect("/admin/setup?passwordMismatch=true");
+            response.redirect("/setup?passwordMismatch=true");
             return null;
         }
 
@@ -55,7 +55,7 @@ public class RegisterInitialUserRoute implements Route {
 
         } catch (SaveException e) {
 
-            response.redirect("/admin/setup?createUserError=true");
+            response.redirect("/setup?createUserError=true");
             LOGGER.error("Unable to create new user", e);
         }
 
