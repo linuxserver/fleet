@@ -17,9 +17,13 @@
 
 package io.linuxserver.fleet.core;
 
+import io.linuxserver.fleet.auth.authenticator.AuthenticatorFactory;
+import io.linuxserver.fleet.auth.security.PKCS5S2PasswordEncoder;
+import io.linuxserver.fleet.auth.security.PasswordEncoder;
 import io.linuxserver.fleet.db.DefaultDatabaseConnection;
 import io.linuxserver.fleet.db.dao.DefaultImageDAO;
 import io.linuxserver.fleet.db.dao.DefaultRepositoryDAO;
+import io.linuxserver.fleet.db.dao.DefaultUserDAO;
 import io.linuxserver.fleet.db.migration.DatabaseVersion;
 import io.linuxserver.fleet.delegate.*;
 import io.linuxserver.fleet.dockerhub.DockerHubV2Client;
@@ -42,6 +46,8 @@ public class FleetBeans {
     private final WebServer                 webServer;
     private final TaskManager               taskManager;
     private final TaskDelegate              taskDelegate;
+    private final UserDelegate              userDelegate;
+    private final PasswordEncoder           passwordEncoder;
 
     /**
      * Ensures the database is kept up to date.
@@ -54,16 +60,17 @@ public class FleetBeans {
 
         final DefaultDatabaseConnection databaseConnection = new DefaultDatabaseConnection(properties);
 
+        passwordEncoder         = new PKCS5S2PasswordEncoder(properties.getAppSecret());
         databaseVersion         = new DatabaseVersion(databaseConnection);
         imageDelegate           = new ImageDelegate(new DefaultImageDAO(databaseConnection));
         repositoryDelegate      = new RepositoryDelegate(new DefaultRepositoryDAO(databaseConnection));
         dockerHubDelegate       = new DockerHubDelegate(new DockerHubV2Client(properties.getDockerHubCredentials()));
-        authenticationDelegate  = new PropertiesAuthenticationDelegate(properties.getAppUsername(), properties.getAppPassword());
         webServer               = new WebServer(properties.getAppPort());
         taskManager             = new TaskManager();
         synchronisationDelegate = new SynchronisationDelegate(imageDelegate, repositoryDelegate, dockerHubDelegate);
-
+        userDelegate            = new UserDelegate(passwordEncoder, new DefaultUserDAO(databaseConnection));
         taskDelegate            = new TaskDelegate(this);
+        authenticationDelegate  = new DefaultAuthenticationDelegate(AuthenticatorFactory.getAuthenticator(this));
     }
 
     public FleetProperties getProperties() {
@@ -104,5 +111,13 @@ public class FleetBeans {
 
     public TaskDelegate getTaskDelegate() {
         return taskDelegate;
+    }
+
+    public UserDelegate getUserDelegate() {
+        return userDelegate;
+    }
+
+    public PasswordEncoder getPasswordEncoder() {
+        return passwordEncoder;
     }
 }

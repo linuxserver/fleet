@@ -20,6 +20,7 @@ package io.linuxserver.fleet.core;
 import io.linuxserver.fleet.web.pages.HomePage;
 import io.linuxserver.fleet.web.pages.LoginPage;
 import io.linuxserver.fleet.web.pages.ManageRepositoriesPage;
+import io.linuxserver.fleet.web.pages.SetupPage;
 import io.linuxserver.fleet.web.routes.*;
 import io.linuxserver.fleet.web.websocket.SynchronisationWebSocket;
 
@@ -56,11 +57,14 @@ class FleetApp {
         beans.getSynchronisationDelegate().registerListener(synchronisationWebSocket);
 
         beans.getWebServer().addWebSocket("/admin/ws/sync", synchronisationWebSocket);
+        beans.getWebServer().addFilter(   "*",              new InitialUserFilterRoute(beans.getProperties().getAuthenticationType(), beans.getUserDelegate()));
         beans.getWebServer().start();
 
         beans.getWebServer().addPage(       "/",                        new HomePage(beans.getRepositoryDelegate(), beans.getImageDelegate()));
         beans.getWebServer().addGetApi(     "/api/v1/images",           new AllImagesApi(beans.getRepositoryDelegate(), beans.getImageDelegate()));
         beans.getWebServer().addPage(       "/admin",                   new ManageRepositoriesPage(beans.getRepositoryDelegate()));
+        beans.getWebServer().addPage(       "/admin/setup",             new SetupPage());
+        beans.getWebServer().addPostRoute(  "/admin/setup",             new RegisterInitialUserRoute(beans.getUserDelegate()));
         beans.getWebServer().addPage(       "/admin/login",             new LoginPage());
         beans.getWebServer().addPostRoute(  "/admin/login",             new LoginRoute(beans.getAuthenticationDelegate()));
         beans.getWebServer().addPostRoute(  "/admin/logout",            new LogoutRoute());

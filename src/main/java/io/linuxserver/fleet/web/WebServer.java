@@ -20,10 +20,7 @@ package io.linuxserver.fleet.web;
 import io.linuxserver.fleet.auth.AuthenticatedUser;
 import io.linuxserver.fleet.model.api.ApiResponse;
 import io.linuxserver.fleet.model.api.FleetApiException;
-import spark.Route;
-import spark.RouteGroup;
-import spark.Session;
-import spark.TemplateViewRoute;
+import spark.*;
 import spark.template.freemarker.FreeMarkerEngine;
 
 import static spark.Spark.*;
@@ -45,7 +42,6 @@ public class WebServer {
         started = true;
 
         path("/admin", configureAuthorisationRoute(""));
-        path("/admin", configureAuthorisationRoute("/repositories"));
         path("/admin", configureAuthorisationRoute("/images"));
         path("/admin", configureAuthorisationRoute("/manageImage"));
         path("/admin", configureAuthorisationRoute("/manageRepository"));
@@ -69,6 +65,10 @@ public class WebServer {
             response.header("Content-Type", "application/json");
             response.status(exception.getStatusCode());
         });
+    }
+
+    public void addFilter(String path, Filter route) {
+        before(path, route);
     }
 
     public void addWebSocket(String path, Object object) {

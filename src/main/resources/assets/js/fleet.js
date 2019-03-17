@@ -311,3 +311,34 @@ var synchronisationManager = (function($) {
     }
 
 }(jQuery));
+
+var passwordValidationManager = (function($) {
+
+    var comparePasswords = function(password, verifyPassword) {
+
+        if (password.val() !== verifyPassword.val()) {
+            verifyPassword.get(0).setCustomValidity('Mismatch');
+        } else {
+            verifyPassword.get(0).setCustomValidity('');
+        }
+    };
+
+    var init = function() {
+
+        var password = $('#password');
+        var verifyPassword = $('#verify-password');
+
+        password.on('keyup', function() {
+            comparePasswords(password, verifyPassword);
+        });
+
+        verifyPassword.on('keyup', function() {
+            comparePasswords(password, verifyPassword);
+        });
+    };
+
+    return {
+        init: init
+    };
+
+}(jQuery));

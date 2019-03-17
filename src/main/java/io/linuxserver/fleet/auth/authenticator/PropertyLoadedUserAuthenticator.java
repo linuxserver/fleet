@@ -15,27 +15,28 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package io.linuxserver.fleet.delegate;
+package io.linuxserver.fleet.auth.authenticator;
 
 import io.linuxserver.fleet.auth.AuthenticatedUser;
 import io.linuxserver.fleet.auth.AuthenticationResult;
+import io.linuxserver.fleet.auth.UserCredentials;
 
-public class PropertiesAuthenticationDelegate implements AuthenticationDelegate {
+public class PropertyLoadedUserAuthenticator implements UserAuthenticator {
 
     private final String adminUsername;
     private final String adminPassword;
 
-    public PropertiesAuthenticationDelegate(String username, String password) {
+    public PropertyLoadedUserAuthenticator(String adminUsername, String adminPassword) {
 
-        this.adminUsername = username;
-        this.adminPassword = password;
+        this.adminUsername = adminUsername;
+        this.adminPassword = adminPassword;
     }
 
     @Override
-    public AuthenticationResult authenticate(String username, String password) {
+    public AuthenticationResult authenticate(UserCredentials userCredentials) {
 
-        if (adminUsername.equals(username) && adminPassword.equals(password))
-            return new AuthenticationResult(true, new AuthenticatedUser(username));
+        if (adminUsername.equals(userCredentials.getUsername()) && adminPassword.equals(userCredentials.getPassword()))
+            return new AuthenticationResult(true, new AuthenticatedUser(userCredentials.getUsername()));
 
         return AuthenticationResult.notAuthenticated();
     }
