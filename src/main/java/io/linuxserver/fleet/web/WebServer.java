@@ -100,6 +100,9 @@ public class WebServer {
 
         return () -> before(path, (request, response) -> {
 
+            if (response.raw().isCommitted())
+                return;
+
             Session session = request.session(false);
 
             if (null == session)

@@ -23,6 +23,8 @@ import spark.Filter;
 import spark.Request;
 import spark.Response;
 
+import static spark.Spark.halt;
+
 /**
  * <p>
  * Forces the maintainer of Fleet to set up an initial user before running Fleet.
@@ -51,7 +53,7 @@ public class InitialUserFilterRoute implements Filter {
         if (databaseAuthenticationEnabled) {
 
             if (!initialUserNeedsConfiguring() && "/admin/setup".equals(request.pathInfo())) {
-                response.redirect("/admin");
+                halt(401);
             }
 
             else if (initialUserNeedsConfiguring() && !pathIsExempted(request.pathInfo())) {
