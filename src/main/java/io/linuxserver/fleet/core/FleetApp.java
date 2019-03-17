@@ -17,6 +17,7 @@
 
 package io.linuxserver.fleet.core;
 
+import io.linuxserver.fleet.web.WebServer;
 import io.linuxserver.fleet.web.pages.HomePage;
 import io.linuxserver.fleet.web.pages.LoginPage;
 import io.linuxserver.fleet.web.pages.ManageRepositoriesPage;
@@ -32,11 +33,30 @@ import java.util.concurrent.TimeUnit;
  * through this class.
  * </p>
  */
-class FleetApp {
+public class FleetApp {
+
+    private static final String FLEET_USER_UNDEFINED = "fleet.user.undefined";
+
+    private static FleetApp instance;
+
+    public static FleetApp instance() {
+
+        if (null == instance) {
+
+            synchronized (FleetApp.class) {
+
+                if (null == instance) {
+                    instance = new FleetApp();
+                }
+            }
+        }
+
+        return instance;
+    }
 
     private final FleetBeans beans;
 
-    FleetApp() {
+    private FleetApp() {
         beans = new FleetBeans();
     }
 
@@ -56,25 +76,41 @@ class FleetApp {
         SynchronisationWebSocket synchronisationWebSocket = new SynchronisationWebSocket();
         beans.getSynchronisationDelegate().registerListener(synchronisationWebSocket);
 
-        beans.getWebServer().addWebSocket("/admin/ws/sync", synchronisationWebSocket);
-        beans.getWebServer().addFilter(   "*",              new InitialUserFilterRoute(beans.getProperties().getAuthenticationType(), beans.getUserDelegate()));
-        beans.getWebServer().start();
+        WebServer webServer = beans.getWebServer();
 
-        beans.getWebServer().addPage(       "/",                        new HomePage(beans.getRepositoryDelegate(), beans.getImageDelegate()));
-        beans.getWebServer().addGetApi(     "/api/v1/images",           new AllImagesApi(beans.getRepositoryDelegate(), beans.getImageDelegate()));
-        beans.getWebServer().addPage(       "/setup",                   new SetupPage());
-        beans.getWebServer().addPostRoute(  "/setup",                   new RegisterInitialUserRoute(beans.getUserDelegate()));
-        beans.getWebServer().addPage(       "/admin",                   new ManageRepositoriesPage(beans.getRepositoryDelegate()));
-        beans.getWebServer().addPage(       "/admin/login",             new LoginPage());
-        beans.getWebServer().addPostRoute(  "/admin/login",             new LoginRoute(beans.getAuthenticationDelegate()));
-        beans.getWebServer().addPostRoute(  "/admin/logout",            new LogoutRoute());
-        beans.getWebServer().addPostApi(    "/admin/manageImage",       new ManageImageApi(beans.getImageDelegate()));
-        beans.getWebServer().addGetApi(     "/admin/getImage",          new GetImageApi(beans.getImageDelegate()));
-        beans.getWebServer().addPostApi(    "/admin/manageRepository",  new ManageRepositoryApi(beans.getRepositoryDelegate()));
-        beans.getWebServer().addPostApi(    "/admin/forceSync",         new ForceSyncApi(beans.getTaskDelegate()));
+        webServer.addWebSocket("/admin/ws/sync", synchronisationWebSocket);
+        webServer.addFilter(   "*",              new InitialUserFilterRoute(beans.getProperties().getAuthenticationType(), beans.getUserDelegate()));
+        webServer.start();
+
+        webServer.addPage(       "/",                        new HomePage(beans.getRepositoryDelegate(), beans.getImageDelegate()));
+        webServer.addGetApi(     "/api/v1/images",           new AllImagesApi(beans.getRepositoryDelegate(), beans.getImageDelegate()));
+        webServer.addPage(       "/admin",                   new ManageRepositoriesPage(beans.getRepositoryDelegate()));
+        webServer.addPage(       "/admin/login",             new LoginPage());
+        webServer.addPostRoute(  "/admin/login",             new LoginRoute(beans.getAuthenticationDelegate()));
+        webServer.addPostRoute(  "/admin/logout",            new LogoutRoute());
+        webServer.addPostApi(    "/admin/manageImage",       new ManageImageApi(beans.getImageDelegate()));
+        webServer.addGetApi(     "/admin/getImage",          new GetImageApi(beans.getImageDelegate()));
+        webServer.addPostApi(    "/admin/manageRepository",  new ManageRepositoryApi(beans.getRepositoryDelegate()));
+        webServer.addPostApi(    "/admin/forceSync",         new ForceSyncApi(beans.getTaskDelegate()));
+
+        if (initialUserNeedsConfiguring()) {
+
+            webServer.addPage(       "/setup", new SetupPage());
+            webServer.addPostRoute(  "/setup", new RegisterInitialUserRoute(beans.getUserDelegate()));
+        }
     }
 
     private void scheduleSync() {
         beans.getTaskDelegate().scheduleSynchronisationTask(beans.getProperties().getRefreshIntervalInMinutes(), TimeUnit.MINUTES);
+    }
+
+    private boolean initialUserNeedsConfiguring() {
+
+        String configured = System.getProperty(FLEET_USER_UNDEFINED);
+        if (null == configured || "true".equalsIgnoreCase(configured)) {
+            System.setProperty(FLEET_USER_UNDEFINED, String.valueOf(beans.getUserDelegate().isUserRepositoryEmpty()));
+        }
+
+        return "true".equalsIgnoreCase(System.getProperty(FLEET_USER_UNDEFINED));
     }
 }

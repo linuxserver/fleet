@@ -53,7 +53,7 @@ public class InitialUserFilterRoute implements Filter {
         if (databaseAuthenticationEnabled) {
 
             if (!initialUserNeedsConfiguring() && "/setup".equals(request.pathInfo())) {
-                halt(401);
+                halt(401); // FIXME: I'm unhappy halting here. Need to get the filter chain correct.
             }
 
             else if (initialUserNeedsConfiguring() && !pathIsExempted(request.pathInfo())) {

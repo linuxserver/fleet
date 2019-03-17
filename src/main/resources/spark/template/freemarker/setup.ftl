@@ -15,7 +15,7 @@
 
                 <h3 class="mb-3">Create a user</h3>
 
-                <form action="/admin/setup" method="POST" class="needs-validation" novalidate>
+                <form action="/setup" method="POST" class="needs-validation" novalidate>
                     <div class="form-group row">
                         <label for="username" class="col-sm-2 col-form-label">Username</label>
                         <div class="col-sm-10">

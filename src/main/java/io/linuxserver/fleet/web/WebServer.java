@@ -37,9 +37,18 @@ public class WebServer {
         staticFiles.expireTime(600);
     }
 
+    public void stopServer() {
+
+        stop();
+
+        started = false;
+    }
+
     public void start() {
 
         started = true;
+
+        init();
 
         path("/admin", configureAuthorisationRoute(""));
         path("/admin", configureAuthorisationRoute("/images"));
