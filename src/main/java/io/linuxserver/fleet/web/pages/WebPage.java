@@ -19,14 +19,15 @@ package io.linuxserver.fleet.web.pages;
 
 import io.linuxserver.fleet.web.SessionAttribute;
 import spark.*;
+import spark.template.freemarker.FreeMarkerEngine;
 
 import java.util.Map;
 
-public abstract class WebPage implements TemplateViewRoute {
+public abstract class WebPage implements Route {
 
     @Override
     @SuppressWarnings("unchecked")
-    public ModelAndView handle(Request request, Response response) {
+    public Object handle(Request request, Response response) {
 
         ModelAndView modelAndView = handle(request);
 
@@ -34,7 +35,7 @@ public abstract class WebPage implements TemplateViewRoute {
         if (null != session && null != session.attribute(SessionAttribute.USER))
             ((Map<String, Object>) modelAndView.getModel()).put("__AUTHENTICATED_USER", session.attribute(SessionAttribute.USER));
 
-        return modelAndView;
+        return new FreeMarkerEngine().render(modelAndView);
     }
 
     protected abstract ModelAndView handle(Request request);

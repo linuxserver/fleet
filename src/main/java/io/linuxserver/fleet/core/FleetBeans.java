@@ -28,7 +28,6 @@ import io.linuxserver.fleet.db.migration.DatabaseVersion;
 import io.linuxserver.fleet.delegate.*;
 import io.linuxserver.fleet.dockerhub.DockerHubV2Client;
 import io.linuxserver.fleet.thread.TaskManager;
-import io.linuxserver.fleet.web.WebServer;
 
 /**
  * <p>
@@ -43,7 +42,6 @@ public class FleetBeans {
     private final AuthenticationDelegate    authenticationDelegate;
     private final DockerHubDelegate         dockerHubDelegate;
     private final SynchronisationDelegate   synchronisationDelegate;
-    private final WebServer                 webServer;
     private final TaskManager               taskManager;
     private final TaskDelegate              taskDelegate;
     private final UserDelegate              userDelegate;
@@ -65,7 +63,6 @@ public class FleetBeans {
         imageDelegate           = new ImageDelegate(new DefaultImageDAO(databaseConnection));
         repositoryDelegate      = new RepositoryDelegate(new DefaultRepositoryDAO(databaseConnection));
         dockerHubDelegate       = new DockerHubDelegate(new DockerHubV2Client(properties.getDockerHubCredentials()));
-        webServer               = new WebServer(properties.getAppPort());
         taskManager             = new TaskManager();
         synchronisationDelegate = new SynchronisationDelegate(imageDelegate, repositoryDelegate, dockerHubDelegate);
         userDelegate            = new UserDelegate(passwordEncoder, new DefaultUserDAO(databaseConnection));
@@ -99,10 +96,6 @@ public class FleetBeans {
 
     public DatabaseVersion getDatabaseVersion() {
         return databaseVersion;
-    }
-
-    public WebServer getWebServer() {
-        return webServer;
     }
 
     public TaskManager getTaskManager() {

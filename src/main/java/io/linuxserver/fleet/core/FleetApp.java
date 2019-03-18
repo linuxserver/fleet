@@ -17,15 +17,21 @@
 
 package io.linuxserver.fleet.core;
 
-import io.linuxserver.fleet.web.WebServer;
+import io.linuxserver.fleet.auth.AuthenticatedUser;
+import io.linuxserver.fleet.auth.authenticator.AuthenticatorFactory.AuthenticationType;
+import io.linuxserver.fleet.web.JsonTransformer;
+import io.linuxserver.fleet.web.SessionAttribute;
 import io.linuxserver.fleet.web.pages.HomePage;
 import io.linuxserver.fleet.web.pages.LoginPage;
 import io.linuxserver.fleet.web.pages.ManageRepositoriesPage;
 import io.linuxserver.fleet.web.pages.SetupPage;
 import io.linuxserver.fleet.web.routes.*;
 import io.linuxserver.fleet.web.websocket.SynchronisationWebSocket;
+import spark.Session;
 
 import java.util.concurrent.TimeUnit;
+
+import static spark.Spark.*;
 
 /**
  * <p>
@@ -73,31 +79,122 @@ public class FleetApp {
 
     private void configureWeb() {
 
+        port(beans.getProperties().getAppPort());
+
+        staticFiles.location("/assets");
+        staticFiles.expireTime(600);
+
         SynchronisationWebSocket synchronisationWebSocket = new SynchronisationWebSocket();
         beans.getSynchronisationDelegate().registerListener(synchronisationWebSocket);
 
-        WebServer webServer = beans.getWebServer();
+        webSocket("/admin/ws/sync", synchronisationWebSocket);
+        init();
 
-        webServer.addWebSocket("/admin/ws/sync", synchronisationWebSocket);
-        webServer.addFilter(   "*",              new InitialUserFilterRoute(beans.getProperties().getAuthenticationType(), beans.getUserDelegate()));
-        webServer.start();
-
-        webServer.addPage(       "/",                        new HomePage(beans.getRepositoryDelegate(), beans.getImageDelegate()));
-        webServer.addGetApi(     "/api/v1/images",           new AllImagesApi(beans.getRepositoryDelegate(), beans.getImageDelegate()));
-        webServer.addPage(       "/admin",                   new ManageRepositoriesPage(beans.getRepositoryDelegate()));
-        webServer.addPage(       "/admin/login",             new LoginPage());
-        webServer.addPostRoute(  "/admin/login",             new LoginRoute(beans.getAuthenticationDelegate()));
-        webServer.addPostRoute(  "/admin/logout",            new LogoutRoute());
-        webServer.addPostApi(    "/admin/manageImage",       new ManageImageApi(beans.getImageDelegate()));
-        webServer.addGetApi(     "/admin/getImage",          new GetImageApi(beans.getImageDelegate()));
-        webServer.addPostApi(    "/admin/manageRepository",  new ManageRepositoryApi(beans.getRepositoryDelegate()));
-        webServer.addPostApi(    "/admin/forceSync",         new ForceSyncApi(beans.getTaskDelegate()));
-
+        /*
+         * -----------------------
+         * Set Up
+         * -----------------------
+         */
         if (initialUserNeedsConfiguring()) {
 
-            webServer.addPage(       "/setup", new SetupPage());
-            webServer.addPostRoute(  "/setup", new RegisterInitialUserRoute(beans.getUserDelegate()));
+            path("/setup", () -> {
+
+                before("", (request, response) -> {
+
+                    if (!initialUserNeedsConfiguring()) {
+                        halt(401);
+                    }
+                });
+
+                get("",     new SetupPage());
+                post("",    new RegisterInitialUserRoute(beans.getUserDelegate()));
+            });
         }
+
+        /*
+         * -----------------------
+         * Image List
+         * -----------------------
+         */
+        get("/", new HomePage(beans.getRepositoryDelegate(), beans.getImageDelegate()));
+
+        /*
+         * -----------------------
+         * API
+         * -----------------------
+         */
+        path("/api/v1", () -> {
+
+            get("/images", new AllImagesApi(beans.getRepositoryDelegate(), beans.getImageDelegate()), new JsonTransformer());
+
+            after("/*", (request, response) -> {
+
+                response.header("Access-Control-Allow-Origin", "*");
+                response.header("Access-Control-Allow-Methods", "GET");
+                response.header("Content-Type","application/json");
+            });
+        });
+
+        /*
+         * -----------------------
+         * Admin
+         * -----------------------
+         */
+        path("/admin", () -> {
+
+            before("", (request, response) -> {
+
+                if (initialUserNeedsConfiguring()) {
+
+                    response.redirect("/setup");
+
+                } else {
+
+                    Session session = request.session(false);
+
+                    if (null == session)
+                        response.redirect("/admin/login");
+
+                    else {
+
+                        AuthenticatedUser user = session.attribute(SessionAttribute.USER);
+                        if (null == user)
+                            response.redirect("/admin/login");
+                    }
+                }
+            });
+
+            before("/*", (request, response) -> {
+
+                if (initialUserNeedsConfiguring()) {
+
+                    response.redirect("/setup");
+
+                } else {
+
+                    Session session = request.session(false);
+
+                    if (null == session)
+                        response.redirect("/admin/login");
+
+                    else {
+
+                        AuthenticatedUser user = session.attribute(SessionAttribute.USER);
+                        if (null == user)
+                            response.redirect("/admin/login");
+                    }
+                }
+            });
+
+            get("",                     new ManageRepositoriesPage(beans.getRepositoryDelegate()));
+            get("/admin/login",         new LoginPage());
+            post("/admin/login",        new LoginRoute(beans.getAuthenticationDelegate()));
+            post("/logout",             new LogoutRoute());
+            post("/manageImage",        new ManageImageApi(beans.getImageDelegate()));
+            get("/getImage",            new GetImageApi(beans.getImageDelegate()));
+            post("/manageRepository",   new ManageRepositoryApi(beans.getRepositoryDelegate()));
+            post("/forceSync",          new ForceSyncApi(beans.getTaskDelegate()));
+        });
     }
 
     private void scheduleSync() {
@@ -111,6 +208,10 @@ public class FleetApp {
             System.setProperty(FLEET_USER_UNDEFINED, String.valueOf(beans.getUserDelegate().isUserRepositoryEmpty()));
         }
 
-        return "true".equalsIgnoreCase(System.getProperty(FLEET_USER_UNDEFINED));
+        return "true".equalsIgnoreCase(System.getProperty(FLEET_USER_UNDEFINED)) && databaseAuthenticationEnabled();
+    }
+
+    private boolean databaseAuthenticationEnabled() {
+        return AuthenticationType.DATABASE == AuthenticationType.valueOf(beans.getProperties().getAuthenticationType());
     }
 }

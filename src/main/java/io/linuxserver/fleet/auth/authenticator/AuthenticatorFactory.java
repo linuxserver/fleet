@@ -34,18 +34,17 @@ public class AuthenticatorFactory {
         AuthenticationType authType = AuthenticationType.valueOf(properties.getAuthenticationType().toUpperCase());
         switch (authType) {
 
-            case PROPERTIES:
-
-                LOGGER.info("Configuring new authenticator: PropertyLoadedUserAuthenticator");
-                return new PropertyLoadedUserAuthenticator(properties.getAppUsername(), properties.getAppPassword());
-
             case DATABASE:
 
                 LOGGER.info("Configuring new authenticator: DatabaseStoredUserAuthenticator");
                 return new DatabaseStoredUserAuthenticator(beans.getPasswordEncoder(), beans.getUserDelegate());
-        }
 
-        throw new RuntimeException("Provided authentication type is not supported");
+            case PROPERTIES:
+            default:
+
+                LOGGER.info("Configuring new authenticator: PropertyLoadedUserAuthenticator");
+                return new PropertyLoadedUserAuthenticator(properties.getAppUsername(), properties.getAppPassword());
+        }
     }
 
     public enum AuthenticationType {

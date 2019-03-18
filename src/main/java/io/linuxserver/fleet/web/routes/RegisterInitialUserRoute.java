@@ -51,7 +51,7 @@ public class RegisterInitialUserRoute implements Route {
         try {
 
             userDelegate.createNewUser(username, password);
-            response.redirect("/admin");
+            response.redirect("/admin/login");
 
         } catch (SaveException e) {
 

@@ -19,6 +19,7 @@ package io.linuxserver.fleet.auth.security;
 
 import io.linuxserver.fleet.auth.security.util.SaltGenerator;
 import org.bouncycastle.crypto.PBEParametersGenerator;
+import org.bouncycastle.crypto.digests.SHA256Digest;
 import org.bouncycastle.crypto.generators.PKCS5S2ParametersGenerator;
 import org.bouncycastle.crypto.params.KeyParameter;
 
@@ -103,7 +104,7 @@ public class PKCS5S2PasswordEncoder implements PasswordEncoder {
      */
     private byte[] encode(String rawPassword, byte[] salt) {
 
-        PKCS5S2ParametersGenerator generator = new PKCS5S2ParametersGenerator();
+        PKCS5S2ParametersGenerator generator = new PKCS5S2ParametersGenerator(new SHA256Digest());
         generator.init(
             PBEParametersGenerator.PKCS5PasswordToBytes(rawPassword.toCharArray()),
             joinArrays(salt, secret),
