@@ -44,7 +44,6 @@ public class ManageRepositoryApi implements Route {
             if (null == repository) {
 
                 response.status(404);
-                response.header("Content-Type", "application/json");
                 return new ApiResponse<>("Error", "Repository not found.");
             }
 
@@ -64,7 +63,6 @@ public class ManageRepositoryApi implements Route {
 
             repositoryDelegate.saveRepository(repository);
 
-            response.header("Content-Type", "application/json");
             return new ApiResponse<>("OK", "Repository updated.");
 
         } catch (Exception e) {

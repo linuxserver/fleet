@@ -43,7 +43,7 @@ var repositoryManager = (function($) {
         var syncEnabled = syncSwitch.is(':checked');
 
         var request = {
-            url: '/admin/manageRepository',
+            url: '/admin/api/manageRepository',
             method: 'POST',
             data: {
                 repositoryId: repositoryId,
@@ -62,7 +62,7 @@ var repositoryManager = (function($) {
         var maskValue = versionMask.val();
 
         var request = {
-            url: '/admin/manageRepository',
+            url: '/admin/api/manageRepository',
             method: 'POST',
             data: {
                 repositoryId: repositoryId,
@@ -174,7 +174,7 @@ var imageListManager = (function($) {
     var buildRequest = function(action, imageId) {
 
         return  {
-           url: '/admin/manageImage',
+           url: '/admin/api/manageImage',
            method: 'POST',
            data: {
                action: action,
@@ -222,7 +222,7 @@ var imageListManager = (function($) {
     var getImageMask = function(imageId, callback) {
 
         var request = {
-            url: '/admin/getImage?imageId=' + imageId,
+            url: '/admin/api/getImage?imageId=' + imageId,
             method: 'GET'
         };
 
@@ -277,7 +277,7 @@ var synchronisationManager = (function($) {
     var startSynchronisation = function() {
 
         var request = {
-            url: '/admin/forceSync',
+            url: '/admin/api/forceSync',
             method: 'POST'
         };
 

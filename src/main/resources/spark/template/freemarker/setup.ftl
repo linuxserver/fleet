@@ -5,7 +5,8 @@
     <div class="container container--white mt-3">
 
         <div class="row">
-            <div class="col-12 p-3">
+            <div class="col-sm-12 col-md-4"></div>
+            <div class="col-sm-12 col-md-4">
                 <h2>Set Up Fleet</h2>
 
                 <p>
@@ -19,11 +20,11 @@
                     <div class="form-group row">
                         <label for="username" class="col-sm-2 col-form-label">Username</label>
                         <div class="col-sm-10">
-                            <input type="text" class="form-control" name="username" id="username" required />
+                            <input type="text" class="form-control form-control-sm" name="username" id="username" required />
                         </div>
                     </div>
                     <div class="form-group row">
-                        <label for="password" class="col-sm-2 col-form-label">Password</label>
+                        <label for="password" class="col-sm-2 col-form-label form-control-sm">Password</label>
                         <div class="col-sm-10">
                             <input type="password" class="form-control" name="password" id="password" required />
                         </div>
@@ -31,7 +32,7 @@
                     <div class="form-group row">
                         <label for="verify-password" class="col-sm-2 col-form-label">Verify Password</label>
                         <div class="col-sm-10">
-                            <input type="password" class="form-control" name="verify-password" id="verify-password" required />
+                            <input type="password" class="form-control form-control-sm" name="verify-password" id="verify-password" required />
                         </div>
                     </div>
                     <div class="form-group text-center">
@@ -39,6 +40,7 @@
                     </div>
                 </form>
             </div>
+            <div class="col-sm-12 col-md-4"></div>
         </div>
 
     </div>

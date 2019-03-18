@@ -44,7 +44,6 @@ public class ManageImageApi implements Route {
             if (null == image) {
 
                 response.status(404);
-                response.header("Content-Type", "application/json");
                 return new ApiResponse<>("Error", "Image not found.");
             }
 
@@ -67,7 +66,6 @@ public class ManageImageApi implements Route {
 
             imageDelegate.saveImage(image);
 
-            response.header("Content-Type", "application/json");
             return new ApiResponse<>("OK", "Image updated.");
 
         } catch (Exception e) {

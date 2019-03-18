@@ -99,7 +99,7 @@ minifyJs {
 combineCss {
 
     source = [
-        'src/main/resources/assets/css/bootstrap.min.css',
+        'src/main/resources/assets/css/bootstrap.css',
         'src/main/resources/assets/css/fleet.css',
         'src/main/resources/assets/css/fontawesome-all.css'
     ]
