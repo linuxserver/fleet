@@ -5,8 +5,7 @@
     <div class="container container--white mt-3">
 
         <div class="row">
-            <div class="col-sm-12 col-md-4"></div>
-            <div class="col-sm-12 col-md-4">
+            <div class="col-sm-12">
                 <h2>Set Up Fleet</h2>
 
                 <p>
@@ -24,9 +23,9 @@
                         </div>
                     </div>
                     <div class="form-group row">
-                        <label for="password" class="col-sm-2 col-form-label form-control-sm">Password</label>
+                        <label for="password" class="col-sm-2 col-form-label">Password</label>
                         <div class="col-sm-10">
-                            <input type="password" class="form-control" name="password" id="password" required />
+                            <input type="password" class="form-control form-control-sm" name="password" id="password" required />
                         </div>
                     </div>
                     <div class="form-group row">
@@ -40,7 +39,6 @@
                     </div>
                 </form>
             </div>
-            <div class="col-sm-12 col-md-4"></div>
         </div>
 
     </div>

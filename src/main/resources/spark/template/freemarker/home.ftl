@@ -64,7 +64,7 @@
                                                     <#if !image.hidden || __AUTHENTICATED_USER?has_content>
                                                         <tr <#if image.hidden>class="hidden-image"</#if> data-image-id="#{image.id}" data-image-name="${image.name}">
                                                             <td class="image-name">
-                                                                <a target="_blank" href="https://hub.docker.com/r/${populatedRepository.repository.name}/${image.name}">${image.name}</a>
+                                                                <span class="image-name--repository">${populatedRepository.repository.name} /</span> <a target="_blank" href="https://hub.docker.com/r/${populatedRepository.repository.name}/${image.name}">${image.name}</a>
                                                             </td>
                                                             <td>
                                                                 <#if image.version?has_content>
