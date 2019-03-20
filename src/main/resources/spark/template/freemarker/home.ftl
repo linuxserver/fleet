@@ -79,7 +79,7 @@
                                                                 <#if image.unstable>
                                                                     <i class="fas fa-exclamation-triangle text-warning" title="Potentially unstable"></i>
                                                                 <#else>
-                                                                    <i class="fas fa-check-circle text-success" title="No issues reported"></i>
+                                                                    <i class="fas fa-check text-success" title="No issues reported"></i>
                                                                 </#if>
 
                                                             </td>

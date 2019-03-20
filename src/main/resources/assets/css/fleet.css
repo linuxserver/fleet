@@ -87,6 +87,10 @@ h2 {
     font-weight: normal;
 }
 
+.dropdown-menu {
+    font-size: 0.8rem;
+}
+
 code {
 
     background-color: #efefef;

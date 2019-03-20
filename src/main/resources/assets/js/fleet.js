@@ -204,7 +204,7 @@ var imageListManager = (function($) {
     };
 
     var createStableIcon = function() {
-        return $('<i class="fas fa-check-circle text-success" title="No issues reported"></i>');
+        return $('<i class="fas fa-check text-success" title="No issues reported"></i>');
     };
 
     var getImageRow = function(item) {
