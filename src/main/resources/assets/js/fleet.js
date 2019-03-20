@@ -43,7 +43,7 @@ var repositoryManager = (function($) {
         var syncEnabled = syncSwitch.is(':checked');
 
         var request = {
-            url: '/admin/manageRepository',
+            url: '/admin/api/manageRepository',
             method: 'POST',
             data: {
                 repositoryId: repositoryId,
@@ -62,7 +62,7 @@ var repositoryManager = (function($) {
         var maskValue = versionMask.val();
 
         var request = {
-            url: '/admin/manageRepository',
+            url: '/admin/api/manageRepository',
             method: 'POST',
             data: {
                 repositoryId: repositoryId,
@@ -174,7 +174,7 @@ var imageListManager = (function($) {
     var buildRequest = function(action, imageId) {
 
         return  {
-           url: '/admin/manageImage',
+           url: '/admin/api/manageImage',
            method: 'POST',
            data: {
                action: action,
@@ -204,7 +204,7 @@ var imageListManager = (function($) {
     };
 
     var createStableIcon = function() {
-        return $('<i class="fas fa-check-circle text-success" title="No issues reported"></i>');
+        return $('<i class="fas fa-check text-success" title="No issues reported"></i>');
     };
 
     var getImageRow = function(item) {
@@ -222,7 +222,7 @@ var imageListManager = (function($) {
     var getImageMask = function(imageId, callback) {
 
         var request = {
-            url: '/admin/getImage?imageId=' + imageId,
+            url: '/admin/api/getImage?imageId=' + imageId,
             method: 'GET'
         };
 
@@ -277,7 +277,7 @@ var synchronisationManager = (function($) {
     var startSynchronisation = function() {
 
         var request = {
-            url: '/admin/forceSync',
+            url: '/admin/api/forceSync',
             method: 'POST'
         };
 
@@ -309,5 +309,36 @@ var synchronisationManager = (function($) {
     return {
         init: init
     }
+
+}(jQuery));
+
+var passwordValidationManager = (function($) {
+
+    var comparePasswords = function(password, verifyPassword) {
+
+        if (password.val() !== verifyPassword.val()) {
+            verifyPassword.get(0).setCustomValidity('Mismatch');
+        } else {
+            verifyPassword.get(0).setCustomValidity('');
+        }
+    };
+
+    var init = function() {
+
+        var password = $('#password');
+        var verifyPassword = $('#verify-password');
+
+        password.on('keyup', function() {
+            comparePasswords(password, verifyPassword);
+        });
+
+        verifyPassword.on('keyup', function() {
+            comparePasswords(password, verifyPassword);
+        });
+    };
+
+    return {
+        init: init
+    };
 
 }(jQuery));

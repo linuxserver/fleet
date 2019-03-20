@@ -240,10 +240,20 @@ public class DefaultSynchronisationState implements SynchronisationState {
     }
 
     private void onStart(SynchronisationContext context) {
+
+        synchronized (running) {
+            running.set(true);
+        }
+
         context.getListeners().forEach(SynchronisationListener::onSynchronisationStart);
     }
 
     private void onFinish(SynchronisationContext context) {
+
+        synchronized (running) {
+            running.set(false);
+        }
+
         context.getListeners().forEach(SynchronisationListener::onSynchronisationFinish);
     }
 

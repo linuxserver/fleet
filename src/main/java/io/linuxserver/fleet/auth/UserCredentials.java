@@ -15,11 +15,24 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package io.linuxserver.fleet.core;
+package io.linuxserver.fleet.auth;
 
-public class Main {
+public class UserCredentials {
 
-    public static void main(String[] args) {
-        FleetApp.instance().run();
+    private final String username;
+    private final String password;
+
+    public UserCredentials(String username, String password) {
+
+        this.username = username;
+        this.password = password;
+    }
+
+    public String getUsername() {
+        return username;
+    }
+
+    public String getPassword() {
+        return password;
     }
 }

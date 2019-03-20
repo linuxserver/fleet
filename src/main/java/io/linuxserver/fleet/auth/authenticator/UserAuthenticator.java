@@ -15,11 +15,24 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package io.linuxserver.fleet.core;
+package io.linuxserver.fleet.auth.authenticator;
 
-public class Main {
+import io.linuxserver.fleet.auth.AuthenticationResult;
+import io.linuxserver.fleet.auth.UserCredentials;
 
-    public static void main(String[] args) {
-        FleetApp.instance().run();
-    }
+/**
+ * <p>
+ * Provides a mechanism for the application to authenticate a login request
+ * from a user.
+ * </p>
+ */
+public interface UserAuthenticator {
+
+    /**
+     * <p>
+     * Performs an authentication check against the provided credentials and the repository
+     * of currently stored users.
+     * </p>
+     */
+    AuthenticationResult authenticate(UserCredentials userCredentials);
 }

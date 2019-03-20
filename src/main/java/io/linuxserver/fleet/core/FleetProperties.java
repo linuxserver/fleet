@@ -45,6 +45,16 @@ public class FleetProperties {
         return getStringProperty("fleet.database.password");
     }
 
+    public String getAuthenticationType() {
+        return getStringProperty("fleet.admin.authentication.type");
+    }
+
+    public String getAppSecret() {
+
+        String secret = getStringProperty("fleet.admin.secret");
+        return null == secret ? "" : secret;
+    }
+
     public String getAppUsername() {
         return getStringProperty("fleet.admin.username");
     }
@@ -82,7 +92,7 @@ public class FleetProperties {
 
             property = System.getProperty(propertyKey);
             if (null == property) {
-                property = System.getenv(propertyKey);
+                property = System.getenv(propertyKey.replace(".", "_"));
             }
         }
 

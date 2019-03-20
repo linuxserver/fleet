@@ -22,6 +22,14 @@ h2 {
     font-size: 30px;
 }
 
+.navbar-toggler {
+    border: 0;
+}
+
+.navbar-toggler:focus {
+   outline: none;
+}
+
 .navbar-darkish {
 
     background-color: #cdcdcd;
@@ -75,6 +83,14 @@ h2 {
     font-size: 16px;
 }
 
+.table tbody tr td.image-name span.image-name--repository {
+    font-weight: normal;
+}
+
+.dropdown-menu {
+    font-size: 0.8rem;
+}
+
 code {
 
     background-color: #efefef;
@@ -96,7 +112,7 @@ code {
     -moz-box-shadow: 0px 0px 5px 0px rgba(82,63,105,0.05);
     box-shadow: 0px 0px 5px 0px rgba(82,63,105,0.05);
 
-    padding: 10px;
+    padding: 20px;
     border: 1px solid #d4dadf;
 
     font-size: 0.9rem;

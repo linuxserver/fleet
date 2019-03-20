@@ -49,7 +49,7 @@ public class LoginRoute implements Route {
         AuthenticationResult authResult = authenticationDelegate.authenticate(username, password);
         if (!authResult.isAuthenticated()) {
 
-            response.redirect("/admin/login?fail=true");
+            response.redirect("/login?fail=true");
             return null;
         }
 

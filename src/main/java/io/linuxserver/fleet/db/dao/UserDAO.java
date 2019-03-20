@@ -15,11 +15,22 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package io.linuxserver.fleet.core;
+package io.linuxserver.fleet.db.dao;
 
-public class Main {
+import io.linuxserver.fleet.db.query.InsertUpdateResult;
+import io.linuxserver.fleet.model.User;
 
-    public static void main(String[] args) {
-        FleetApp.instance().run();
-    }
+import java.util.List;
+
+public interface UserDAO {
+
+    User fetchUser(int id);
+
+    User fetchUserByUsername(String username);
+
+    InsertUpdateResult<User> saveUser(User user);
+
+    List<User> fetchAllUsers();
+
+    void removeUser(User user);
 }

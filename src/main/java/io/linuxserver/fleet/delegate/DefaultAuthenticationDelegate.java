@@ -15,11 +15,22 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package io.linuxserver.fleet.core;
+package io.linuxserver.fleet.delegate;
 
-public class Main {
+import io.linuxserver.fleet.auth.AuthenticationResult;
+import io.linuxserver.fleet.auth.UserCredentials;
+import io.linuxserver.fleet.auth.authenticator.UserAuthenticator;
 
-    public static void main(String[] args) {
-        FleetApp.instance().run();
+public class DefaultAuthenticationDelegate implements AuthenticationDelegate {
+
+    private final UserAuthenticator authenticator;
+
+    public DefaultAuthenticationDelegate(UserAuthenticator authenticator) {
+        this.authenticator = authenticator;
+    }
+
+    @Override
+    public AuthenticationResult authenticate(String username, String password) {
+        return authenticator.authenticate(new UserCredentials(username, password));
     }
 }

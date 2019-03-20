@@ -15,11 +15,32 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package io.linuxserver.fleet.core;
+package io.linuxserver.fleet.model;
 
-public class Main {
+public class User extends PersistableItem<User> {
 
-    public static void main(String[] args) {
-        FleetApp.instance().run();
+    private final String username;
+    private final String password;
+
+    public User(String username, String password) {
+        super();
+
+        this.username = username;
+        this.password = password;
+    }
+
+    public User(Integer id, String username, String password) {
+        super(id);
+
+        this.username = username;
+        this.password = password;
+    }
+
+    public String getUsername() {
+        return username;
+    }
+
+    public String getPassword() {
+        return password;
     }
 }

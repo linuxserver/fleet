@@ -7,6 +7,7 @@
             <title>${title}</title>
 
             <link rel="shortcut icon" type="image/png" href="/images/favicon-32x32.png"/>
+            <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
 
             <link href="https://fonts.googleapis.com/css?family=Pacifico|Nunito" rel="stylesheet" />
             <link rel="stylesheet" type="text/css" href="/css/all.min.css" />
@@ -21,7 +22,9 @@
 
                     <#if __AUTHENTICATED_USER?has_content>
                         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-                            <span class="navbar-toggler-icon"></span>
+                            <span class="navbar-toggler-icon align-middle">
+                                <i class="fas fa-bars"></i>
+                            </span>
                         </button>
 
                         <div class="collapse navbar-collapse" id="navbarSupportedContent">
@@ -32,7 +35,7 @@
                                     </a>
                                     <div class="dropdown-menu" aria-labelledby="navbarDropdown">
                                         <a class="dropdown-item" href="admin">Manage Repositories</a>
-                                        <form action="/admin/logout" method="POST">
+                                        <form action="/logout" method="POST">
                                             <button class="dropdown-item">Log Out</button>
                                         </form>
                                     </div>
@@ -69,13 +72,35 @@
                 $("table.table--sortable").tablesorter();
             });
 
-            <#if context='admin'>
+            <#if context="admin">
             repositoryManager.init();
             synchronisationManager.init();
             </#if>
 
-            <#if context='home'>
+            <#if context="home">
             imageListManager.init();
+            </#if>
+
+            <#if context="setup" || context="login">
+            (function() {
+              'use strict';
+              window.addEventListener('load', function() {
+
+                var forms = document.getElementsByClassName('needs-validation');
+
+                var validation = Array.prototype.filter.call(forms, function(form) {
+                  form.addEventListener('submit', function(event) {
+                    if (form.checkValidity() === false) {
+                      event.preventDefault();
+                      event.stopPropagation();
+                    }
+                    form.classList.add('was-validated');
+                  }, false);
+                });
+              }, false);
+            })();
+
+            passwordValidationManager.init();
             </#if>
 
         </script>

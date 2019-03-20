@@ -15,11 +15,25 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package io.linuxserver.fleet.core;
+package io.linuxserver.fleet.auth.security.util;
 
-public class Main {
+import java.security.SecureRandom;
 
-    public static void main(String[] args) {
-        FleetApp.instance().run();
+public class SaltGenerator {
+
+    private static final int KEY_LENGTH = 16;
+
+    public byte[] generateSalt() {
+
+        SecureRandom sr = new SecureRandom();
+
+        byte[] salt = new byte[KEY_LENGTH];
+        sr.nextBytes(salt);
+
+        return salt;
+    }
+
+    public int getKeyLength() {
+        return KEY_LENGTH;
     }
 }

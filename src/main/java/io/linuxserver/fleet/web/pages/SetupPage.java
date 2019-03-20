@@ -15,11 +15,17 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package io.linuxserver.fleet.core;
+package io.linuxserver.fleet.web.pages;
 
-public class Main {
+import spark.ModelAndView;
+import spark.Request;
 
-    public static void main(String[] args) {
-        FleetApp.instance().run();
+import java.util.HashMap;
+
+public class SetupPage extends WebPage {
+
+    @Override
+    protected ModelAndView handle(Request request) {
+        return new ModelAndView(new HashMap<>(), "setup.ftl");
     }
 }
