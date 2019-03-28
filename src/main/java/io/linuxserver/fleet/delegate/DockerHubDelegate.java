@@ -19,6 +19,7 @@ package io.linuxserver.fleet.delegate;
 
 import io.linuxserver.fleet.dockerhub.DockerHubClient;
 import io.linuxserver.fleet.dockerhub.model.DockerHubV2Image;
+import io.linuxserver.fleet.dockerhub.model.DockerHubV2Tag;
 import io.linuxserver.fleet.model.DockerHubImage;
 
 import java.time.LocalDateTime;
@@ -52,7 +53,13 @@ public class DockerHubDelegate {
     }
 
     public String fetchLatestImageTag(String repositoryName, String imageName) {
-        return dockerHubClient.fetchLatestTagForImage(repositoryName, imageName).getName();
+
+        DockerHubV2Tag dockerHubV2Tag = dockerHubClient.fetchLatestTagForImage(repositoryName, imageName);
+
+        if (null != dockerHubV2Tag)
+            return dockerHubV2Tag.getName();
+
+        return null;
     }
 
     private DockerHubImage convertApiImageToInternalImage(DockerHubV2Image apiImage) {

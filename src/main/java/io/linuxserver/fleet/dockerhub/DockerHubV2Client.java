@@ -115,7 +115,12 @@ public class DockerHubV2Client implements DockerHubClient {
             String absoluteUrl = DOCKERHUB_BASE_URI + "/repositories/" + repositoryName + "/" + imageName + "/tags" ;
 
             RestResponse<DockerHubV2TagListResult> restResponse = doCall(absoluteUrl, DockerHubV2TagListResult.class);
-            return restResponse.getPayload().getResults().get(0);
+
+            List<DockerHubV2Tag> results = restResponse.getPayload().getResults();
+            if (!results.isEmpty())
+                return results.get(0);
+
+            return null;
 
         } catch (HttpException e) {
             throw new DockerHubException("Unable to get tags for " + repositoryName + "/" + imageName, e);

@@ -154,6 +154,9 @@ public class DefaultSynchronisationState implements SynchronisationState {
 
         String tag = context.getDockerHubDelegate().fetchLatestImageTag(repositoryName, imageName);
 
+        if (null == tag)
+            return "<Never Built>";
+
         if (isTagJustLatestAndNotAVersion(tag) || null == versionMask)
             return tag;
 
