@@ -25,17 +25,12 @@ import static org.hamcrest.MatcherAssert.assertThat;
 
 public class PKCS5S2PasswordEncoderTest {
 
-    private static final String HASH_FOR_PASSWORD = "8SLrEokFZQQrRk1MeDrpgINOHNXKXPMs2r56DMWBCjLXs9oTHsLzEmnwb68oQAc9+1YdKPTdWahAjjqtvO9M8FtQxCC+8yd71+J1VoWizow=";
+    private static final String HASH_FOR_PASSWORD = "CYvjZH/RPa+6Y4JVQiKjOTEIrdntD+6DJDmolYpO0gta8gjI5yRiN/dRoHr0PhpJB0EoTmqR4gJakqk6HElT2yRaLp6WPG4U0GZIYjQSUo8=";
 
     private PKCS5S2PasswordEncoder encoder = new PKCS5S2PasswordEncoder("superSecret");
 
     @Test
     public void shouldGenerateHash() {
         assertThat(encoder.matches("password", HASH_FOR_PASSWORD), is(equalTo(true)));
-    }
-
-    @Test
-    public void test() {
-        System.out.println(encoder.encode("password").length());
     }
 }
