@@ -161,22 +161,23 @@ public class FleetApp {
                 }
             });
 
-            before("/*", (request, response) -> {
+            get("",                         new ManageRepositoriesPage(beans.getRepositoryDelegate()));
+
+            before("/api/*", (request, response) -> {
 
                 Session session = request.session(false);
 
                 if (null == session)
-                    response.redirect("/login");
+                    halt(403);
 
                 else {
 
                     AuthenticatedUser user = session.attribute(SessionAttribute.USER);
                     if (null == user)
-                        response.redirect("/login");
+                        halt(403);
                 }
-            });
 
-            get("",                         new ManageRepositoriesPage(beans.getRepositoryDelegate()));
+            });
 
             get("/api/getImage",            new GetImageApi(beans.getImageDelegate()),              new JsonTransformer());
             post("/api/manageImage",        new ManageImageApi(beans.getImageDelegate()),           new JsonTransformer());
