@@ -145,6 +145,22 @@ var imageListManager = (function($) {
         });
     };
 
+    var removeDeprecationNotice = function() {
+
+        var option  = $(this);
+        var row     = getImageRow(option);
+        var imageId = getImageId(row);
+        var request = buildRequest('RESTORE', imageId)
+
+        var call = ajaxManager.call(request, function(data) {
+
+            row.removeClass('deprecated-image');
+            row.find('.deprecation-message').remove();
+
+            option.replaceWith(createDeprecationButton(imageId));
+        });
+    };
+
     var showImageVersionMask = function(event) {
 
         var modal   = $(this);
@@ -171,6 +187,42 @@ var imageListManager = (function($) {
         });
     };
 
+    var showImageDeprecationNotice = function(event) {
+
+        var modal   = $(this);
+        var option  = $(event.relatedTarget);
+        var row     = getImageRow(option);
+        var imageId = getImageId(row);
+
+        modal.find('#image-deprecation-reason').val('');
+        modal.find('#selected-deprecation-image-name').text('Deprecation notice for' + getImageName(row));
+        modal.find('#submit-deprecation-change').data('image-id', imageId);
+        modal.find('#submit-deprecation-change').data('trigger-option', option.attr('id'));
+    };
+
+    var submitDeprecationNotice = function() {
+
+        var button  = $(this);
+        var imageId = button.data('image-id');
+        var request = buildRequest('DEPRECATE', imageId);
+
+        request.data.deprecationReason = $('#image-deprecation-reason').val();
+
+        ajaxManager.call(request, function(data) {
+
+            var trigger = $('#' + button.data('trigger-option'));
+            var row     = getImageRow(trigger);
+            var imageId = getImageId(row);
+
+            row.addClass('deprecated-image');
+            row.find('.image-name').append(createRowDeprecationMessage(data.data.deprecationReason));
+
+            trigger.replaceWith(createRestoreButton());
+
+            $('#update-image-deprecation').modal("hide");
+        });
+    };
+
     var buildRequest = function(action, imageId) {
 
         return  {
@@ -184,19 +236,27 @@ var imageListManager = (function($) {
     };
 
     var createHideButton = function() {
-        return $('<button type="button" class="image--hide dropdown-item btn-clickable">Hide from list</button>');
+        return $('<button type="button" class="image--hide dropdown-item btn-clickable"><i class="fas fa-eye-slash"></i> Hide from list</button>');
     };
 
     var createShowButton = function() {
-        return $('<button type="button" class="image--show dropdown-item btn-clickable">Show in list</button>');
+        return $('<button type="button" class="image--show dropdown-item btn-clickable"><i class="fas fa-eye"></i> Show in list</button>');
     };
 
     var createStableButton = function() {
-        return $('<button type="button" class="image--mark-stable dropdown-item btn-clickable">Mark as stable</button>');
+        return $('<button type="button" class="image--mark-stable dropdown-item btn-clickable"><i class="fas fa-check"></i> Mark as stable</button>');
     };
 
     var createUnstableButton = function() {
-        return $('<button type="button" class="image--mark-unstable dropdown-item btn-clickable">Mark as unstable</button>');
+        return $('<button type="button" class="image--mark-unstable dropdown-item btn-clickable"><i class="fas fa-exclamation-triangle"></i> Mark as unstable</button>');
+    };
+
+    var createDeprecationButton = function(imageId) {
+        return $('<button id="deprecate-image_' + imageId + '" type="button" class="dropdown-item btn-clickable" data-toggle="modal" data-target="#update-image-deprecation"><i class="fas fa-exclamation-circle"></i> Mark as deprecated</button>');
+    };
+
+    var createRestoreButton = function() {
+        return $('<button type="button" class="image--remove-deprecation-notice dropdown-item btn-clickable"><i class="fas fa-thumbs-up"></i> Remove deprecation notice</button>');
     };
 
     var createUnstableIcon = function() {
@@ -205,6 +265,10 @@ var imageListManager = (function($) {
 
     var createStableIcon = function() {
         return $('<i class="fas fa-check text-success" title="No issues reported"></i>');
+    };
+
+    var createRowDeprecationMessage = function(deprecationReason) {
+        return $('<span class="deprecation-message"><i class="fas fa-exclamation-circle"></i></span>').attr('title', $('<span />').html('This image has been deprecated: ' + deprecationReason).text());
     };
 
     var getImageRow = function(item) {
@@ -235,9 +299,13 @@ var imageListManager = (function($) {
         $('.admin-actions').on('click', '.image--hide', hideImage);
         $('.admin-actions').on('click', '.image--mark-stable', markImageStable);
         $('.admin-actions').on('click', '.image--mark-unstable', markImageUnstable);
+        $('.admin-actions').on('click', '.image--remove-deprecation-notice', removeDeprecationNotice);
 
         $('#update-image-version-mask').on('show.bs.modal', showImageVersionMask);
+        $('#update-image-deprecation').on('show.bs.modal', showImageDeprecationNotice);
+
         $('#submit-version-mask-change').on('click', submitVersionMaskChange);
+        $('#submit-deprecation-change').on('click', submitDeprecationNotice);
     };
 
     return {
@@ -325,16 +393,20 @@ var passwordValidationManager = (function($) {
 
     var init = function() {
 
-        var password = $('#password');
         var verifyPassword = $('#verify-password');
 
-        password.on('keyup', function() {
-            comparePasswords(password, verifyPassword);
-        });
+        if (verifyPassword.length) {
 
-        verifyPassword.on('keyup', function() {
-            comparePasswords(password, verifyPassword);
-        });
+            var password = $('#password');
+
+            password.on('keyup', function() {
+                comparePasswords(password, verifyPassword);
+            });
+
+            verifyPassword.on('keyup', function() {
+                comparePasswords(password, verifyPassword);
+            });
+        }
     };
 
     return {

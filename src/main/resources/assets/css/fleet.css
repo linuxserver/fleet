@@ -77,6 +77,14 @@ h2 {
     color: rgba(0, 0, 0, 0.3)
 }
 
+.table tbody tr.deprecated-image td.image-name {
+    text-decoration: line-through;
+}
+
+.table tbody tr.deprecated-image td.image-name span.deprecation-message {
+    margin-left: 10px;
+}
+
 .table tbody tr td.image-name {
 
     font-weight: 600;

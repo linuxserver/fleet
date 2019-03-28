@@ -62,11 +62,18 @@ public class ManageImageApi implements Route {
                     String versionMask = cleanParam(request.queryParams("versionMask"));
                     image.withVersionMask(versionMask);
                     break;
+                case DEPRECATE:
+                    String deprecationReason = cleanParam(request.queryParams("deprecationReason"));
+                    image.withDeprecated(true).withDeprecationReason(deprecationReason);
+                    break;
+                case RESTORE:
+                    image.withDeprecated(false).withDeprecationReason(null);
+                    break;
             }
 
-            imageDelegate.saveImage(image);
+            Image updatedImage = imageDelegate.saveImage(image);
 
-            return new ApiResponse<>("OK", "Image updated.");
+            return new ApiResponse<>("OK", updatedImage);
 
         } catch (Exception e) {
             throw new FleetApiException(500, e.getMessage(), e);
@@ -82,6 +89,6 @@ public class ManageImageApi implements Route {
     }
 
     public enum Action {
-        SHOW, HIDE, MASK, STABLE, UNSTABLE
+        SHOW, HIDE, MASK, STABLE, UNSTABLE, DEPRECATE, RESTORE
     }
 }

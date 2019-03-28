@@ -25,6 +25,7 @@ public class ApiImage {
     private long    pullCount;
     private String  version;
     private boolean stable;
+    private boolean deprecated;
 
     public String getName() {
         return name;
@@ -42,6 +43,10 @@ public class ApiImage {
         return stable;
     }
 
+    public boolean isDeprecated() {
+        return deprecated;
+    }
+
     public static ApiImage fromImage(Image image) {
 
         ApiImage apiImage = new ApiImage();
@@ -50,6 +55,7 @@ public class ApiImage {
         apiImage.pullCount  = image.getPullCount();
         apiImage.version    = image.getVersion();
         apiImage.stable     = !image.isUnstable();
+        apiImage.deprecated = image.isDeprecated();
 
         return apiImage;
     }

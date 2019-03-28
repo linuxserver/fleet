@@ -17,6 +17,9 @@
 
 package io.linuxserver.fleet.web.pages;
 
+import freemarker.core.HTMLOutputFormat;
+import freemarker.template.Configuration;
+import freemarker.template.Version;
 import io.linuxserver.fleet.web.SessionAttribute;
 import spark.*;
 import spark.template.freemarker.FreeMarkerEngine;
@@ -24,6 +27,14 @@ import spark.template.freemarker.FreeMarkerEngine;
 import java.util.Map;
 
 public abstract class WebPage implements Route {
+
+    private static final Configuration CONFIGURATION;
+    static {
+
+        CONFIGURATION = new Configuration(new Version(2, 3, 23));
+        CONFIGURATION.setClassForTemplateLoading(FreeMarkerEngine.class, "");
+        CONFIGURATION.setOutputFormat(HTMLOutputFormat.INSTANCE);
+    }
 
     @Override
     @SuppressWarnings("unchecked")
@@ -35,7 +46,7 @@ public abstract class WebPage implements Route {
         if (null != session && null != session.attribute(SessionAttribute.USER))
             ((Map<String, Object>) modelAndView.getModel()).put("__AUTHENTICATED_USER", session.attribute(SessionAttribute.USER));
 
-        return new FreeMarkerEngine().render(modelAndView);
+        return new FreeMarkerEngine(CONFIGURATION).render(modelAndView);
     }
 
     protected abstract ModelAndView handle(Request request);

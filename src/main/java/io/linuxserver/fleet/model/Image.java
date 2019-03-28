@@ -34,6 +34,9 @@ public class Image extends PersistableItem<Image> {
     private boolean         unstable;
     private boolean         hidden;
 
+    private boolean         deprecated;
+    private String          deprecationReason;
+
     public Image(Integer id, int repositoryId, String name) {
 
         super(id);
@@ -76,6 +79,18 @@ public class Image extends PersistableItem<Image> {
         return this;
     }
 
+    public Image withDeprecated(boolean deprecated) {
+
+        this.deprecated = deprecated;
+        return this;
+    }
+
+    public Image withDeprecationReason(String deprecationReason) {
+
+        this.deprecationReason = deprecationReason;
+        return this;
+    }
+
     public int getRepositoryId() {
         return repositoryId;
     }
@@ -102,5 +117,13 @@ public class Image extends PersistableItem<Image> {
 
     public boolean isHidden() {
         return hidden;
+    }
+
+    public boolean isDeprecated() {
+        return deprecated;
+    }
+
+    public String getDeprecationReason() {
+        return deprecationReason;
     }
 }

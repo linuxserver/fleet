@@ -114,7 +114,7 @@ public class DefaultImageDAO implements ImageDAO {
 
         try (Connection connection = databaseConnection.getConnection()) {
 
-            CallableStatement call = connection.prepareCall("{CALL Image_Save(?,?,?,?,?,?,?,?,?,?,?)");
+            CallableStatement call = connection.prepareCall("{CALL Image_Save(?,?,?,?,?,?,?,?,?,?,?,?,?)");
             setNullableInt(call, 1, image.getId());
             call.setInt(2, image.getRepositoryId());
             call.setString(3, image.getName());
@@ -123,16 +123,18 @@ public class DefaultImageDAO implements ImageDAO {
             setNullableString(call, 6, image.getVersionMask());
             call.setBoolean(7, image.isHidden());
             call.setBoolean(8, image.isUnstable());
+            call.setBoolean(9, image.isDeprecated());
+            setNullableString(call, 10, image.getDeprecationReason());
 
-            call.registerOutParameter(9, Types.INTEGER);
-            call.registerOutParameter(10, Types.INTEGER);
-            call.registerOutParameter(11, Types.VARCHAR);
+            call.registerOutParameter(11, Types.INTEGER);
+            call.registerOutParameter(12, Types.INTEGER);
+            call.registerOutParameter(13, Types.VARCHAR);
 
             call.executeUpdate();
 
-            int imageId             = call.getInt(9);
-            int status              = call.getInt(10);
-            String statusMessage    = call.getString(11);
+            int imageId             = call.getInt(11);
+            int status              = call.getInt(12);
+            String statusMessage    = call.getString(13);
 
             if (InsertUpdateStatus.OK == status)
                 return new InsertUpdateResult<>(fetchImage(imageId), status, statusMessage);
@@ -175,6 +177,8 @@ public class DefaultImageDAO implements ImageDAO {
             .withVersionMask(results.getString("ImageVersionMask"))
             .withModifiedTime(results.getTimestamp("ModifiedTime").toLocalDateTime())
             .withHidden(results.getBoolean("ImageHidden"))
-            .withUnstable(results.getBoolean("ImageUnstable"));
+            .withUnstable(results.getBoolean("ImageUnstable"))
+            .withDeprecated(results.getBoolean("ImageDeprecated"))
+            .withDeprecationReason(results.getString("ImageDeprecationReason"));
     }
 }
