@@ -161,7 +161,7 @@ public class FleetApp {
                 }
             });
 
-            get("",                         new ManageRepositoriesPage(beans.getRepositoryDelegate()));
+            get("", new ManageRepositoriesPage(beans.getRepositoryDelegate()));
 
             before("/api/*", (request, response) -> {
 
