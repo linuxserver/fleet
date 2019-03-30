@@ -11,7 +11,7 @@ repositories {
     mavenCentral()
 }
 
-version = '1.2.0'
+version = '1.2.1'
 
 sourceSets {
 
@@ -54,7 +54,6 @@ dependencies {
 
     // MISC
     compile 'org.apache.commons:commons-lang3:3.7'
-    compile 'org.bouncycastle:bcprov-jdk15on:1.61'
 
     // Unit Testing
     testCompile 'junit:junit:4.11'
@@ -70,6 +69,8 @@ jar {
     from {
         configurations.compile.collect { it.isDirectory() ? it : zipTree(it) }
     }
+
+    exclude 'META-INF/*.RSA', 'META-INF/*.SF','META-INF/*.DSA'
 }
 
 combineJs {

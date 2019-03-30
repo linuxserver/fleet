@@ -18,24 +18,25 @@
 package io.linuxserver.fleet.auth.security;
 
 import io.linuxserver.fleet.auth.security.util.SaltGenerator;
-import org.bouncycastle.crypto.PBEParametersGenerator;
-import org.bouncycastle.crypto.digests.SHA256Digest;
-import org.bouncycastle.crypto.generators.PKCS5S2ParametersGenerator;
-import org.bouncycastle.crypto.params.KeyParameter;
 
+import javax.crypto.SecretKeyFactory;
+import javax.crypto.spec.PBEKeySpec;
 import java.nio.charset.StandardCharsets;
+import java.security.GeneralSecurityException;
 import java.util.Arrays;
 import java.util.Base64;
 
 /**
  * <p>
- * Uses the PKCS5S2 crypto algorithm to encode and verify hashed passwords.
+ * Uses the PBKDF2 crypto algorithm to encode and verify hashed passwords.
  * </p>
  */
-public class PKCS5S2PasswordEncoder implements PasswordEncoder {
+public class PBKDF2PasswordEncoder implements PasswordEncoder {
 
     private static final int DEFAULT_HASH_WIDTH = 512;
     private static final int DEFAULT_ITERATIONS = 150051;
+
+    private static final String PBKDF2 = "PBKDF2WithHmacSHA512";
 
     private final SaltGenerator saltGenerator = new SaltGenerator();
 
@@ -43,11 +44,11 @@ public class PKCS5S2PasswordEncoder implements PasswordEncoder {
     private final int hashWidth;
     private final int iterations;
 
-    public PKCS5S2PasswordEncoder(String secret) {
+    public PBKDF2PasswordEncoder(String secret) {
         this(secret, DEFAULT_HASH_WIDTH, DEFAULT_ITERATIONS);
     }
 
-    public PKCS5S2PasswordEncoder(String secret, int hashWidth, int iterations) {
+    public PBKDF2PasswordEncoder(String secret, int hashWidth, int iterations) {
 
         this.secret     = secret.getBytes(StandardCharsets.UTF_8);
         this.hashWidth  = hashWidth;
@@ -104,14 +105,21 @@ public class PKCS5S2PasswordEncoder implements PasswordEncoder {
      */
     private byte[] encode(String rawPassword, byte[] salt) {
 
-        PKCS5S2ParametersGenerator generator = new PKCS5S2ParametersGenerator(new SHA256Digest());
-        generator.init(
-            PBEParametersGenerator.PKCS5PasswordToBytes(rawPassword.toCharArray()),
-            joinArrays(salt, secret),
-            iterations
-        );
+        try {
 
-        return joinArrays(salt, ((KeyParameter) generator.generateDerivedMacParameters(hashWidth)).getKey());
+            PBEKeySpec spec = new PBEKeySpec(
+
+                rawPassword.toCharArray(),
+                joinArrays(salt, secret),
+                iterations,
+                hashWidth
+            );
+
+            return joinArrays(salt, SecretKeyFactory.getInstance(PBKDF2).generateSecret(spec).getEncoded());
+
+        } catch (GeneralSecurityException e) {
+            throw new IllegalStateException("Unable to create password hash", e);
+        }
     }
 
     /**

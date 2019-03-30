@@ -23,11 +23,11 @@ import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 
-public class PKCS5S2PasswordEncoderTest {
+public class PBKDF2PasswordEncoderTest {
 
-    private static final String HASH_FOR_PASSWORD = "CYvjZH/RPa+6Y4JVQiKjOTEIrdntD+6DJDmolYpO0gta8gjI5yRiN/dRoHr0PhpJB0EoTmqR4gJakqk6HElT2yRaLp6WPG4U0GZIYjQSUo8=";
+    private static final String HASH_FOR_PASSWORD = "AEGvVmpwYMMYdW5XkX5lqQWKsuZp0fSIxo27KUaI7nPqHF1gTVFvKlEIJyN9FJWsBG5bF59v5axUg2gpyqAsNbT7l9nT5KwKenfkcx7IVEo=";
 
-    private PKCS5S2PasswordEncoder encoder = new PKCS5S2PasswordEncoder("superSecret");
+    private PBKDF2PasswordEncoder encoder = new PBKDF2PasswordEncoder("superSecret");
 
     @Test
     public void shouldGenerateHash() {

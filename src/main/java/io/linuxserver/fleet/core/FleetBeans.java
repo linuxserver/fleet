@@ -18,7 +18,7 @@
 package io.linuxserver.fleet.core;
 
 import io.linuxserver.fleet.auth.authenticator.AuthenticatorFactory;
-import io.linuxserver.fleet.auth.security.PKCS5S2PasswordEncoder;
+import io.linuxserver.fleet.auth.security.PBKDF2PasswordEncoder;
 import io.linuxserver.fleet.auth.security.PasswordEncoder;
 import io.linuxserver.fleet.db.DefaultDatabaseConnection;
 import io.linuxserver.fleet.db.dao.DefaultImageDAO;
@@ -58,7 +58,7 @@ public class FleetBeans {
 
         final DefaultDatabaseConnection databaseConnection = new DefaultDatabaseConnection(properties);
 
-        passwordEncoder         = new PKCS5S2PasswordEncoder(properties.getAppSecret());
+        passwordEncoder         = new PBKDF2PasswordEncoder(properties.getAppSecret());
         databaseVersion         = new DatabaseVersion(databaseConnection);
         imageDelegate           = new ImageDelegate(new DefaultImageDAO(databaseConnection));
         repositoryDelegate      = new RepositoryDelegate(new DefaultRepositoryDAO(databaseConnection));

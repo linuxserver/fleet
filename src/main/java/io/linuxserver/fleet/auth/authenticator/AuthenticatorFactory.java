@@ -17,7 +17,6 @@
 
 package io.linuxserver.fleet.auth.authenticator;
 
-import io.linuxserver.fleet.auth.security.PKCS5S2PasswordEncoder;
 import io.linuxserver.fleet.core.FleetBeans;
 import io.linuxserver.fleet.core.FleetProperties;
 import org.slf4j.Logger;
