@@ -19,8 +19,29 @@ var ajaxManager = (function($) {
 
     var handleError = function(jqXHR, textStatus, handleError) {
 
-        var error = JSON.parse(jqXHR.responseText);
-        console.error(error);
+        if (jqXHR.status === 403) {
+
+            var notification = $(
+                '<div class="fleet-alert fleet-alert--warning">' +
+                     '<i class="fas fa-exclamation-triangle text-warning"></i> Permission denied. Has your session expired?' +
+                 '</div>'
+            );
+
+        } else {
+
+            var message = JSON.parse(jqXHR.responseText).data;
+
+            var notification = $(
+                '<div class="fleet-alert fleet-alert--warning">' +
+                     '<i class="fas fa-exclamation-triangle text-warning"></i> ' + message +
+                 '</div>'
+            );
+        }
+
+        $('.fleet-notifications').append(notification);
+        notification.delay(3000).fadeOut(2000, function() {
+            $(this).remove();
+        });
     };
 
     var call = function(param, onDone) {
@@ -195,7 +216,7 @@ var imageListManager = (function($) {
         var imageId = getImageId(row);
 
         modal.find('#image-deprecation-reason').val('');
-        modal.find('#selected-deprecation-image-name').text('Deprecation notice for' + getImageName(row));
+        modal.find('#selected-deprecation-image-name').text('Deprecation notice for ' + getImageName(row));
         modal.find('#submit-deprecation-change').data('image-id', imageId);
         modal.find('#submit-deprecation-change').data('trigger-option', option.attr('id'));
     };

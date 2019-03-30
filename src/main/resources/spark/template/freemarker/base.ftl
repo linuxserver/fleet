@@ -46,6 +46,8 @@
                 </div>
             </nav>
 
+            <div class="fleet-notifications"></div>
+
             <#nested>
 
             <footer class="text-center my-5">

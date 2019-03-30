@@ -132,8 +132,9 @@ public class DefaultSynchronisationState implements SynchronisationState {
                     DockerHubImage dockerHubImage = images.get(i);
                     Image image = configureImage(repository.getId(), dockerHubImage, context);
 
-                    String maskedVersion = getMaskedVersion(repository.getName(), image.getName(), image.getVersionMask(), context);
-                    LOGGER.debug("Updated image version using mask. Mask=" + image.getVersionMask() + ", MaskedVersion=" + maskedVersion);
+                    String versionMask = getVersionMask(repository.getVersionMask(), image.getVersionMask());
+                    String maskedVersion = getMaskedVersion(repository.getName(), image.getName(), versionMask, context);
+                    LOGGER.debug("Updated image version using mask. Mask=" + versionMask + ", MaskedVersion=" + maskedVersion);
 
                     image.withPullCount(dockerHubImage.getPullCount()).withVersion(maskedVersion);
 
@@ -148,6 +149,10 @@ public class DefaultSynchronisationState implements SynchronisationState {
         } else {
             LOGGER.info("Skipping " + repositoryName);
         }
+    }
+
+    private String getVersionMask(String repositoryMask, String imageMask) {
+        return imageMask == null ? repositoryMask : imageMask;
     }
 
     private String getMaskedVersion(String repositoryName, String imageName, String versionMask, SynchronisationContext context) {

@@ -1,5 +1,6 @@
 body {
     color: #666;
+    position: relative;
 }
 
 a {
@@ -172,6 +173,15 @@ code {
 
 i.fas, i.far {
     margin-right: 5px;
+}
+
+.fleet-notifications {
+
+    position: fixed;
+    bottom: 25px;
+    right: 25px;
+    max-width: calc(100% - 25px);
+    z-index: 1000;
 }
 
 /*
