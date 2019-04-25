@@ -44,11 +44,24 @@ END;
 CREATE PROCEDURE `Image_GetPullHistory`
 (
     in_image_id         INT,
-    in_grouping_mode    ENUM('day', 'week', 'month', 'year')
+    in_grouping_mode    ENUM('hour', 'day', 'week', 'month', 'year')
 )
 BEGIN
 
-    IF in_grouping_mode = 'day' THEN
+    IF in_grouping_mode = 'hour' THEN
+
+        SELECT
+            `image_id`                                AS ImageId,
+            MAX(`pull_count`)                         AS ImagePulls,
+            FROM_UNIXTIME(`pull_timestamp`, '%d%m%Y') AS TimeGroup
+        FROM
+            ImagePullHistory
+        WHERE
+            `image_id` = in_image_id
+        GROUP BY `image_id`, TimeGroup
+        ORDER BY TimeGroup;
+
+    ELSEIF in_grouping_mode = 'day' THEN
 
         SELECT
             `image_id`                                AS ImageId,

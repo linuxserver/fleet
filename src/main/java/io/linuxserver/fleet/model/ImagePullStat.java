@@ -50,7 +50,7 @@ public class ImagePullStat {
 
     public enum GroupMode {
 
-        DAY, WEEK, MONTH, YEAR;
+        HOUR, DAY, WEEK, MONTH, YEAR;
 
         @Override
         public String toString() {
