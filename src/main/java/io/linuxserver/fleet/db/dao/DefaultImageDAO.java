@@ -22,6 +22,7 @@ import io.linuxserver.fleet.db.query.InsertUpdateResult;
 import io.linuxserver.fleet.db.query.InsertUpdateStatus;
 import io.linuxserver.fleet.db.query.LimitedResult;
 import io.linuxserver.fleet.model.Image;
+import io.linuxserver.fleet.model.ImagePullStat;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -29,9 +30,7 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
-import static io.linuxserver.fleet.db.dao.Utils.setNullableInt;
-import static io.linuxserver.fleet.db.dao.Utils.setNullableLong;
-import static io.linuxserver.fleet.db.dao.Utils.setNullableString;
+import static io.linuxserver.fleet.db.dao.Utils.*;
 
 public class DefaultImageDAO implements ImageDAO {
 
@@ -46,9 +45,11 @@ public class DefaultImageDAO implements ImageDAO {
     @Override
     public Image findImageByRepositoryAndImageName(int repositoryId, String imageName) {
 
+        CallableStatement call = null;
+
         try (Connection connection = databaseConnection.getConnection()) {
 
-            CallableStatement call = connection.prepareCall("{CALL Image_GetByName(?,?)}");
+            call = connection.prepareCall("{CALL Image_GetByName(?,?)}");
             call.setInt(1, repositoryId);
             call.setString(2, imageName);
 
@@ -58,6 +59,8 @@ public class DefaultImageDAO implements ImageDAO {
 
         } catch (SQLException e) {
             LOGGER.error("Unable to fetch image", e);
+        } finally {
+            safeClose(call);
         }
 
         return null;
@@ -68,9 +71,11 @@ public class DefaultImageDAO implements ImageDAO {
 
         LOGGER.debug("Fetching image by ID: " + id);
 
+        CallableStatement call = null;
+
         try (Connection connection = databaseConnection.getConnection()) {
 
-            CallableStatement call = connection.prepareCall("{CALL Image_Get(?)}");
+            call = connection.prepareCall("{CALL Image_Get(?)}");
             call.setInt(1, id);
 
             ResultSet results = call.executeQuery();
@@ -79,6 +84,8 @@ public class DefaultImageDAO implements ImageDAO {
 
         } catch (SQLException e) {
             LOGGER.error("Unable to fetch image.", e);
+        } finally {
+            safeClose(call);
         }
 
         return null;
@@ -89,9 +96,11 @@ public class DefaultImageDAO implements ImageDAO {
 
         List<Image> images = new ArrayList<>();
 
+        CallableStatement call = null;
+
         try (Connection connection = databaseConnection.getConnection()) {
 
-            CallableStatement call = connection.prepareCall("{CALL Image_GetAll(?,?)}");
+            call = connection.prepareCall("{CALL Image_GetAll(?,?)}");
             call.setInt(1, repositoryId);
             call.registerOutParameter(2, Types.INTEGER);
 
@@ -104,6 +113,8 @@ public class DefaultImageDAO implements ImageDAO {
 
         } catch (SQLException e) {
             LOGGER.error("Unable to get all images", e);
+        } finally {
+            safeClose(call);
         }
 
         return new LimitedResult<>(images, images.size());
@@ -112,9 +123,11 @@ public class DefaultImageDAO implements ImageDAO {
     @Override
     public InsertUpdateResult<Image> saveImage(Image image) {
 
+        CallableStatement call = null;
+
         try (Connection connection = databaseConnection.getConnection()) {
 
-            CallableStatement call = connection.prepareCall("{CALL Image_Save(?,?,?,?,?,?,?,?,?,?,?,?,?)");
+            call = connection.prepareCall("{CALL Image_Save(?,?,?,?,?,?,?,?,?,?,?,?,?)");
             setNullableInt(call, 1, image.getId());
             call.setInt(2, image.getRepositoryId());
             call.setString(3, image.getName());
@@ -145,22 +158,68 @@ public class DefaultImageDAO implements ImageDAO {
 
             LOGGER.error("Unable to save image", e);
             return new InsertUpdateResult<>(null, InsertUpdateStatus.OK, "Unable to save image");
+
+        } finally {
+            safeClose(call);
         }
     }
 
     @Override
     public void removeImage(Integer id) {
 
+        CallableStatement call = null;
+
         try (Connection connection = databaseConnection.getConnection()) {
 
-            PreparedStatement call = connection.prepareStatement("DELETE FROM Images WHERE `id` = ?");
+            call = connection.prepareCall("{CALL Image_Delete(?)}");
             call.setInt(1, id);
 
             call.executeUpdate();
+            call.close();
 
         } catch (SQLException e) {
             LOGGER.error("Error when removing image", e);
+        } finally {
+            safeClose(call);
         }
+    }
+
+    @Override
+    public List<ImagePullStat> fetchImagePullHistory(Integer imageId, ImagePullStat.GroupMode groupMode) {
+
+        List<ImagePullStat> pullHistory = new ArrayList<>();
+
+        CallableStatement call = null;
+
+        try (Connection connection = databaseConnection.getConnection()) {
+
+            call = connection.prepareCall("CALL Image_GetPullHistory(?, ?)");
+            call.setInt(1, imageId);
+            call.setString(2, groupMode.toString());
+
+            ResultSet results = call.executeQuery();
+            while (results.next())
+                pullHistory.add(parseImagePullHistoryFromResultSet(results, groupMode));
+
+            call.close();
+
+        } catch (SQLException e) {
+            LOGGER.error("Error when fetching image pull history", e);
+        } finally {
+            safeClose(call);
+        }
+
+        return pullHistory;
+    }
+
+    private ImagePullStat parseImagePullHistoryFromResultSet(ResultSet results, ImagePullStat.GroupMode groupMode) throws SQLException {
+
+        return new ImagePullStat(
+            results.getInt("ImageId"),
+            results.getString("TimeGroup"),
+            results.getLong("ImagePulls"),
+            groupMode
+        );
     }
 
     private Image parseImageFromResultSet(ResultSet results) throws SQLException {

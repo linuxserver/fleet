@@ -3,6 +3,9 @@ package io.linuxserver.fleet.db.dao;
 import io.linuxserver.fleet.db.query.InsertUpdateResult;
 import io.linuxserver.fleet.db.query.LimitedResult;
 import io.linuxserver.fleet.model.Image;
+import io.linuxserver.fleet.model.ImagePullStat;
+
+import java.util.List;
 
 public interface ImageDAO {
 
@@ -15,4 +18,6 @@ public interface ImageDAO {
     InsertUpdateResult<Image> saveImage(Image image);
 
     void removeImage(Integer id);
+
+    List<ImagePullStat> fetchImagePullHistory(Integer imageId, ImagePullStat.GroupMode groupMode);
 }
