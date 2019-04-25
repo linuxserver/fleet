@@ -53,7 +53,7 @@ BEGIN
         SELECT
             `image_id`                                AS ImageId,
             MAX(`pull_count`)                         AS ImagePulls,
-            FROM_UNIXTIME(`pull_timestamp`, '%d%m%Y') AS TimeGroup
+            FROM_UNIXTIME(`pull_timestamp`, '%H%d%m%Y') AS TimeGroup
         FROM
             ImagePullHistory
         WHERE
