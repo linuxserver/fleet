@@ -65,6 +65,7 @@ public class ApiImagePullHistory {
         private final long pullCount;
 
         ApiImagePullStat(String timeGroup, long pullCount) {
+
             this.timeGroup = timeGroup;
             this.pullCount = pullCount;
         }

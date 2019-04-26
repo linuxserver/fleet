@@ -67,10 +67,6 @@ public class ImageDelegate {
         throw new SaveException(result.getStatusMessage());
     }
 
-    public List<ImagePullStat> fetchImagePullHistory(int id) {
-        return fetchImagePullHistory(id, ImagePullStat.GroupMode.DAY);
-    }
-
     public List<ImagePullStat> fetchImagePullHistory(int id, ImagePullStat.GroupMode groupMode) {
         return imageDAO.fetchImagePullHistory(id, groupMode);
     }
