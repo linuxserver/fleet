@@ -49,4 +49,16 @@ class Utils {
         else
             call.setString(position, value);
     }
+
+    static void safeClose(CallableStatement call) {
+
+        try {
+
+            if (null != call)
+                call.close();
+
+        } catch (SQLException e) {
+            throw new RuntimeException("Unable to close call", e);
+        }
+    }
 }

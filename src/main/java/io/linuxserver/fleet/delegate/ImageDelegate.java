@@ -22,6 +22,7 @@ import io.linuxserver.fleet.db.query.InsertUpdateResult;
 import io.linuxserver.fleet.db.query.InsertUpdateStatus;
 import io.linuxserver.fleet.exception.SaveException;
 import io.linuxserver.fleet.model.Image;
+import io.linuxserver.fleet.model.ImagePullStat;
 
 import java.util.List;
 
@@ -64,5 +65,9 @@ public class ImageDelegate {
             return result.getResult();
 
         throw new SaveException(result.getStatusMessage());
+    }
+
+    public List<ImagePullStat> fetchImagePullHistory(int id, ImagePullStat.GroupMode groupMode) {
+        return imageDAO.fetchImagePullHistory(id, groupMode);
     }
 }

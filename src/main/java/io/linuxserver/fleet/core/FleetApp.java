@@ -130,7 +130,8 @@ public class FleetApp {
          */
         path("/api/v1", () -> {
 
-            get("/images", new AllImagesApi(beans.getRepositoryDelegate(), beans.getImageDelegate()), new JsonTransformer());
+            get("/images",      new AllImagesApi(beans.getRepositoryDelegate(), beans.getImageDelegate()), new JsonTransformer());
+            get("/pullHistory", new GetImagePullHistoryApi(beans.getImageDelegate()), new JsonTransformer());
 
             after("/*", (request, response) -> {
 

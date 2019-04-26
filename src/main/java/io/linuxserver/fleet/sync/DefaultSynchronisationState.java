@@ -31,6 +31,7 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 public class DefaultSynchronisationState implements SynchronisationState {
 
@@ -86,7 +87,9 @@ public class DefaultSynchronisationState implements SynchronisationState {
             try {
 
                 List<String> repositories = context.getDockerHubDelegate().fetchAllRepositories();
+
                 onRepositoryScanned(context, repositories);
+                checkAndRemoveMissingRepositories(repositories, context);
 
                 for (String repositoryName : repositories)
                     synchroniseRepository(repositoryName, context);
@@ -122,6 +125,7 @@ public class DefaultSynchronisationState implements SynchronisationState {
         if (repository.isSyncEnabled()) {
 
             List<DockerHubImage> images = context.getDockerHubDelegate().fetchAllImagesFromRepository(repository.getName());
+            checkAndRemoveMissingImages(repository, images, context);
 
             int totalSize = images.size();
             LOGGER.info("Found {} images in Docker Hub", totalSize);
@@ -139,7 +143,7 @@ public class DefaultSynchronisationState implements SynchronisationState {
                     image.withPullCount(dockerHubImage.getPullCount()).withVersion(maskedVersion);
 
                     context.getImageDelegate().saveImage(image);
-                    onImageUpdated(context, new ImageUpdateEvent(image, i, totalSize));
+                    onImageUpdated(context, new ImageUpdateEvent(image, i + 1, totalSize));
 
                 } catch (SaveException e) {
                     LOGGER.error("Unable to save updated image", e);
@@ -148,6 +152,34 @@ public class DefaultSynchronisationState implements SynchronisationState {
 
         } else {
             LOGGER.info("Skipping " + repositoryName);
+        }
+    }
+
+    private void checkAndRemoveMissingRepositories(List<String> repositories, SynchronisationContext context) {
+
+        LOGGER.info("Checking for any removed repositories.");
+        for (Repository storedRepository : context.getRepositoryDelegate().fetchAllRepositories()) {
+
+            if (!repositories.contains(storedRepository.getName())) {
+
+                LOGGER.info("Found repository which no longer exists in Docker Hub. Removing {}", storedRepository.getName());
+                context.getRepositoryDelegate().removeRepository(storedRepository.getId());
+            }
+        }
+    }
+
+    private void checkAndRemoveMissingImages(Repository repository, List<DockerHubImage> images, SynchronisationContext context) {
+
+        List<String> dockerHubImageNames = images.stream().map(DockerHubImage::getName).collect(Collectors.toList());
+
+        LOGGER.info("Checking for any removed images under {}", repository.getName());
+        for (Image storedImage : context.getImageDelegate().fetchImagesByRepository(repository.getId())) {
+
+            if (!dockerHubImageNames.contains(storedImage.getName())) {
+
+                LOGGER.info("Found image which no longer exists in Docker Hub. Removing {}", storedImage.getName());
+                context.getImageDelegate().removeImage(storedImage.getId());
+            }
         }
     }
 
