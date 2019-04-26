@@ -314,6 +314,56 @@ var imageListManager = (function($) {
         ajaxManager.call(request, callback);
     };
 
+    var getImageMeta = function() {
+
+        var option  = $(this);
+        var row     = getImageRow(option);
+        var imageId = getImageId(row);
+
+        getPullHistory(imageId);
+    };
+
+    var getPullHistory = function(imageId) {
+
+        var request = {
+            url: '/api/v1/pullHistory?imageId=' + imageId + '&groupMode=HOUR',
+            method: 'GET'
+        };
+
+        ajaxManager.call(request, function(history) {
+
+            var pullCounts = history.data.pullHistory.map(function (item) { return item.pullCount; });
+            var labels = history.data.pullHistory.map(function (item) { return item.timeGroup; });
+
+            var ctx = document.getElementById('pullChart_' + imageId);
+            var chart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [
+                        {
+                            label: 'Pulls',
+                            data: pullCounts
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRadio: false,
+                    scales: {
+                        yAxes: [
+                            {
+                                ticks: {
+                                    beginAtZero: false
+                                }
+                            }
+                        ]
+                    }
+                }
+            });
+        });
+    };
+
     var init = function() {
 
         $('.admin-actions').on('click', '.image--show', showImage);
@@ -321,6 +371,8 @@ var imageListManager = (function($) {
         $('.admin-actions').on('click', '.image--mark-stable', markImageStable);
         $('.admin-actions').on('click', '.image--mark-unstable', markImageUnstable);
         $('.admin-actions').on('click', '.image--remove-deprecation-notice', removeDeprecationNotice);
+
+        $('.image--expand').on('click', getImageMeta);
 
         $('#update-image-version-mask').on('show.bs.modal', showImageVersionMask);
         $('#update-image-deprecation').on('show.bs.modal', showImageDeprecationNotice);
@@ -435,3 +487,5 @@ var passwordValidationManager = (function($) {
     };
 
 }(jQuery));
+
+Chart.defaults.scale.gridLines.display = false;

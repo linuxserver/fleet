@@ -82,6 +82,7 @@ h2 {
     text-decoration: line-through;
 }
 
+
 .table tbody tr.deprecated-image td.image-name span.deprecation-message {
     margin-left: 10px;
 }
@@ -94,6 +95,15 @@ h2 {
 
 .table tbody tr td.image-name span.image-name--repository {
     font-weight: normal;
+}
+
+.table tbody tr td.image-name:hover .image--expand {
+    display: inline-block;
+}
+
+.table tbody tr td.image-name .image--expand {
+    display: none;
+    cursor: pointer;
 }
 
 .dropdown-menu {

@@ -35,6 +35,7 @@
                                     </a>
                                     <div class="dropdown-menu" aria-labelledby="navbarDropdown">
                                         <a class="dropdown-item" href="admin">Manage Repositories</a>
+                                        <a class="dropdown-item" href="admin/templates">Image Templates</a>
                                         <form action="/logout" method="POST">
                                             <button class="dropdown-item">Log Out</button>
                                         </form>

@@ -68,6 +68,7 @@
                                                                 <#if image.deprecated>
                                                                 <span class="deprecation-message" title="This image has been deprecated: ${image.deprecationReason!""}"><i class="fas fa-exclamation-circle"></i></span>
                                                                 </#if>
+                                                                <a href="#expand_#{image.id}" data-toggle="collapse" role="button" aria-expanded="false" aria-controls="expand_#{image.id}" class="image--expand"><i class="fas fa-caret-down"></i></a>
                                                             </td>
                                                             <td>
                                                                 <#if image.version?has_content>
@@ -114,6 +115,11 @@
                                                                     </div>
                                                                 </td>
                                                             </#if>
+                                                        </tr>
+                                                        <tr class="collapse" id="expand_#{image.id}">
+                                                            <td colspan="<#if __AUTHENTICATED_USER?has_content>5<#else>4</#if>">
+                                                                <canvas id="pullChart_#{image.id}"></canvas>
+                                                            </td>
                                                         </tr>
                                                     </#if>
                                                 </#list>

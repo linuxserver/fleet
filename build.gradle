@@ -82,6 +82,7 @@ combineJs {
         'src/main/resources/assets/js/bootstrap.bundle.min.js',
         'src/main/resources/assets/js/fontawesome-all.min.js',
         'src/main/resources/assets/js/jquery.tablesorter.js',
+        'src/main/resources/assets/js/Chart.bundle.min.js',
         'src/main/resources/assets/js/fleet.js'
     ]
 
@@ -101,6 +102,7 @@ combineCss {
 
     source = [
         'src/main/resources/assets/css/bootstrap.css',
+        'src/main/resources/assets/css/Chart.min.css',
         'src/main/resources/assets/css/fleet.css',
         'src/main/resources/assets/css/fontawesome-all.css'
     ]
