@@ -54,7 +54,7 @@ public class GetImagePullHistoryApi implements Route {
 
     private ImagePullStat.GroupMode getGroupMode(Request request) {
 
-        String groupMode = request.params("groupMode");
+        String groupMode = request.queryParams("groupMode");
         return ImagePullStat.GroupMode.isValid(groupMode) ? ImagePullStat.GroupMode.valueOf(groupMode) : ImagePullStat.GroupMode.DAY;
     }
 }

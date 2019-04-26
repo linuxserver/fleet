@@ -51,9 +51,9 @@ BEGIN
     IF in_grouping_mode = 'hour' THEN
 
         SELECT
-            `image_id`                                AS ImageId,
-            MAX(`pull_count`)                         AS ImagePulls,
-            FROM_UNIXTIME(`pull_timestamp`, '%H%d%m%Y') AS TimeGroup
+            `image_id`                                  AS ImageId,
+            MAX(`pull_count`)                           AS ImagePulls,
+            FROM_UNIXTIME(`pull_timestamp`, '%Y%m%d%H') AS TimeGroup
         FROM
             ImagePullHistory
         WHERE
@@ -66,7 +66,7 @@ BEGIN
         SELECT
             `image_id`                                AS ImageId,
             MAX(`pull_count`)                         AS ImagePulls,
-            FROM_UNIXTIME(`pull_timestamp`, '%d%m%Y') AS TimeGroup
+            FROM_UNIXTIME(`pull_timestamp`, '%Y%m%d') AS TimeGroup
         FROM
             ImagePullHistory
         WHERE
@@ -79,7 +79,7 @@ BEGIN
         SELECT
             `image_id`                              AS ImageId,
             MAX(`pull_count`)                       AS ImagePulls,
-            FROM_UNIXTIME(`pull_timestamp`, '%v%Y') AS TimeGroup
+            FROM_UNIXTIME(`pull_timestamp`, '%Y%v') AS TimeGroup
         FROM
             ImagePullHistory
         WHERE
@@ -92,7 +92,7 @@ BEGIN
         SELECT
             `image_id`                              AS ImageId,
             MAX(`pull_count`)                       AS ImagePulls,
-            FROM_UNIXTIME(`pull_timestamp`, '%m%Y') AS TimeGroup
+            FROM_UNIXTIME(`pull_timestamp`, '%Y%m') AS TimeGroup
         FROM
             ImagePullHistory
         WHERE
