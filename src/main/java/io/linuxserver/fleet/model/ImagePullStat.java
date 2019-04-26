@@ -56,5 +56,21 @@ public class ImagePullStat {
         public String toString() {
             return name().toLowerCase();
         }
+
+        public static boolean isValid(String value) {
+
+            try {
+
+                if (null == value) {
+                    return false;
+                }
+
+                valueOf(value);
+                return true;
+
+            } catch (IllegalArgumentException e) {
+                return false;
+            }
+        }
     }
 }

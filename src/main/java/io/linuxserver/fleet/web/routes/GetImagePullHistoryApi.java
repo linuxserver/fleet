@@ -46,10 +46,15 @@ public class GetImagePullHistoryApi implements Route {
         }
 
         int imageId = Integer.parseInt(imageIdParam);
+        List<ImagePullStat> imagePullStats = imageDelegate.fetchImagePullHistory(imageId, getGroupMode(request));
 
         Image image = imageDelegate.fetchImage(imageId);
-        List<ImagePullStat> imagePullStats = imageDelegate.fetchImagePullHistory(imageId);
-
         return new ApiResponse<>("OK", ApiImagePullHistory.fromPullStats(image, imagePullStats));
+    }
+
+    private ImagePullStat.GroupMode getGroupMode(Request request) {
+
+        String groupMode = request.params("groupMode");
+        return ImagePullStat.GroupMode.isValid(groupMode) ? ImagePullStat.GroupMode.valueOf(groupMode) : ImagePullStat.GroupMode.DAY;
     }
 }
