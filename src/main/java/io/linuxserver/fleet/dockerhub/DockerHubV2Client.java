@@ -22,10 +22,7 @@ import io.linuxserver.fleet.rest.HttpException;
 import io.linuxserver.fleet.rest.RestClient;
 import io.linuxserver.fleet.rest.RestResponse;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Client class to interface with Docker Hub's V2 API.
@@ -33,6 +30,7 @@ import java.util.Map;
 public class DockerHubV2Client implements DockerHubClient {
 
     static final String DOCKERHUB_BASE_URI = "https://hub.docker.com/v2";
+    static final int    DEFAULT_PAGE_SIZE  = 1000;
 
     private final RestClient             restClient;
     private final DockerHubAuthenticator authenticator;
@@ -70,8 +68,7 @@ public class DockerHubV2Client implements DockerHubClient {
 
         try {
 
-            String url = DOCKERHUB_BASE_URI + "/repositories/" + repositoryName;
-
+            String url = DOCKERHUB_BASE_URI + "/repositories/" + repositoryName + "?page_size=" + DEFAULT_PAGE_SIZE;
             while (url != null) {
 
                 RestResponse<DockerHubV2ImageListResult> response = doCall(url, DockerHubV2ImageListResult.class);
@@ -112,13 +109,24 @@ public class DockerHubV2Client implements DockerHubClient {
 
         try {
 
-            String absoluteUrl = DOCKERHUB_BASE_URI + "/repositories/" + repositoryName + "/" + imageName + "/tags" ;
+            List<DockerHubV2Tag> tags = new ArrayList<>();
 
-            RestResponse<DockerHubV2TagListResult> restResponse = doCall(absoluteUrl, DockerHubV2TagListResult.class);
+            String absoluteUrl = DOCKERHUB_BASE_URI + "/repositories/" + repositoryName + "/" + imageName + "/tags?page_size=" + DEFAULT_PAGE_SIZE;
+            while (absoluteUrl != null) {
 
-            List<DockerHubV2Tag> results = restResponse.getPayload().getResults();
-            if (!results.isEmpty())
-                return results.get(0);
+                RestResponse<DockerHubV2TagListResult> response = doCall(absoluteUrl, DockerHubV2TagListResult.class);
+
+                if (isResponseOK(response)) {
+
+                    DockerHubV2TagListResult payload = response.getPayload();
+
+                    tags.addAll(payload.getResults());
+                    absoluteUrl = payload.getNext();
+                }
+            }
+
+            if (!tags.isEmpty())
+                return determineLatestVersionedTag(tags);
 
             return null;
 
@@ -160,5 +168,22 @@ public class DockerHubV2Client implements DockerHubClient {
 
     private boolean isResponseUnauthorised(RestResponse restResponse) {
         return restResponse.getStatusCode() == 401;
+    }
+
+    private DockerHubV2Tag determineLatestVersionedTag(List<DockerHubV2Tag> results) {
+
+        Optional<DockerHubV2Tag> trueLatest = results.stream().filter(tag -> "latest".equals(tag.getName())).findFirst();
+
+        if (trueLatest.isPresent()) {
+
+            DockerHubV2Tag trueLatestTag = trueLatest.get();
+            Optional<DockerHubV2Tag> versionedLatestTag = results.stream()
+                .filter(tag -> !tag.equals(trueLatestTag))
+                .filter(tag -> tag.getFullSize() == trueLatestTag.getFullSize()).findFirst();
+
+            return versionedLatestTag.orElse(trueLatestTag);
+        }
+
+        return results.get(0);
     }
 }
