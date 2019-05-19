@@ -28,7 +28,7 @@ public class DefaultLoggingSyncListener implements SynchronisationListener {
 
     @Override
     public void onSynchronisationStart() {
-        LOGGER.info("Sync started");
+        LOGGER.info("Sync started.");
     }
 
     @Override
@@ -38,7 +38,7 @@ public class DefaultLoggingSyncListener implements SynchronisationListener {
 
     @Override
     public void onImageUpdated(ImageUpdateEvent event) {
-        LOGGER.info("({}/{}) {}.", event.getCurrentPosition(), event.getTotalImages(), event.getImage().getName());
+
     }
 
     @Override

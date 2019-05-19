@@ -15,21 +15,28 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package io.linuxserver.fleet.dockerhub;
+package io.linuxserver.fleet.dockerhub.util;
 
-import io.linuxserver.fleet.dockerhub.model.DockerHubV2Image;
-import io.linuxserver.fleet.dockerhub.model.DockerHubV2NamespaceLookupResult;
 import io.linuxserver.fleet.dockerhub.model.DockerHubV2Tag;
 
 import java.util.List;
+import java.util.Optional;
 
-public interface DockerHubClient {
+public class DockerTagFinder {
 
-    DockerHubV2NamespaceLookupResult fetchAllRepositories();
+    public DockerHubV2Tag findVersionedTagMatchingBranch(List<DockerHubV2Tag> tags, String namedBranch) {
 
-    List<DockerHubV2Image> fetchImagesFromRepository(String repositoryName);
+        Optional<DockerHubV2Tag> trueLatest = tags.stream().filter(tag -> namedBranch.equals(tag.getName())).findFirst();
 
-    DockerHubV2Image fetchImageFromRepository(String repositoryName, String imageName);
+        if (trueLatest.isPresent()) {
 
-    List<DockerHubV2Tag> fetchAllTagsForImage(String repositoryName, String imageName);
+            DockerHubV2Tag trueLatestTag = trueLatest.get();
+            Optional<DockerHubV2Tag> versionedLatestTag = tags.stream()
+                .filter(tag -> !tag.equals(trueLatestTag) && tag.getFullSize() == trueLatestTag.getFullSize()).findFirst();
+
+            return versionedLatestTag.orElse(trueLatestTag);
+        }
+
+        return tags.get(0);
+    }
 }

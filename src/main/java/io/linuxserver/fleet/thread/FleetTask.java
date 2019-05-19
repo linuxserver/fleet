@@ -17,24 +17,26 @@
 
 package io.linuxserver.fleet.thread;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public abstract class FleetTask implements Runnable {
 
-    private TaskListener taskListener;
+    private final Logger logger;
 
-    public void setTaskListener(TaskListener listener) {
-        this.taskListener = listener;
-    }
-
-    protected TaskListener getTaskListener() {
-        return taskListener;
+    FleetTask() {
+        logger = LoggerFactory.getLogger(getClass().getSimpleName());
     }
 
     @Override
     public void run() {
 
-        onStart(toString() + " has started.");
-        executeTask();
-        onEnd(toString() + " has finished.");
+        try {
+            executeTask();
+        } catch (Exception e) {
+            logger.error("run() Caught unhandled exception during task execution.", e);
+        }
+
     }
 
     protected abstract void executeTask();
@@ -42,17 +44,5 @@ public abstract class FleetTask implements Runnable {
     @Override
     public String toString() {
         return getClass().getSimpleName();
-    }
-
-    private void onStart(String message) {
-
-        if (taskListener != null)
-            taskListener.onTaskStart(message);
-    }
-
-    private void onEnd(String message) {
-
-        if (taskListener != null)
-            taskListener.onTaskEnd(message);
     }
 }

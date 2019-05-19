@@ -20,6 +20,7 @@ package io.linuxserver.fleet.delegate;
 import io.linuxserver.fleet.dockerhub.DockerHubClient;
 import io.linuxserver.fleet.dockerhub.model.DockerHubV2Image;
 import io.linuxserver.fleet.dockerhub.model.DockerHubV2Tag;
+import io.linuxserver.fleet.dockerhub.util.DockerTagFinder;
 import io.linuxserver.fleet.model.DockerHubImage;
 
 import java.time.LocalDateTime;
@@ -31,9 +32,12 @@ import java.util.List;
 public class DockerHubDelegate {
 
     private final DockerHubClient dockerHubClient;
+    private final DockerTagFinder dockerTagFinder;
 
     public DockerHubDelegate(DockerHubClient dockerHubClient) {
+
         this.dockerHubClient = dockerHubClient;
+        this.dockerTagFinder = new DockerTagFinder();
     }
 
     public List<String> fetchAllRepositories() {
@@ -52,14 +56,19 @@ public class DockerHubDelegate {
         return images;
     }
 
+    public List<DockerHubV2Tag> fetchAllTagsForImage(String repositoryName, String imageName) {
+        return dockerHubClient.fetchAllTagsForImage(repositoryName, imageName);
+    }
+
     public String fetchLatestImageTag(String repositoryName, String imageName) {
 
-        DockerHubV2Tag dockerHubV2Tag = dockerHubClient.fetchLatestTagForImage(repositoryName, imageName);
+        List<DockerHubV2Tag> tags = fetchAllTagsForImage(repositoryName, imageName);
 
-        if (null != dockerHubV2Tag)
-            return dockerHubV2Tag.getName();
+        if (tags.isEmpty()) {
+            return null;
+        }
 
-        return null;
+        return dockerTagFinder.findVersionedTagMatchingBranch(tags, "latest").getName();
     }
 
     private DockerHubImage convertApiImageToInternalImage(DockerHubV2Image apiImage) {

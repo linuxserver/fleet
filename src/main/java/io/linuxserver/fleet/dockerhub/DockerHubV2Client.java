@@ -22,17 +22,15 @@ import io.linuxserver.fleet.rest.HttpException;
 import io.linuxserver.fleet.rest.RestClient;
 import io.linuxserver.fleet.rest.RestResponse;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Client class to interface with Docker Hub's V2 API.
  */
 public class DockerHubV2Client implements DockerHubClient {
 
-    static final String DOCKERHUB_BASE_URI = "https://hub.docker.com/v2";
+    private static final int    DEFAULT_PAGE_SIZE  = 1000;
+    static final String         DOCKERHUB_BASE_URI = "https://hub.docker.com/v2";
 
     private final RestClient             restClient;
     private final DockerHubAuthenticator authenticator;
@@ -70,8 +68,7 @@ public class DockerHubV2Client implements DockerHubClient {
 
         try {
 
-            String url = DOCKERHUB_BASE_URI + "/repositories/" + repositoryName;
-
+            String url = DOCKERHUB_BASE_URI + "/repositories/" + repositoryName + "?page_size=" + DEFAULT_PAGE_SIZE;
             while (url != null) {
 
                 RestResponse<DockerHubV2ImageListResult> response = doCall(url, DockerHubV2ImageListResult.class);
@@ -108,19 +105,27 @@ public class DockerHubV2Client implements DockerHubClient {
     }
 
     @Override
-    public DockerHubV2Tag fetchLatestTagForImage(String repositoryName, String imageName) {
+    public List<DockerHubV2Tag> fetchAllTagsForImage(String repositoryName, String imageName) {
 
         try {
 
-            String absoluteUrl = DOCKERHUB_BASE_URI + "/repositories/" + repositoryName + "/" + imageName + "/tags" ;
+            List<DockerHubV2Tag> tags = new ArrayList<>();
 
-            RestResponse<DockerHubV2TagListResult> restResponse = doCall(absoluteUrl, DockerHubV2TagListResult.class);
+            String absoluteUrl = DOCKERHUB_BASE_URI + "/repositories/" + repositoryName + "/" + imageName + "/tags?page_size=" + DEFAULT_PAGE_SIZE;
+            while (absoluteUrl != null) {
 
-            List<DockerHubV2Tag> results = restResponse.getPayload().getResults();
-            if (!results.isEmpty())
-                return results.get(0);
+                RestResponse<DockerHubV2TagListResult> response = doCall(absoluteUrl, DockerHubV2TagListResult.class);
 
-            return null;
+                if (isResponseOK(response)) {
+
+                    DockerHubV2TagListResult payload = response.getPayload();
+
+                    tags.addAll(payload.getResults());
+                    absoluteUrl = payload.getNext();
+                }
+            }
+
+            return tags;
 
         } catch (HttpException e) {
             throw new DockerHubException("Unable to get tags for " + repositoryName + "/" + imageName, e);
