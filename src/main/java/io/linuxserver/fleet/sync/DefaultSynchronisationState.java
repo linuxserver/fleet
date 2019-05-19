@@ -82,9 +82,9 @@ public class DefaultSynchronisationState implements SynchronisationState {
 
         if (isProcessIdle()) {
 
-            onStart(context);
-
             try {
+
+                onStart(context);
 
                 List<String> repositories = context.getDockerHubDelegate().fetchAllRepositories();
 
@@ -98,9 +98,10 @@ public class DefaultSynchronisationState implements SynchronisationState {
 
                 LOGGER.error("Synchronisation process failed on the first step. Will skip for now.", e);
                 onSkip(context);
-            }
 
-            onFinish(context);
+            } finally {
+                onFinish(context);
+            }
 
         } else {
             onSkip(context);

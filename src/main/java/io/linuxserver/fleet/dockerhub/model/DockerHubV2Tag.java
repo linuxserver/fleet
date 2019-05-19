@@ -34,4 +34,28 @@ public class DockerHubV2Tag {
     public long getFullSize() {
         return fullSize;
     }
+
+    @Override
+    public String toString() {
+        return name;
+    }
+
+    @Override
+    public int hashCode() {
+        return name.hashCode();
+    }
+
+    @Override
+    public boolean equals(Object other) {
+
+        if (!(other instanceof DockerHubV2Tag)) {
+            return false;
+        }
+
+        if (other == this) {
+            return true;
+        }
+
+        return name.equals(((DockerHubV2Tag) other).name);
+    }
 }

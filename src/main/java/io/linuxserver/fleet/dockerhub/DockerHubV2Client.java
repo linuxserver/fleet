@@ -29,8 +29,8 @@ import java.util.*;
  */
 public class DockerHubV2Client implements DockerHubClient {
 
-    static final String DOCKERHUB_BASE_URI = "https://hub.docker.com/v2";
-    static final int    DEFAULT_PAGE_SIZE  = 1000;
+    private static final int    DEFAULT_PAGE_SIZE  = 1000;
+    static final String         DOCKERHUB_BASE_URI = "https://hub.docker.com/v2";
 
     private final RestClient             restClient;
     private final DockerHubAuthenticator authenticator;
@@ -105,7 +105,7 @@ public class DockerHubV2Client implements DockerHubClient {
     }
 
     @Override
-    public DockerHubV2Tag fetchLatestTagForImage(String repositoryName, String imageName) {
+    public List<DockerHubV2Tag> fetchAllTagsForImage(String repositoryName, String imageName) {
 
         try {
 
@@ -125,10 +125,7 @@ public class DockerHubV2Client implements DockerHubClient {
                 }
             }
 
-            if (!tags.isEmpty())
-                return determineLatestVersionedTag(tags);
-
-            return null;
+            return tags;
 
         } catch (HttpException e) {
             throw new DockerHubException("Unable to get tags for " + repositoryName + "/" + imageName, e);
@@ -168,22 +165,5 @@ public class DockerHubV2Client implements DockerHubClient {
 
     private boolean isResponseUnauthorised(RestResponse restResponse) {
         return restResponse.getStatusCode() == 401;
-    }
-
-    private DockerHubV2Tag determineLatestVersionedTag(List<DockerHubV2Tag> results) {
-
-        Optional<DockerHubV2Tag> trueLatest = results.stream().filter(tag -> "latest".equals(tag.getName())).findFirst();
-
-        if (trueLatest.isPresent()) {
-
-            DockerHubV2Tag trueLatestTag = trueLatest.get();
-            Optional<DockerHubV2Tag> versionedLatestTag = results.stream()
-                .filter(tag -> !tag.equals(trueLatestTag))
-                .filter(tag -> tag.getFullSize() == trueLatestTag.getFullSize()).findFirst();
-
-            return versionedLatestTag.orElse(trueLatestTag);
-        }
-
-        return results.get(0);
     }
 }
