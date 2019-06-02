@@ -17,6 +17,7 @@
 
 package io.linuxserver.fleet.delegate;
 
+import io.linuxserver.fleet.cache.ImageCache;
 import io.linuxserver.fleet.db.dao.ImageDAO;
 import io.linuxserver.fleet.db.query.InsertUpdateResult;
 import io.linuxserver.fleet.db.query.InsertUpdateStatus;
@@ -28,10 +29,13 @@ import java.util.List;
 
 public class ImageDelegate {
 
-    private final ImageDAO imageDAO;
+    private final ImageCache    imageCache;
+    private final ImageDAO      imageDAO;
 
     public ImageDelegate(ImageDAO imageDAO) {
-        this.imageDAO = imageDAO;
+
+        this.imageDAO   = imageDAO;
+        this.imageCache = new ImageCache();
     }
 
     /**
@@ -42,7 +46,21 @@ public class ImageDelegate {
      * </p>
      */
     public Image findImageByRepositoryAndImageName(int repositoryId, String imageName) {
-        return imageDAO.findImageByRepositoryAndImageName(repositoryId, imageName);
+
+        Image cachedImage = imageCache.get(repositoryId, imageName);
+
+        if (null == cachedImage) {
+
+            Image image = imageDAO.findImageByRepositoryAndImageName(repositoryId, imageName);
+
+            if (null != image) {
+                imageCache.updateCache(image);
+            }
+
+            return image;
+        }
+
+        return cachedImage;
     }
 
     public Image fetchImage(int id) {
@@ -50,19 +68,40 @@ public class ImageDelegate {
     }
 
     public List<Image> fetchImagesByRepository(int repositoryId) {
-        return imageDAO.fetchImagesByRepository(repositoryId).getResults();
+
+        List<Image> cachedImages = imageCache.getAll(repositoryId);
+        if (cachedImages.isEmpty()) {
+
+            List<Image> images = imageDAO.fetchImagesByRepository(repositoryId).getResults();
+            images.forEach(imageCache::updateCache);
+
+            return images;
+        }
+
+        return cachedImages;
     }
 
     public void removeImage(Integer id) {
-        imageDAO.removeImage(id);
+
+        Image existingImage = imageDAO.fetchImage(id);
+        if (null != existingImage) {
+
+            imageDAO.removeImage(id);
+            imageCache.remove(existingImage);
+        }
     }
 
     public Image saveImage(Image image) throws SaveException {
 
         InsertUpdateResult<Image> result = imageDAO.saveImage(image);
 
-        if (result.getStatus() == InsertUpdateStatus.OK)
+        if (result.getStatus() == InsertUpdateStatus.OK) {
+
+            Image updatedImage = result.getResult();
+
+            imageCache.updateCache(updatedImage);
             return result.getResult();
+        }
 
         throw new SaveException(result.getStatusMessage());
     }

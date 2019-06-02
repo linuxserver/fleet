@@ -17,6 +17,8 @@
 
 package io.linuxserver.fleet.model;
 
+import java.util.Objects;
+
 /**
  * <p>
  * Representation of a stored image in the Fleet database. Each image contains
@@ -43,6 +45,20 @@ public class Image extends PersistableItem<Image> {
 
         this.name           = name;
         this.repositoryId   = repositoryId;
+    }
+
+    public static Image copyOf(Image image) {
+
+        Image cloned                = new Image(image.getId(), image.repositoryId, image.name);
+        cloned.version              = image.version;
+        cloned.pullCount            = image.pullCount;
+        cloned.versionMask          = image.versionMask;
+        cloned.unstable             = image.unstable;
+        cloned.hidden               = image.hidden;
+        cloned.deprecated           = image.deprecated;
+        cloned.deprecationReason    = image.deprecationReason;
+
+        return cloned;
     }
 
     public Image(int repositoryId, String name) {
@@ -125,5 +141,19 @@ public class Image extends PersistableItem<Image> {
 
     public String getDeprecationReason() {
         return deprecationReason;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Image image = (Image) o;
+        return repositoryId == image.repositoryId && Objects.equals(name, image.name);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(repositoryId, name);
     }
 }
