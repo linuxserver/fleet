@@ -24,15 +24,7 @@
                 <div class="tab-pane<#if populatedRepository?index == 0> show active</#if>" id="repository_#{populatedRepository.repository.id}" role="tabpanel" aria-labelledby="repository-tab_#{populatedRepository.repository.id}">
                     <div class="container">
 
-                        <#if populatedRepository.everyImageStable>
-                            <div class="row my-3">
-                                <div class="col-12">
-                                    <div class="fleet-alert fleet-alert--success">
-                                        <i class="fas fa-check text-success"></i> No issues reported
-                                    </div>
-                                </div>
-                            </div>
-                        <#else>
+                        <#if !populatedRepository.everyImageStable>
                             <div class="row my-3">
                                 <div class="col-12">
                                     <div class="fleet-alert fleet-alert--warning">
@@ -45,8 +37,16 @@
                         <#if populatedRepository.images?size &gt; 0>
                             <div class="row">
                                 <div class="col-12">
+                                    <div class="input-group mb-3 mt-3">
+                                        <div class="input-group-prepend">
+                                            <span class="input-group-text" id="searchLabel_#{populatedRepository.repository.id}"><i class="fas fa-search"></i></span>
+                                        </div>
+                                        <input type="text" class="form-control image-search" id="search_#{populatedRepository.repository.id}" data-repository-id="#{populatedRepository.repository.id}" aria-describedby="searchLabel_#{populatedRepository.repository.id}">
+                                    </div>
+                                </div>
+                                <div class="col-12">
 
-                                    <div class="table-responsive">
+                                    <div class="table-responsive" id="#{populatedRepository.repository.id}_images">
                                         <table class="table table--sortable">
                                             <thead>
                                                 <tr>
@@ -64,7 +64,7 @@
                                                     <#if !image.hidden || __AUTHENTICATED_USER?has_content>
                                                         <tr class="<#if image.hidden>hidden-image</#if><#if image.deprecated>deprecated-image</#if>" data-image-id="#{image.id}" data-image-name="${image.name}">
                                                             <td class="image-name">
-                                                                <span class="image-name--repository">${populatedRepository.repository.name} /</span> <a target="_blank" href="https://hub.docker.com/r/${populatedRepository.repository.name}/${image.name}">${image.name}</a>
+                                                                <span class="image-name--repository">${populatedRepository.repository.name} /</span> <a target="_blank" href="https://hub.docker.com/r/${populatedRepository.repository.name}/${image.name}"><span class="image-name__image">${image.name}</span></a>
                                                                 <#if image.deprecated>
                                                                 <span class="deprecation-message" title="This image has been deprecated: ${image.deprecationReason!""}"><i class="fas fa-exclamation-circle"></i></span>
                                                                 </#if>
