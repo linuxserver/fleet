@@ -19,9 +19,11 @@ package io.linuxserver.fleet.sync;
 
 import io.linuxserver.fleet.dockerhub.DockerHubException;
 import io.linuxserver.fleet.exception.SaveException;
-import io.linuxserver.fleet.model.DockerHubImage;
-import io.linuxserver.fleet.model.Image;
-import io.linuxserver.fleet.model.Repository;
+import io.linuxserver.fleet.model.docker.DockerImage;
+import io.linuxserver.fleet.model.docker.DockerTag;
+import io.linuxserver.fleet.model.internal.Image;
+import io.linuxserver.fleet.model.internal.Repository;
+import io.linuxserver.fleet.model.internal.Tag;
 import io.linuxserver.fleet.sync.event.ImageUpdateEvent;
 import io.linuxserver.fleet.sync.event.RepositoriesScannedEvent;
 import org.slf4j.Logger;
@@ -125,7 +127,7 @@ public class DefaultSynchronisationState implements SynchronisationState {
         Repository repository = configureRepository(repositoryName, context);
         if (repository.isSyncEnabled()) {
 
-            List<DockerHubImage> images = context.getDockerHubDelegate().fetchAllImagesFromRepository(repository.getName());
+            List<DockerImage> images = context.getDockerHubDelegate().fetchAllImagesFromRepository(repository.getName());
             checkAndRemoveMissingImages(repository, images, context);
 
             int totalSize = images.size();
@@ -134,14 +136,15 @@ public class DefaultSynchronisationState implements SynchronisationState {
 
                 try {
 
-                    DockerHubImage dockerHubImage = images.get(i);
-                    Image image = configureImage(repository.getId(), dockerHubImage, context);
+                    DockerImage dockerImage = images.get(i);
+                    Image image = configureImage(repository.getId(), dockerImage, context);
 
                     String versionMask = getVersionMask(repository.getVersionMask(), image.getVersionMask());
-                    String maskedVersion = getMaskedVersion(repository.getName(), image.getName(), versionMask, context);
+                    Tag maskedVersion = getLatestTagAndCreateMaskedVersion(repository.getName(), image.getName(), versionMask, context);
                     LOGGER.debug("Updated image version using mask. Mask=" + versionMask + ", MaskedVersion=" + maskedVersion);
 
-                    image.withPullCount(dockerHubImage.getPullCount()).withVersion(maskedVersion);
+                    image.withPullCount(dockerImage.getPullCount());
+                    image.updateTag(maskedVersion);
 
                     context.getImageDelegate().saveImage(image);
                     onImageUpdated(context, new ImageUpdateEvent(image, i + 1, totalSize));
@@ -169,9 +172,9 @@ public class DefaultSynchronisationState implements SynchronisationState {
         }
     }
 
-    private void checkAndRemoveMissingImages(Repository repository, List<DockerHubImage> images, SynchronisationContext context) {
+    private void checkAndRemoveMissingImages(Repository repository, List<DockerImage> images, SynchronisationContext context) {
 
-        List<String> dockerHubImageNames = images.stream().map(DockerHubImage::getName).collect(Collectors.toList());
+        List<String> dockerHubImageNames = images.stream().map(DockerImage::getName).collect(Collectors.toList());
 
         LOGGER.info("Checking for any removed images under {}", repository.getName());
         for (Image storedImage : context.getImageDelegate().fetchImagesByRepository(repository.getId())) {
@@ -188,17 +191,17 @@ public class DefaultSynchronisationState implements SynchronisationState {
         return imageMask == null ? repositoryMask : imageMask;
     }
 
-    private String getMaskedVersion(String repositoryName, String imageName, String versionMask, SynchronisationContext context) {
+    private Tag getLatestTagAndCreateMaskedVersion(String repositoryName, String imageName, String versionMask, SynchronisationContext context) {
 
-        String tag = context.getDockerHubDelegate().fetchLatestImageTag(repositoryName, imageName);
+        DockerTag tag = context.getDockerHubDelegate().fetchLatestImageTag(repositoryName, imageName);
 
         if (null == tag)
-            return "<Never Built>";
+            return Tag.NONE;
 
         if (isTagJustLatestAndNotAVersion(tag) || null == versionMask)
-            return tag;
+            return new Tag(tag.getName(), tag.getName(), tag.getBuildDate());
 
-        return extractMaskedVersion(tag, versionMask);
+        return new Tag(tag.getName(), extractMaskedVersion(tag.getName(), versionMask), tag.getBuildDate());
     }
 
     /**
@@ -227,7 +230,7 @@ public class DefaultSynchronisationState implements SynchronisationState {
      * Looks up the image in the database to see if it already exists. If it does, it gets returned, otherwise a base
      * image is created with just the top-level information, as the rest will get updated later.
      */
-    private Image configureImage(int repositoryId, DockerHubImage dockerHubImage, SynchronisationContext context) {
+    private Image configureImage(int repositoryId, DockerImage dockerHubImage, SynchronisationContext context) {
 
         Image image = context.getImageDelegate().findImageByRepositoryAndImageName(repositoryId, dockerHubImage.getName());
 
@@ -268,8 +271,8 @@ public class DefaultSynchronisationState implements SynchronisationState {
      * If the top-level tag is not versioned, a mask can't be applied.
      * </p>
      */
-    private boolean isTagJustLatestAndNotAVersion(String tag) {
-        return "latest".equals(tag);
+    private boolean isTagJustLatestAndNotAVersion(DockerTag tag) {
+        return "latest".equals(tag.getName());
     }
 
     private boolean isRepositoryNew(Repository repository) {

@@ -19,8 +19,8 @@ package io.linuxserver.fleet.web.pages;
 
 import io.linuxserver.fleet.delegate.ImageDelegate;
 import io.linuxserver.fleet.delegate.RepositoryDelegate;
-import io.linuxserver.fleet.model.Repository;
-import io.linuxserver.fleet.model.RepositoryWithImages;
+import io.linuxserver.fleet.model.internal.Repository;
+import io.linuxserver.fleet.model.internal.RepositoryWithImages;
 import spark.ModelAndView;
 import spark.Request;
 

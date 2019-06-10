@@ -15,47 +15,46 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package io.linuxserver.fleet.model;
+package io.linuxserver.fleet.model.internal;
 
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 
 import java.time.LocalDateTime;
 
-public abstract class PersistableItem<T extends PersistableItem> {
+public class Tag {
 
-    private Integer       id;
-    private LocalDateTime modifiedTime;
+    public static final Tag NONE = new Tag("<Never Built>", "<Never Built>", null);
 
-    PersistableItem() { }
+    private String          version;
+    private String          maskedVersion;
+    private LocalDateTime   buildDate;
 
-    PersistableItem(Integer id) {
-        this.id = id;
+    public Tag(String version, String maskedVersion, LocalDateTime buildDate) {
+
+        this.version        = version;
+        this.maskedVersion  = maskedVersion;
+
+        if (null != buildDate) {
+            this.buildDate  = LocalDateTime.of(buildDate.toLocalDate(), buildDate.toLocalTime());
+        }
     }
 
-    @SuppressWarnings("unchecked")
-    public T withId(Integer id) {
-
-        if (null == id)
-            throw new IllegalArgumentException("Item ID must not be null");
-
-        this.id = id;
-        return (T) this;
+    public String getVersion() {
+        return version;
     }
 
-    @SuppressWarnings("unchecked")
-    public T withModifiedTime(LocalDateTime modifiedTime) {
-
-        this.modifiedTime = modifiedTime;
-        return (T) this;
+    public String getMaskedVersion() {
+        return maskedVersion;
     }
 
-    public Integer getId() {
-        return id;
-    }
+    public LocalDateTime getBuildDate() {
 
-    public LocalDateTime getModifiedTime() {
-        return modifiedTime;
+        if (null != buildDate) {
+            return LocalDateTime.of(buildDate.toLocalDate(), buildDate.toLocalTime());
+        }
+
+        return null;
     }
 
     @Override

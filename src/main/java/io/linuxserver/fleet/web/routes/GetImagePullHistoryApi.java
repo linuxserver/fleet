@@ -18,8 +18,8 @@
 package io.linuxserver.fleet.web.routes;
 
 import io.linuxserver.fleet.delegate.ImageDelegate;
-import io.linuxserver.fleet.model.Image;
-import io.linuxserver.fleet.model.ImagePullStat;
+import io.linuxserver.fleet.model.internal.Image;
+import io.linuxserver.fleet.model.internal.ImagePullStat;
 import io.linuxserver.fleet.model.api.ApiImagePullHistory;
 import io.linuxserver.fleet.model.api.ApiResponse;
 import io.linuxserver.fleet.model.api.FleetApiException;

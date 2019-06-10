@@ -17,7 +17,7 @@
 
 package io.linuxserver.fleet.model.api;
 
-import io.linuxserver.fleet.model.Image;
+import io.linuxserver.fleet.model.internal.Image;
 
 public class ApiImage {
 
@@ -53,7 +53,7 @@ public class ApiImage {
 
         apiImage.name       = image.getName();
         apiImage.pullCount  = image.getPullCount();
-        apiImage.version    = image.getVersion();
+        apiImage.version    = image.getMaskedVersion();
         apiImage.stable     = !image.isUnstable();
         apiImage.deprecated = image.isDeprecated();
 

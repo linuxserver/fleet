@@ -22,8 +22,8 @@ import io.linuxserver.fleet.db.dao.ImageDAO;
 import io.linuxserver.fleet.db.query.InsertUpdateResult;
 import io.linuxserver.fleet.db.query.InsertUpdateStatus;
 import io.linuxserver.fleet.exception.SaveException;
-import io.linuxserver.fleet.model.Image;
-import io.linuxserver.fleet.model.ImagePullStat;
+import io.linuxserver.fleet.model.internal.Image;
+import io.linuxserver.fleet.model.internal.ImagePullStat;
 
 import java.util.List;
 

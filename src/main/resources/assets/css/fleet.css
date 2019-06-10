@@ -23,6 +23,10 @@ input[type="text"], textarea {
     border:1px solid #ccc !important;
 }
 
+.navbar {
+    padding: 0 1rem;
+}
+
 .navbar-brand {
 
     font-family: 'Pacifico', cursive;

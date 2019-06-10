@@ -21,12 +21,14 @@ import io.linuxserver.fleet.db.PoolingDatabaseConnection;
 import io.linuxserver.fleet.db.query.InsertUpdateResult;
 import io.linuxserver.fleet.db.query.InsertUpdateStatus;
 import io.linuxserver.fleet.db.query.LimitedResult;
-import io.linuxserver.fleet.model.Image;
-import io.linuxserver.fleet.model.ImagePullStat;
+import io.linuxserver.fleet.model.internal.Image;
+import io.linuxserver.fleet.model.internal.ImagePullStat;
+import io.linuxserver.fleet.model.internal.Tag;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.sql.*;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -127,27 +129,29 @@ public class DefaultImageDAO implements ImageDAO {
 
         try (Connection connection = databaseConnection.getConnection()) {
 
-            call = connection.prepareCall("{CALL Image_Save(?,?,?,?,?,?,?,?,?,?,?,?,?)");
+            call = connection.prepareCall("{CALL Image_Save(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)");
             setNullableInt(call, 1, image.getId());
             call.setInt(2, image.getRepositoryId());
             call.setString(3, image.getName());
             setNullableLong(call, 4, image.getPullCount());
-            call.setString(5, image.getVersion());
+            call.setString(5, image.getMaskedVersion());
             setNullableString(call, 6, image.getVersionMask());
             call.setBoolean(7, image.isHidden());
             call.setBoolean(8, image.isUnstable());
             call.setBoolean(9, image.isDeprecated());
             setNullableString(call, 10, image.getDeprecationReason());
+            call.setString(11, image.getRawVersion());
+            setNullableTimestamp(call, 12, image.getBuildDate());
 
-            call.registerOutParameter(11, Types.INTEGER);
-            call.registerOutParameter(12, Types.INTEGER);
-            call.registerOutParameter(13, Types.VARCHAR);
+            call.registerOutParameter(13, Types.INTEGER);
+            call.registerOutParameter(14, Types.INTEGER);
+            call.registerOutParameter(15, Types.VARCHAR);
 
             call.executeUpdate();
 
-            int imageId             = call.getInt(11);
-            int status              = call.getInt(12);
-            String statusMessage    = call.getString(13);
+            int imageId             = call.getInt(13);
+            int status              = call.getInt(14);
+            String statusMessage    = call.getString(15);
 
             if (InsertUpdateStatus.OK == status)
                 return new InsertUpdateResult<>(fetchImage(imageId), status, statusMessage);
@@ -227,11 +231,15 @@ public class DefaultImageDAO implements ImageDAO {
         Image image = new Image(
             results.getInt("ImageId"),
             results.getInt("RepositoryId"),
-            results.getString("ImageName")
+            results.getString("ImageName"),
+            new Tag(
+                results.getString("LatestTagVersion"),
+                results.getString("LatestMaskedTagVersion"),
+                safeParseLocalDateTime(results.getTimestamp("LatestTagBuildDate"))
+            )
         );
 
         return image
-            .withVersion(results.getString("ImageVersion"))
             .withPullCount(results.getLong("ImagePullCount"))
             .withVersionMask(results.getString("ImageVersionMask"))
             .withModifiedTime(results.getTimestamp("ModifiedTime").toLocalDateTime())
@@ -239,5 +247,14 @@ public class DefaultImageDAO implements ImageDAO {
             .withUnstable(results.getBoolean("ImageUnstable"))
             .withDeprecated(results.getBoolean("ImageDeprecated"))
             .withDeprecationReason(results.getString("ImageDeprecationReason"));
+    }
+
+    private LocalDateTime safeParseLocalDateTime(Timestamp timestamp) {
+
+        if (timestamp == null) {
+            return null;
+        }
+
+        return timestamp.toLocalDateTime();
     }
 }

@@ -21,15 +21,22 @@ import io.linuxserver.fleet.dockerhub.DockerHubClient;
 import io.linuxserver.fleet.dockerhub.model.DockerHubV2Image;
 import io.linuxserver.fleet.dockerhub.model.DockerHubV2Tag;
 import io.linuxserver.fleet.dockerhub.util.DockerTagFinder;
-import io.linuxserver.fleet.model.DockerHubImage;
+import io.linuxserver.fleet.model.docker.DockerImage;
+import io.linuxserver.fleet.model.docker.DockerTag;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class DockerHubDelegate {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(DockerHubDelegate.class);
 
     private final DockerHubClient dockerHubClient;
     private final DockerTagFinder dockerTagFinder;
@@ -44,42 +51,51 @@ public class DockerHubDelegate {
         return dockerHubClient.fetchAllRepositories().getNamespaces();
     }
 
-    public List<DockerHubImage> fetchAllImagesFromRepository(String repositoryName) {
+    public List<DockerImage> fetchAllImagesFromRepository(String repositoryName) {
 
-        List<DockerHubImage> images = new ArrayList<>();
+        List<DockerImage> images = new ArrayList<>();
 
         for (DockerHubV2Image apiImage : dockerHubClient.fetchImagesFromRepository(repositoryName))
-            images.add(convertApiImageToInternalImage(apiImage));
+            images.add(convertImage(apiImage));
 
-        images.sort(Comparator.comparing(DockerHubImage::getName));
+        images.sort(Comparator.comparing(DockerImage::getName));
 
         return images;
     }
 
-    public List<DockerHubV2Tag> fetchAllTagsForImage(String repositoryName, String imageName) {
-        return dockerHubClient.fetchAllTagsForImage(repositoryName, imageName);
+    public List<DockerTag> fetchAllTagsForImage(String repositoryName, String imageName) {
+        return dockerHubClient.fetchAllTagsForImage(repositoryName, imageName).stream().map(this::convertTag).collect(Collectors.toList());
     }
 
-    public String fetchLatestImageTag(String repositoryName, String imageName) {
+    public DockerTag fetchLatestImageTag(String repositoryName, String imageName) {
 
-        List<DockerHubV2Tag> tags = fetchAllTagsForImage(repositoryName, imageName);
+        List<DockerTag> tags = fetchAllTagsForImage(repositoryName, imageName);
 
         if (tags.isEmpty()) {
             return null;
         }
 
-        return dockerTagFinder.findVersionedTagMatchingBranch(tags, "latest").getName();
+        return dockerTagFinder.findVersionedTagMatchingBranch(tags, "latest");
     }
 
-    private DockerHubImage convertApiImageToInternalImage(DockerHubV2Image apiImage) {
+    private DockerImage convertImage(DockerHubV2Image dockerHubV2Image) {
 
-        return new DockerHubImage(
-            apiImage.getName(),
-            apiImage.getNamespace(),
-            apiImage.getDescription(),
-            apiImage.getStarCount(),
-            apiImage.getPullCount(),
-            parseDockerHubDate(apiImage.getLastUpdated())
+        return new DockerImage(
+            dockerHubV2Image.getName(),
+            dockerHubV2Image.getNamespace(),
+            dockerHubV2Image.getDescription(),
+            dockerHubV2Image.getStarCount(),
+            dockerHubV2Image.getPullCount(),
+            parseDockerHubDate(dockerHubV2Image.getLastUpdated())
+        );
+    }
+
+    private DockerTag convertTag(DockerHubV2Tag dockerHubV2Tag) {
+
+        return new DockerTag(
+            dockerHubV2Tag.getName(),
+            dockerHubV2Tag.getFullSize(),
+            parseDockerHubDate(dockerHubV2Tag.getLastUpdated())
         );
     }
 
@@ -88,6 +104,14 @@ public class DockerHubDelegate {
         if (null == date)
             return null;
 
-        return LocalDateTime.parse(date, DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSSSS'Z'"));
+        try {
+            return LocalDateTime.parse(date, DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSSSS'Z'"));
+        } catch (DateTimeParseException e) {
+            return LocalDateTime.parse(date, DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss'Z'"));
+        } catch (Exception e) {
+
+            LOGGER.warn("parseDockerHubDate(" + date + ") unable to parse date.");
+            return null;
+        }
     }
 }

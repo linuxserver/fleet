@@ -57,7 +57,7 @@ public class DatabaseVersion {
         } catch (FlywayException e) {
 
             LOGGER.error(e.getMessage());
-            throw new RuntimeException("Unable to start application because the database has gone out of sync.");
+            throw new RuntimeException("Unable to start application because the database has gone out of sync.", e);
         }
     }
 }

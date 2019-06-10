@@ -21,7 +21,7 @@ import io.linuxserver.fleet.db.dao.RepositoryDAO;
 import io.linuxserver.fleet.db.query.InsertUpdateResult;
 import io.linuxserver.fleet.db.query.InsertUpdateStatus;
 import io.linuxserver.fleet.exception.SaveException;
-import io.linuxserver.fleet.model.Repository;
+import io.linuxserver.fleet.model.internal.Repository;
 
 import java.util.List;
 

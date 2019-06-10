@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package io.linuxserver.fleet.model;
+package io.linuxserver.fleet.model.docker;
 
 import java.time.LocalDateTime;
 
@@ -25,7 +25,7 @@ import java.time.LocalDateTime;
  * is common within the app, and is immune to any API changes to DockerHub itself.
  * </p>
  */
-public class DockerHubImage {
+public class DockerImage {
 
     private final String        name;
     private final String        repository;
@@ -34,7 +34,7 @@ public class DockerHubImage {
     private final long          pullCount;
     private final LocalDateTime buildDate;
 
-    public DockerHubImage(String name, String repository, String description, int starCount, long pullCount, LocalDateTime buildDate) {
+    public DockerImage(String name, String repository, String description, int starCount, long pullCount, LocalDateTime buildDate) {
 
         this.name = name;
         this.repository = repository;

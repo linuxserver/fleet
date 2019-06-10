@@ -24,7 +24,15 @@
                 <div class="tab-pane<#if populatedRepository?index == 0> show active</#if>" id="repository_#{populatedRepository.repository.id}" role="tabpanel" aria-labelledby="repository-tab_#{populatedRepository.repository.id}">
                     <div class="container">
 
-                        <#if !populatedRepository.everyImageStable>
+                        <#if populatedRepository.everyImageStable>
+                            <div class="row my-3">
+                                <div class="col-12">
+                                    <div class="fleet-alert fleet-alert--success">
+                                        <i class="fas fa-check text-success"></i> No issues reported
+                                    </div>
+                                </div>
+                            </div>
+                        <#else>
                             <div class="row my-3">
                                 <div class="col-12">
                                     <div class="fleet-alert fleet-alert--warning">
@@ -39,7 +47,7 @@
                                 <div class="col-12">
                                     <div class="input-group mb-3 mt-3">
                                         <div class="input-group-prepend">
-                                            <span class="input-group-text" id="searchLabel_#{populatedRepository.repository.id}"><i class="fas fa-search"></i></span>
+                                            <span class="input-group-text" id="searchLabel_#{populatedRepository.repository.id}"><i class="fas fa-search"></i> Search images</span>
                                         </div>
                                         <input type="text" class="form-control image-search" id="search_#{populatedRepository.repository.id}" data-repository-id="#{populatedRepository.repository.id}" aria-describedby="searchLabel_#{populatedRepository.repository.id}">
                                     </div>
@@ -70,8 +78,8 @@
                                                                 </#if>
                                                             </td>
                                                             <td>
-                                                                <#if image.version?has_content>
-                                                                    <code>${image.version}</code>
+                                                                <#if image.maskedVersion?has_content>
+                                                                    <code title="${image.rawVersion}">${image.maskedVersion}</code>
                                                                 </#if>
                                                             </td>
                                                             <td>
@@ -141,7 +149,7 @@
             <div class="modal" id="update-image-version-mask" tabindex="-1" role="dialog">
                 <div class="modal-dialog modal-dialog-centered" role="document">
                     <div class="modal-content">
-                        <div class="modal-header" id="selected-mask-image-name"></div>
+                        <div class="modal-header" id="selected-mask-image-version"></div>
                         <div class="modal-body">
                             <div class="input-group">
                                 <input type="text" class="form-control version-mask" id="image-version-mask" />
@@ -157,7 +165,7 @@
             <div class="modal" id="update-image-deprecation" tabindex="-1" role="dialog">
                 <div class="modal-dialog modal-dialog-centered" role="document">
                     <div class="modal-content">
-                        <div class="modal-header" id="selected-deprecation-image-name"></div>
+                        <div class="modal-header" id="selected-deprecation-image-version"></div>
                         <div class="modal-body">
                             <p>
                                 Provide a reason for the deprecation of this image.

@@ -18,7 +18,7 @@
 package io.linuxserver.fleet.web.routes;
 
 import io.linuxserver.fleet.delegate.RepositoryDelegate;
-import io.linuxserver.fleet.model.Repository;
+import io.linuxserver.fleet.model.internal.Repository;
 import io.linuxserver.fleet.model.api.ApiResponse;
 import io.linuxserver.fleet.model.api.FleetApiException;
 import spark.Request;

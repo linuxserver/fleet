@@ -15,8 +15,10 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package io.linuxserver.fleet.model;
+package io.linuxserver.fleet.model.internal;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Objects;
 
 /**
@@ -30,7 +32,7 @@ public class Image extends PersistableItem<Image> {
     private final int       repositoryId;
     private final String    name;
 
-    private String          version;
+    private Tag             tag;
     private long            pullCount;
     private String          versionMask;
     private boolean         unstable;
@@ -39,18 +41,22 @@ public class Image extends PersistableItem<Image> {
     private boolean         deprecated;
     private String          deprecationReason;
 
-    public Image(Integer id, int repositoryId, String name) {
+    public Image(Integer id, int repositoryId, String name, Tag latestVersion) {
 
         super(id);
 
         this.name           = name;
         this.repositoryId   = repositoryId;
+        this.tag            = new Tag(latestVersion.getVersion(), latestVersion.getMaskedVersion(), latestVersion.getBuildDate());
+    }
+
+    public Image(int repositoryId, String name) {
+        this(null, repositoryId, name, Tag.NONE);
     }
 
     public static Image copyOf(Image image) {
 
-        Image cloned                = new Image(image.getId(), image.repositoryId, image.name);
-        cloned.version              = image.version;
+        Image cloned                = new Image(image.getId(), image.repositoryId, image.name, image.tag);
         cloned.pullCount            = image.pullCount;
         cloned.versionMask          = image.versionMask;
         cloned.unstable             = image.unstable;
@@ -59,16 +65,6 @@ public class Image extends PersistableItem<Image> {
         cloned.deprecationReason    = image.deprecationReason;
 
         return cloned;
-    }
-
-    public Image(int repositoryId, String name) {
-        this(null, repositoryId, name);
-    }
-
-    public Image withVersion(String version) {
-
-        this.version = version;
-        return this;
     }
 
     public Image withPullCount(long pullCount) {
@@ -107,6 +103,10 @@ public class Image extends PersistableItem<Image> {
         return this;
     }
 
+    public void updateTag(Tag maskedVersion) {
+        this.tag = new Tag(maskedVersion.getVersion(), maskedVersion.getMaskedVersion(), maskedVersion.getBuildDate());
+    }
+
     public int getRepositoryId() {
         return repositoryId;
     }
@@ -119,8 +119,25 @@ public class Image extends PersistableItem<Image> {
         return pullCount;
     }
 
-    public String getVersion() {
-        return version;
+    public String getMaskedVersion() {
+        return tag.getMaskedVersion();
+    }
+
+    public String getRawVersion() {
+        return tag.getVersion();
+    }
+
+    public LocalDateTime getBuildDate() {
+        return tag.getBuildDate();
+    }
+
+    public String getBuildDateAsString() {
+
+        if (getBuildDate() != null) {
+            return getBuildDate().format(DateTimeFormatter.ofPattern("dd MMM yyyy HH:mm:ss"));
+        }
+
+        return null;
     }
 
     public String getVersionMask() {

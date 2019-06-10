@@ -17,7 +17,7 @@
 
 package io.linuxserver.fleet.cache;
 
-import io.linuxserver.fleet.model.Image;
+import io.linuxserver.fleet.model.internal.Image;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -78,16 +78,17 @@ public class ImageCache {
 
     public Image get(int repositoryId, String imageName) {
 
-        List<Image> images = cachedImages.get(repositoryId);
-        return images.stream().filter(i -> i.getName().equals(imageName)).findFirst().orElse(null);
+        if (cachedImages.containsKey(repositoryId)) {
+            return cachedImages.get(repositoryId).stream().filter(i -> i.getName().equals(imageName)).findFirst().orElse(null);
+        }
+
+        return null;
     }
 
     public void remove(Image image) {
 
         if (cachedImages.containsKey(image.getRepositoryId())) {
-
-            List<Image> images = cachedImages.get(image.getRepositoryId());
-            images.remove(image);
+            cachedImages.get(image.getRepositoryId()).remove(image);
         }
     }
 }
