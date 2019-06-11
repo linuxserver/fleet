@@ -44,14 +44,16 @@
 
                         <#if populatedRepository.images?size &gt; 0>
                             <div class="row">
-                                <div class="col-12">
-                                    <div class="input-group mb-3 mt-3">
+                                <div class="col-md-2"></div>
+                                <div class="col-md-8">
+                                    <div class="input-group input-group-sm mb-3 mt-3">
                                         <div class="input-group-prepend">
-                                            <span class="input-group-text" id="searchLabel_#{populatedRepository.repository.id}"><i class="fas fa-search"></i> Search images</span>
+                                            <span class="input-group-text" id="searchLabel_#{populatedRepository.repository.id}"><i class="fas fa-search"></i> Search ${populatedRepository.repository.name}</span>
                                         </div>
                                         <input type="text" class="form-control image-search" id="search_#{populatedRepository.repository.id}" data-repository-id="#{populatedRepository.repository.id}" aria-describedby="searchLabel_#{populatedRepository.repository.id}">
                                     </div>
                                 </div>
+                                <div class="col-md-2"></div>
                                 <div class="col-12">
 
                                     <div class="table-responsive" id="#{populatedRepository.repository.id}_images">
@@ -149,7 +151,7 @@
             <div class="modal" id="update-image-version-mask" tabindex="-1" role="dialog">
                 <div class="modal-dialog modal-dialog-centered" role="document">
                     <div class="modal-content">
-                        <div class="modal-header" id="selected-mask-image-version"></div>
+                        <div class="modal-header" id="selected-mask-image-name"></div>
                         <div class="modal-body">
                             <div class="input-group">
                                 <input type="text" class="form-control version-mask" id="image-version-mask" />
@@ -165,7 +167,7 @@
             <div class="modal" id="update-image-deprecation" tabindex="-1" role="dialog">
                 <div class="modal-dialog modal-dialog-centered" role="document">
                     <div class="modal-content">
-                        <div class="modal-header" id="selected-deprecation-image-version"></div>
+                        <div class="modal-header" id="selected-deprecation-image-name"></div>
                         <div class="modal-body">
                             <p>
                                 Provide a reason for the deprecation of this image.
