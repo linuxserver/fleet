@@ -62,6 +62,7 @@
                                                 <tr>
                                                     <th>Name</th>
                                                     <th>Version</th>
+                                                    <th>Built</th>
                                                     <th class="sorter-pullCount">Pull Count</th>
                                                     <th class="text-center">Status</th>
                                                     <#if __AUTHENTICATED_USER?has_content>
@@ -81,7 +82,12 @@
                                                             </td>
                                                             <td>
                                                                 <#if image.maskedVersion?has_content>
-                                                                    <code title="${image.rawVersion}">${image.maskedVersion}</code>
+                                                                <code title="${image.rawVersion}">${image.maskedVersion}</code>
+                                                                </#if>
+                                                            </td>
+                                                            <td>
+                                                                <#if image.buildDate?has_content>
+                                                                <span class="image__tag-build-date">${image.buildDateAsString}</span>
                                                                 </#if>
                                                             </td>
                                                             <td>
@@ -90,9 +96,9 @@
                                                             <td class="text-center image-status">
 
                                                                 <#if image.unstable>
-                                                                    <i class="fas fa-exclamation-triangle text-warning" title="Potentially unstable"></i>
+                                                                <i class="fas fa-exclamation-triangle text-warning" title="Potentially unstable"></i>
                                                                 <#else>
-                                                                    <i class="fas fa-check text-success" title="No issues reported"></i>
+                                                                <i class="fas fa-check text-success" title="No issues reported"></i>
                                                                 </#if>
 
                                                             </td>

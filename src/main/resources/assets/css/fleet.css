@@ -106,6 +106,10 @@ input[type="text"], textarea {
     font-weight: normal;
 }
 
+.table tbody tr td span.image__tag-build-date {
+    font-size: 0.8rem;
+}
+
 .dropdown-menu {
     font-size: 0.8rem;
 }
