@@ -26,6 +26,7 @@ public class ApiImage {
     private String  version;
     private boolean stable;
     private boolean deprecated;
+    private String  buildDate;
 
     public String getName() {
         return name;
@@ -47,6 +48,10 @@ public class ApiImage {
         return deprecated;
     }
 
+    public String getBuildDate() {
+        return buildDate;
+    }
+
     public static ApiImage fromImage(Image image) {
 
         ApiImage apiImage = new ApiImage();
@@ -56,6 +61,7 @@ public class ApiImage {
         apiImage.version    = image.getMaskedVersion();
         apiImage.stable     = !image.isUnstable();
         apiImage.deprecated = image.isDeprecated();
+        apiImage.buildDate  = image.getBuildDateAsString();
 
         return apiImage;
     }
