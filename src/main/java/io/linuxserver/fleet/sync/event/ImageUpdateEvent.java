@@ -17,7 +17,7 @@
 
 package io.linuxserver.fleet.sync.event;
 
-import io.linuxserver.fleet.model.Image;
+import io.linuxserver.fleet.model.internal.Image;
 
 public class ImageUpdateEvent {
 

@@ -44,14 +44,25 @@
 
                         <#if populatedRepository.images?size &gt; 0>
                             <div class="row">
+                                <div class="col-md-2"></div>
+                                <div class="col-md-8">
+                                    <div class="input-group input-group-sm mb-3 mt-3">
+                                        <div class="input-group-prepend">
+                                            <span class="input-group-text" id="searchLabel_#{populatedRepository.repository.id}"><i class="fas fa-search"></i> Search ${populatedRepository.repository.name}</span>
+                                        </div>
+                                        <input type="text" class="form-control image-search" id="search_#{populatedRepository.repository.id}" data-repository-id="#{populatedRepository.repository.id}" aria-describedby="searchLabel_#{populatedRepository.repository.id}">
+                                    </div>
+                                </div>
+                                <div class="col-md-2"></div>
                                 <div class="col-12">
 
-                                    <div class="table-responsive">
+                                    <div class="table-responsive" id="#{populatedRepository.repository.id}_images">
                                         <table class="table table--sortable">
                                             <thead>
                                                 <tr>
                                                     <th>Name</th>
                                                     <th>Version</th>
+                                                    <th>Built</th>
                                                     <th class="sorter-pullCount">Pull Count</th>
                                                     <th class="text-center">Status</th>
                                                     <#if __AUTHENTICATED_USER?has_content>
@@ -64,14 +75,19 @@
                                                     <#if !image.hidden || __AUTHENTICATED_USER?has_content>
                                                         <tr class="<#if image.hidden>hidden-image</#if><#if image.deprecated>deprecated-image</#if>" data-image-id="#{image.id}" data-image-name="${image.name}">
                                                             <td class="image-name">
-                                                                <span class="image-name--repository">${populatedRepository.repository.name} /</span> <a target="_blank" href="https://hub.docker.com/r/${populatedRepository.repository.name}/${image.name}">${image.name}</a>
+                                                                <span class="image-name--repository">${populatedRepository.repository.name} /</span> <a target="_blank" href="https://hub.docker.com/r/${populatedRepository.repository.name}/${image.name}"><span class="image-name__image">${image.name}</span></a>
                                                                 <#if image.deprecated>
                                                                 <span class="deprecation-message" title="This image has been deprecated: ${image.deprecationReason!""}"><i class="fas fa-exclamation-circle"></i></span>
                                                                 </#if>
                                                             </td>
                                                             <td>
-                                                                <#if image.version?has_content>
-                                                                    <code>${image.version}</code>
+                                                                <#if image.maskedVersion?has_content>
+                                                                <code title="${image.rawVersion}">${image.maskedVersion}</code>
+                                                                </#if>
+                                                            </td>
+                                                            <td>
+                                                                <#if image.buildDate?has_content>
+                                                                <span class="image__tag-build-date">${image.buildDateAsString}</span>
                                                                 </#if>
                                                             </td>
                                                             <td>
@@ -80,9 +96,9 @@
                                                             <td class="text-center image-status">
 
                                                                 <#if image.unstable>
-                                                                    <i class="fas fa-exclamation-triangle text-warning" title="Potentially unstable"></i>
+                                                                <i class="fas fa-exclamation-triangle text-warning" title="Potentially unstable"></i>
                                                                 <#else>
-                                                                    <i class="fas fa-check text-success" title="No issues reported"></i>
+                                                                <i class="fas fa-check text-success" title="No issues reported"></i>
                                                                 </#if>
 
                                                             </td>

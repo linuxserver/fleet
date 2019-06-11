@@ -2,8 +2,8 @@ package io.linuxserver.fleet.db.dao;
 
 import io.linuxserver.fleet.db.query.InsertUpdateResult;
 import io.linuxserver.fleet.db.query.LimitedResult;
-import io.linuxserver.fleet.model.Image;
-import io.linuxserver.fleet.model.ImagePullStat;
+import io.linuxserver.fleet.model.internal.Image;
+import io.linuxserver.fleet.model.internal.ImagePullStat;
 
 import java.util.List;
 

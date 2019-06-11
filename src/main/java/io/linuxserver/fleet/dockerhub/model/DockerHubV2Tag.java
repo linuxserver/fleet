@@ -19,6 +19,8 @@ package io.linuxserver.fleet.dockerhub.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import java.util.Objects;
+
 public class DockerHubV2Tag {
 
     @JsonProperty("name")
@@ -26,6 +28,9 @@ public class DockerHubV2Tag {
 
     @JsonProperty("full_size")
     private long fullSize;
+
+    @JsonProperty("last_updated")
+    private String lastUpdated;
 
     public String getName() {
         return name;
@@ -35,6 +40,10 @@ public class DockerHubV2Tag {
         return fullSize;
     }
 
+    public String getLastUpdated() {
+        return lastUpdated;
+    }
+
     @Override
     public String toString() {
         return name;
@@ -42,7 +51,7 @@ public class DockerHubV2Tag {
 
     @Override
     public int hashCode() {
-        return name.hashCode();
+        return Objects.hash(name, fullSize);
     }
 
     @Override
@@ -56,6 +65,7 @@ public class DockerHubV2Tag {
             return true;
         }
 
-        return name.equals(((DockerHubV2Tag) other).name);
+        DockerHubV2Tag otherTag = (DockerHubV2Tag) other;
+        return name.equals(otherTag.name) && fullSize == otherTag.fullSize;
     }
 }

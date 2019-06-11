@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package io.linuxserver.fleet.model;
+package io.linuxserver.fleet.model.internal;
 
 public class User extends PersistableItem<User> {
 

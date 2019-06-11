@@ -19,7 +19,9 @@ package io.linuxserver.fleet.db.dao;
 
 import java.sql.CallableStatement;
 import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.sql.Types;
+import java.time.LocalDateTime;
 
 class Utils {
 
@@ -48,6 +50,15 @@ class Utils {
 
         else
             call.setString(position, value);
+    }
+
+    static void setNullableTimestamp(CallableStatement call, int position, LocalDateTime localDateTime) throws SQLException {
+
+        if (null == localDateTime) {
+            call.setNull(position, Types.TIMESTAMP);
+        } else {
+            call.setTimestamp(position, Timestamp.valueOf(localDateTime));
+        }
     }
 
     static void safeClose(CallableStatement call) {

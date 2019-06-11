@@ -335,6 +335,39 @@ var imageListManager = (function($) {
 
 }(jQuery));
 
+var imageSearchManager = (function($) {
+
+    var performSearch = function() {
+
+        var $searchBox      = $(this);
+        var currentSearch   = $.trim($searchBox.val());
+        var activeTable     = $('#' + $searchBox.data('repository-id') + '_images');
+        var rows            = activeTable.find('tbody tr');
+
+        rows.each(function(i, row) {
+
+            var $row = $(row);
+            var imageName = $row.data('image-name');
+
+            if (imageName.startsWith(currentSearch) || currentSearch.length === 0) {
+                $row.show();
+            } else {
+                $row.hide();
+            }
+        });
+
+    };
+
+    var init = function() {
+        $('input.image-search').on('keyup', performSearch);
+    };
+
+    return {
+        init: init
+    }
+
+}(jQuery));
+
 var synchronisationManager = (function($) {
 
     var onMessage = function(event) {

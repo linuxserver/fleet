@@ -15,48 +15,32 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package io.linuxserver.fleet.model;
+package io.linuxserver.fleet.model.docker;
 
-public class Repository extends PersistableItem<Repository> {
+import java.time.LocalDateTime;
 
-    private final String name;
+public class DockerTag {
 
-    private String       versionMask;
-    private boolean      syncEnabled;
+    private final String        name;
+    private final long          size;
+    private final LocalDateTime buildDate;
 
-    public Repository(Integer id, String name) {
-        super(id);
-
-        this.name = name;
-    }
-
-    public Repository(String name) {
-        super();
+    public DockerTag(String name, long size, LocalDateTime buildDate) {
 
         this.name = name;
-    }
-
-    public Repository withVersionMask(String versionMask) {
-
-        this.versionMask = versionMask;
-        return this;
-    }
-
-    public Repository withSyncEnabled(boolean syncEnabled) {
-
-        this.syncEnabled = syncEnabled;
-        return this;
+        this.size = size;
+        this.buildDate = buildDate;
     }
 
     public String getName() {
         return name;
     }
 
-    public String getVersionMask() {
-        return versionMask;
+    public long getSize() {
+        return size;
     }
 
-    public boolean isSyncEnabled() {
-        return syncEnabled;
+    public LocalDateTime getBuildDate() {
+        return buildDate;
     }
 }

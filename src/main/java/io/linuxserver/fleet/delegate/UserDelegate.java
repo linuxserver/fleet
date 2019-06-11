@@ -22,7 +22,7 @@ import io.linuxserver.fleet.db.dao.UserDAO;
 import io.linuxserver.fleet.db.query.InsertUpdateResult;
 import io.linuxserver.fleet.db.query.InsertUpdateStatus;
 import io.linuxserver.fleet.exception.SaveException;
-import io.linuxserver.fleet.model.User;
+import io.linuxserver.fleet.model.internal.User;
 
 public class UserDelegate {
 

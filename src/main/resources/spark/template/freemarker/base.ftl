@@ -81,6 +81,7 @@
 
             <#if context="home">
             imageListManager.init();
+            imageSearchManager.init();
             </#if>
 
             <#if context="setup" || context="login">

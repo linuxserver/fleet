@@ -20,7 +20,7 @@ package io.linuxserver.fleet.db.dao;
 import io.linuxserver.fleet.db.PoolingDatabaseConnection;
 import io.linuxserver.fleet.db.query.InsertUpdateResult;
 import io.linuxserver.fleet.db.query.InsertUpdateStatus;
-import io.linuxserver.fleet.model.User;
+import io.linuxserver.fleet.model.internal.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

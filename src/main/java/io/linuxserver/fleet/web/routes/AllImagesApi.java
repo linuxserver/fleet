@@ -19,8 +19,8 @@ package io.linuxserver.fleet.web.routes;
 
 import io.linuxserver.fleet.delegate.ImageDelegate;
 import io.linuxserver.fleet.delegate.RepositoryDelegate;
-import io.linuxserver.fleet.model.Image;
-import io.linuxserver.fleet.model.Repository;
+import io.linuxserver.fleet.model.internal.Image;
+import io.linuxserver.fleet.model.internal.Repository;
 import io.linuxserver.fleet.model.api.ApiImage;
 import io.linuxserver.fleet.model.api.ApiImagesWithTotalCount;
 import io.linuxserver.fleet.model.api.ApiResponse;

@@ -17,8 +17,8 @@
 
 package io.linuxserver.fleet.model.api;
 
-import io.linuxserver.fleet.model.Image;
-import io.linuxserver.fleet.model.ImagePullStat;
+import io.linuxserver.fleet.model.internal.Image;
+import io.linuxserver.fleet.model.internal.ImagePullStat;
 
 import java.util.ArrayList;
 import java.util.List;
