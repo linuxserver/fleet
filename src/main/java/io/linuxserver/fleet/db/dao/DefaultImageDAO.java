@@ -23,6 +23,7 @@ import io.linuxserver.fleet.db.query.InsertUpdateStatus;
 import io.linuxserver.fleet.db.query.LimitedResult;
 import io.linuxserver.fleet.model.internal.Image;
 import io.linuxserver.fleet.model.internal.ImagePullStat;
+import io.linuxserver.fleet.model.internal.Repository;
 import io.linuxserver.fleet.model.internal.Tag;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -230,7 +231,10 @@ public class DefaultImageDAO implements ImageDAO {
 
         Image image = new Image(
             results.getInt("ImageId"),
-            results.getInt("RepositoryId"),
+            new Repository(
+                results.getInt("RepositoryId"),
+                results.getString("RepositoryName")
+            ),
             results.getString("ImageName"),
             new Tag(
                 results.getString("LatestTagVersion"),

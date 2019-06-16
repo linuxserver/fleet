@@ -29,34 +29,34 @@ import java.util.Objects;
  */
 public class Image extends PersistableItem<Image> {
 
-    private final int       repositoryId;
-    private final String    name;
+    private final Repository repository;
+    private final String     name;
 
-    private Tag             tag;
-    private long            pullCount;
-    private String          versionMask;
-    private boolean         unstable;
-    private boolean         hidden;
+    private Tag              tag;
+    private long             pullCount;
+    private String           versionMask;
+    private boolean          unstable;
+    private boolean          hidden;
 
-    private boolean         deprecated;
-    private String          deprecationReason;
+    private boolean          deprecated;
+    private String           deprecationReason;
 
-    public Image(Integer id, int repositoryId, String name, Tag latestVersion) {
+    public Image(Integer id, Repository repository, String name, Tag latestVersion) {
 
         super(id);
 
         this.name           = name;
-        this.repositoryId   = repositoryId;
+        this.repository     = repository;
         this.tag            = new Tag(latestVersion.getVersion(), latestVersion.getMaskedVersion(), latestVersion.getBuildDate());
     }
 
-    public Image(int repositoryId, String name) {
-        this(null, repositoryId, name, Tag.NONE);
+    public Image(Repository repository, String name) {
+        this(null, repository, name, Tag.NONE);
     }
 
     public static Image copyOf(Image image) {
 
-        Image cloned                = new Image(image.getId(), image.repositoryId, image.name, image.tag);
+        Image cloned                = new Image(image.getId(), Repository.copyOf(image.repository), image.name, image.tag);
         cloned.pullCount            = image.pullCount;
         cloned.versionMask          = image.versionMask;
         cloned.unstable             = image.unstable;
@@ -108,7 +108,11 @@ public class Image extends PersistableItem<Image> {
     }
 
     public int getRepositoryId() {
-        return repositoryId;
+        return repository.getId();
+    }
+
+    public Repository getRepository() {
+        return repository;
     }
 
     public String getName() {
@@ -166,11 +170,11 @@ public class Image extends PersistableItem<Image> {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Image image = (Image) o;
-        return repositoryId == image.repositoryId && Objects.equals(name, image.name);
+        return Objects.equals(repository, image.repository) && Objects.equals(name, image.name);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(repositoryId, name);
+        return Objects.hash(repository, name);
     }
 }

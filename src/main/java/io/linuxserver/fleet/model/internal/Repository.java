@@ -17,6 +17,8 @@
 
 package io.linuxserver.fleet.model.internal;
 
+import java.util.Objects;
+
 public class Repository extends PersistableItem<Repository> {
 
     private final String name;
@@ -34,6 +36,10 @@ public class Repository extends PersistableItem<Repository> {
         super();
 
         this.name = name;
+    }
+
+    public static Repository copyOf(Repository repository) {
+        return new Repository(repository.getId(), repository.name).withVersionMask(repository.versionMask).withSyncEnabled(repository.syncEnabled);
     }
 
     public Repository withVersionMask(String versionMask) {
@@ -58,5 +64,18 @@ public class Repository extends PersistableItem<Repository> {
 
     public boolean isSyncEnabled() {
         return syncEnabled;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Repository that = (Repository) o;
+        return Objects.equals(name, that.name);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(name);
     }
 }

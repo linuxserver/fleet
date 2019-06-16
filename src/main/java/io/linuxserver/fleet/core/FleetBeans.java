@@ -27,7 +27,11 @@ import io.linuxserver.fleet.db.dao.DefaultUserDAO;
 import io.linuxserver.fleet.db.migration.DatabaseVersion;
 import io.linuxserver.fleet.delegate.*;
 import io.linuxserver.fleet.dockerhub.DockerHubV2Client;
+import io.linuxserver.fleet.dockerhub.queue.DockerHubSyncConsumer;
+import io.linuxserver.fleet.dockerhub.queue.DockerHubSyncQueue;
 import io.linuxserver.fleet.thread.TaskManager;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * <p>
@@ -35,6 +39,8 @@ import io.linuxserver.fleet.thread.TaskManager;
  * </p>
  */
 public class FleetBeans {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(FleetBeans.class);
 
     private final FleetProperties           properties;
     private final ImageDelegate             imageDelegate;
@@ -46,6 +52,7 @@ public class FleetBeans {
     private final TaskDelegate              taskDelegate;
     private final UserDelegate              userDelegate;
     private final PasswordEncoder           passwordEncoder;
+    private final DockerHubSyncQueue        dockerHubSyncQueue;
 
     /**
      * Ensures the database is kept up to date.
@@ -68,6 +75,14 @@ public class FleetBeans {
         userDelegate            = new UserDelegate(passwordEncoder, new DefaultUserDAO(databaseConnection));
         taskDelegate            = new TaskDelegate(this);
         authenticationDelegate  = new DefaultAuthenticationDelegate(AuthenticatorFactory.getAuthenticator(this));
+        dockerHubSyncQueue      = new DockerHubSyncQueue();
+
+        final int consumerThreadCount = properties.getQueueThreadCount();
+        for (int i = 0; i < consumerThreadCount; i++) {
+
+            LOGGER.info("Starting consumer thread " + i + "...");
+            new DockerHubSyncConsumer(imageDelegate, dockerHubSyncQueue, "SyncThread-" + i).start();
+        }
     }
 
     public FleetProperties getProperties() {

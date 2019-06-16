@@ -137,7 +137,7 @@ public class DefaultSynchronisationState implements SynchronisationState {
                 try {
 
                     DockerImage dockerImage = images.get(i);
-                    Image image = configureImage(repository.getId(), dockerImage, context);
+                    Image image = configureImage(repository, dockerImage, context);
 
                     String versionMask = getVersionMask(repository.getVersionMask(), image.getVersionMask());
                     Tag maskedVersion = getLatestTagAndCreateMaskedVersion(repository.getName(), image.getName(), versionMask, context);
@@ -230,15 +230,15 @@ public class DefaultSynchronisationState implements SynchronisationState {
      * Looks up the image in the database to see if it already exists. If it does, it gets returned, otherwise a base
      * image is created with just the top-level information, as the rest will get updated later.
      */
-    private Image configureImage(int repositoryId, DockerImage dockerHubImage, SynchronisationContext context) {
+    private Image configureImage(Repository repository, DockerImage dockerHubImage, SynchronisationContext context) {
 
-        Image image = context.getImageDelegate().findImageByRepositoryAndImageName(repositoryId, dockerHubImage.getName());
+        Image image = context.getImageDelegate().findImageByRepositoryAndImageName(repository.getId(), dockerHubImage.getName());
 
         if (isImageNew(image)) {
 
             try {
 
-                return context.getImageDelegate().saveImage(new Image(repositoryId, dockerHubImage.getName()));
+                return context.getImageDelegate().saveImage(new Image(repository, dockerHubImage.getName()));
 
             } catch (SaveException e) {
                 LOGGER.error("Tried to save new image during sync but failed", e);
