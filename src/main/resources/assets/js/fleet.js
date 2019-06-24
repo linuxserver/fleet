@@ -340,14 +340,14 @@ var imageSearchManager = (function($) {
     var performSearch = function() {
 
         var $searchBox      = $(this);
-        var currentSearch   = $.trim($searchBox.val());
+        var currentSearch   = $.trim($searchBox.val()).toLowerCase();
         var activeTable     = $('#' + $searchBox.data('repository-id') + '_images');
         var rows            = activeTable.find('tbody tr');
 
         rows.each(function(i, row) {
 
             var $row = $(row);
-            var imageName = $row.data('image-name');
+            var imageName = $row.data('image-name').toLowerCase();
 
             if (imageName.startsWith(currentSearch) || currentSearch.length === 0) {
                 $row.show();
