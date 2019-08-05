@@ -55,7 +55,7 @@ public class AllImagesApi implements Route {
 
             if (repository.isSyncEnabled()) {
 
-                List<Image> savedImages = imageDelegate.fetchImagesByRepository(repository.getId());
+                List<Image> savedImages = imageDelegate.fetchImagesByRepository(repository.getKey());
                 List<ApiImage> apiImages = new ArrayList<>();
 
                 for (Image savedImage : savedImages) {

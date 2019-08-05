@@ -22,6 +22,7 @@ import io.linuxserver.fleet.db.query.InsertUpdateResult;
 import io.linuxserver.fleet.db.query.InsertUpdateStatus;
 import io.linuxserver.fleet.exception.SaveException;
 import io.linuxserver.fleet.model.internal.Repository;
+import io.linuxserver.fleet.model.key.RepositoryKey;
 
 import java.util.List;
 
@@ -33,8 +34,8 @@ public class RepositoryDelegate {
         this.repositoryDAO = repositoryDAO;
     }
 
-    public Repository fetchRepository(int id) {
-        return repositoryDAO.fetchRepository(id);
+    public Repository fetchRepository(RepositoryKey repositoryKey) {
+        return repositoryDAO.fetchRepository(repositoryKey);
     }
 
     public Repository saveRepository(Repository repository) throws SaveException {

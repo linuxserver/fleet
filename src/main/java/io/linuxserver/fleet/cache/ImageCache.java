@@ -18,20 +18,19 @@
 package io.linuxserver.fleet.cache;
 
 import io.linuxserver.fleet.model.internal.Image;
+import io.linuxserver.fleet.model.key.ImageKey;
+import io.linuxserver.fleet.model.key.RepositoryKey;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class ImageCache {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ImageCache.class);
 
-    private final Map<Integer, List<Image>> cachedImages;
+    private final Map<RepositoryKey, List<Image>> cachedImages;
 
     public ImageCache() {
         this.cachedImages = new HashMap<>();
@@ -41,19 +40,19 @@ public class ImageCache {
 
         Image updatedImage = Image.copyOf(image);
 
-        if (cachedImages.containsKey(updatedImage.getRepositoryId())) {
+        if (cachedImages.containsKey(updatedImage.getKey().getRepositoryKey())) {
 
-            List<Image> images = cachedImages.get(updatedImage.getRepositoryId());
+            List<Image> images = cachedImages.get(updatedImage.getKey().getRepositoryKey());
             int cachedImageLocation = images.indexOf(updatedImage);
 
             if (cachedImageLocation > -1) {
 
-                LOGGER.info("updateCache({}) Updating existing cached image.", updatedImage.getName());
+                LOGGER.info("updateCache({}) Updating existing cached image.", updatedImage);
                 images.set(cachedImageLocation, updatedImage);
 
             } else {
 
-                LOGGER.info("updateCache({}) Adding image to cache", updatedImage.getName());
+                LOGGER.info("updateCache({}) Adding image to cache", updatedImage);
                 images.add(updatedImage);
             }
 
@@ -62,33 +61,37 @@ public class ImageCache {
             List<Image> images = new ArrayList<>();
             images.add(updatedImage);
 
-            LOGGER.info("updateCache({}:{}) Creating new cache for repository {}", updatedImage.getName(), updatedImage.getRepositoryId());
-            cachedImages.put(updatedImage.getRepositoryId(), images);
+            LOGGER.info("updateCache({}) Creating new cache for repository {}", updatedImage, updatedImage.getRepositoryId());
+            cachedImages.put(updatedImage.getKey().getRepositoryKey(), images);
         }
     }
 
-    public List<Image> getAll(int repositoryId) {
+    public List<Image> getAll(RepositoryKey repositoryKey) {
 
-        if (cachedImages.containsKey(repositoryId)) {
-            return cachedImages.get(repositoryId).stream().map(Image::copyOf).collect(Collectors.toList());
+        if (cachedImages.containsKey(repositoryKey)) {
+            return cachedImages.get(repositoryKey).stream().map(Image::copyOf).collect(Collectors.toList());
         }
 
         return new ArrayList<>();
     }
 
-    public Image get(int repositoryId, String imageName) {
+    public Image get(ImageKey imageKey) {
 
-        if (cachedImages.containsKey(repositoryId)) {
-            return cachedImages.get(repositoryId).stream().filter(i -> i.getName().equals(imageName)).findFirst().orElse(null);
+        final RepositoryKey repositoryKey = imageKey.getRepositoryKey();
+
+        if (cachedImages.containsKey(repositoryKey)) {
+            return cachedImages.get(repositoryKey).stream().filter(i -> i.getName().equals(imageKey.getName())).findFirst().orElse(null);
         }
 
         return null;
     }
 
-    public void remove(Image image) {
+    public void remove(ImageKey imageKey) {
 
-        if (cachedImages.containsKey(image.getRepositoryId())) {
-            cachedImages.get(image.getRepositoryId()).remove(image);
+        final RepositoryKey repositoryKey = imageKey.getRepositoryKey();
+
+        if (cachedImages.containsKey(repositoryKey)) {
+            cachedImages.get(repositoryKey).removeIf(image -> image.getKey().equals(imageKey));
         }
     }
 }

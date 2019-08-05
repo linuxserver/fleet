@@ -21,6 +21,7 @@ import io.linuxserver.fleet.db.PoolingDatabaseConnection;
 import io.linuxserver.fleet.db.query.InsertUpdateResult;
 import io.linuxserver.fleet.db.query.InsertUpdateStatus;
 import io.linuxserver.fleet.model.internal.Repository;
+import io.linuxserver.fleet.model.key.RepositoryKey;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -28,9 +29,7 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
-import static io.linuxserver.fleet.db.dao.Utils.safeClose;
-import static io.linuxserver.fleet.db.dao.Utils.setNullableInt;
-import static io.linuxserver.fleet.db.dao.Utils.setNullableString;
+import static io.linuxserver.fleet.db.dao.Utils.*;
 
 public class DefaultRepositoryDAO implements RepositoryDAO {
 
@@ -43,14 +42,14 @@ public class DefaultRepositoryDAO implements RepositoryDAO {
     }
 
     @Override
-    public Repository fetchRepository(int id) {
+    public Repository fetchRepository(RepositoryKey repositoryKey) {
 
         CallableStatement call = null;
 
         try (Connection connection = databaseConnection.getConnection()) {
 
             call = connection.prepareCall("{CALL Repository_Get(?)}");
-            call.setInt(1, id);
+            call.setInt(1, repositoryKey.getId());
 
             ResultSet results = call.executeQuery();
             if (results.next())
@@ -73,7 +72,7 @@ public class DefaultRepositoryDAO implements RepositoryDAO {
         try (Connection connection = databaseConnection.getConnection()) {
 
             call = connection.prepareCall("{CALL Repository_Save(?,?,?,?,?,?,?)}");
-            setNullableInt(call, 1, repository.getId());
+            setNullableInt(call, 1, repository.getKey().getId());
             call.setString(2, repository.getName());
             setNullableString(call, 3, repository.getVersionMask());
             call.setBoolean(4, repository.isSyncEnabled());
@@ -89,7 +88,7 @@ public class DefaultRepositoryDAO implements RepositoryDAO {
             String statusMessage    = call.getString(7);
 
             if (InsertUpdateStatus.OK == status)
-                return new InsertUpdateResult<>(fetchRepository(repositoryId), status, statusMessage);
+                return new InsertUpdateResult<>(fetchRepository(repository.getKey().cloneWithId(repositoryId)), status, statusMessage);
 
             return new InsertUpdateResult<>(status, statusMessage);
 
@@ -171,7 +170,7 @@ public class DefaultRepositoryDAO implements RepositoryDAO {
 
     private Repository parseRepositoryFromResultSet(ResultSet results) throws SQLException {
 
-        Repository repository = new Repository(results.getInt("RepositoryId"), results.getString("RepositoryName"))
+        Repository repository = new Repository(new RepositoryKey(results.getInt("RepositoryId"), results.getString("RepositoryName")))
             .withSyncEnabled(results.getBoolean("SyncEnabled"))
             .withVersionMask(results.getString("RepositoryVersionMask"))
             .withModifiedTime(results.getTimestamp("ModifiedTime").toLocalDateTime());

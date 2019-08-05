@@ -51,7 +51,7 @@ public class HomePage extends WebPage {
         for (Repository repository : repositories) {
 
             if (repository.isSyncEnabled())
-                populatedRepositories.add(new RepositoryWithImages(repository, imageDelegate.fetchImagesByRepository(repository.getId())));
+                populatedRepositories.add(new RepositoryWithImages(repository, imageDelegate.fetchImagesByRepository(repository.getKey())));
         }
 
         model.put("populatedRepositories", populatedRepositories);

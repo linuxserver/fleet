@@ -17,20 +17,27 @@
 
 package io.linuxserver.fleet.model.internal;
 
-public class User extends PersistableItem<User> {
+import io.linuxserver.fleet.model.key.AbstractHasKey;
+import io.linuxserver.fleet.model.key.UserKey;
 
-    private final String username;
-    private final String password;
+import java.time.LocalDateTime;
+
+public class User extends AbstractHasKey<UserKey> {
+
+    private final String        username;
+    private final String        password;
+
+    private LocalDateTime modifiedTime;
 
     public User(String username, String password) {
-        super();
+        super(new UserKey());
 
         this.username = username;
         this.password = password;
     }
 
     public User(Integer id, String username, String password) {
-        super(id);
+        super(new UserKey(id));
 
         this.username = username;
         this.password = password;
@@ -42,5 +49,28 @@ public class User extends PersistableItem<User> {
 
     public String getPassword() {
         return password;
+    }
+
+    public User withModifiedTime(LocalDateTime modifiedTime) {
+
+        this.modifiedTime = modifiedTime;
+        return this;
+    }
+
+    public LocalDateTime getModifiedTime() {
+
+        if (null != modifiedTime) {
+
+            return LocalDateTime.of(
+                modifiedTime.getYear(),
+                modifiedTime.getMonth(),
+                modifiedTime.getDayOfMonth(),
+                modifiedTime.getHour(),
+                modifiedTime.getMinute(),
+                modifiedTime.getSecond()
+            );
+        }
+
+        return null;
     }
 }

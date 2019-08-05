@@ -23,8 +23,9 @@ import io.linuxserver.fleet.db.query.InsertUpdateStatus;
 import io.linuxserver.fleet.db.query.LimitedResult;
 import io.linuxserver.fleet.model.internal.Image;
 import io.linuxserver.fleet.model.internal.ImagePullStat;
-import io.linuxserver.fleet.model.internal.Repository;
 import io.linuxserver.fleet.model.internal.Tag;
+import io.linuxserver.fleet.model.key.ImageKey;
+import io.linuxserver.fleet.model.key.RepositoryKey;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -46,15 +47,15 @@ public class DefaultImageDAO implements ImageDAO {
     }
 
     @Override
-    public Image findImageByRepositoryAndImageName(int repositoryId, String imageName) {
+    public Image findImageByRepositoryAndImageName(ImageKey imageKey) {
 
         CallableStatement call = null;
 
         try (Connection connection = databaseConnection.getConnection()) {
 
             call = connection.prepareCall("{CALL Image_GetByName(?,?)}");
-            call.setInt(1, repositoryId);
-            call.setString(2, imageName);
+            call.setInt(1, imageKey.getRepositoryKey().getId());
+            call.setString(2, imageKey.getName());
 
             ResultSet results = call.executeQuery();
             if (results.next())
@@ -70,16 +71,16 @@ public class DefaultImageDAO implements ImageDAO {
     }
 
     @Override
-    public Image fetchImage(Integer id) {
+    public Image fetchImage(ImageKey imageKey) {
 
-        LOGGER.debug("Fetching image by ID: " + id);
+        LOGGER.debug("Fetching image by ID: " + imageKey);
 
         CallableStatement call = null;
 
         try (Connection connection = databaseConnection.getConnection()) {
 
             call = connection.prepareCall("{CALL Image_Get(?)}");
-            call.setInt(1, id);
+            call.setInt(1, imageKey.getId());
 
             ResultSet results = call.executeQuery();
             if (results.next())
@@ -95,7 +96,7 @@ public class DefaultImageDAO implements ImageDAO {
     }
 
     @Override
-    public LimitedResult<Image> fetchImagesByRepository(int repositoryId) {
+    public LimitedResult<Image> fetchImagesByRepository(final RepositoryKey repositoryKey) {
 
         List<Image> images = new ArrayList<>();
 
@@ -104,7 +105,7 @@ public class DefaultImageDAO implements ImageDAO {
         try (Connection connection = databaseConnection.getConnection()) {
 
             call = connection.prepareCall("{CALL Image_GetAll(?,?)}");
-            call.setInt(1, repositoryId);
+            call.setInt(1, repositoryKey.getId());
             call.registerOutParameter(2, Types.INTEGER);
 
             ResultSet results = call.executeQuery();
@@ -131,7 +132,7 @@ public class DefaultImageDAO implements ImageDAO {
         try (Connection connection = databaseConnection.getConnection()) {
 
             call = connection.prepareCall("{CALL Image_Save(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)");
-            setNullableInt(call, 1, image.getId());
+            setNullableInt(call, 1, image.getKey().getId());
             call.setInt(2, image.getRepositoryId());
             call.setString(3, image.getName());
             setNullableLong(call, 4, image.getPullCount());
@@ -155,7 +156,7 @@ public class DefaultImageDAO implements ImageDAO {
             String statusMessage    = call.getString(15);
 
             if (InsertUpdateStatus.OK == status)
-                return new InsertUpdateResult<>(fetchImage(imageId), status, statusMessage);
+                return new InsertUpdateResult<>(fetchImage(image.getKey().cloneWithId(imageId)), status, statusMessage);
 
             return new InsertUpdateResult<>(status, statusMessage);
 
@@ -170,14 +171,14 @@ public class DefaultImageDAO implements ImageDAO {
     }
 
     @Override
-    public void removeImage(Integer id) {
+    public void removeImage(final ImageKey imageKey) {
 
         CallableStatement call = null;
 
         try (Connection connection = databaseConnection.getConnection()) {
 
             call = connection.prepareCall("{CALL Image_Delete(?)}");
-            call.setInt(1, id);
+            call.setInt(1, imageKey.getId());
 
             call.executeUpdate();
             call.close();
@@ -190,7 +191,7 @@ public class DefaultImageDAO implements ImageDAO {
     }
 
     @Override
-    public List<ImagePullStat> fetchImagePullHistory(Integer imageId, ImagePullStat.GroupMode groupMode) {
+    public List<ImagePullStat> fetchImagePullHistory(final ImageKey imageKey, ImagePullStat.GroupMode groupMode) {
 
         List<ImagePullStat> pullHistory = new ArrayList<>();
 
@@ -199,7 +200,7 @@ public class DefaultImageDAO implements ImageDAO {
         try (Connection connection = databaseConnection.getConnection()) {
 
             call = connection.prepareCall("CALL Image_GetPullHistory(?, ?)");
-            call.setInt(1, imageId);
+            call.setInt(1, imageKey.getId());
             call.setString(2, groupMode.toString());
 
             ResultSet results = call.executeQuery();
@@ -230,12 +231,14 @@ public class DefaultImageDAO implements ImageDAO {
     private Image parseImageFromResultSet(ResultSet results) throws SQLException {
 
         Image image = new Image(
-            results.getInt("ImageId"),
-            new Repository(
-                results.getInt("RepositoryId"),
-                results.getString("RepositoryName")
+            new ImageKey(
+                results.getInt("ImageId"),
+                results.getString("ImageName"),
+                new RepositoryKey(
+                    results.getInt("RepositoryId"),
+                    results.getString("RepositoryName")
+                )
             ),
-            results.getString("ImageName"),
             new Tag(
                 results.getString("LatestTagVersion"),
                 results.getString("LatestMaskedTagVersion"),

@@ -21,6 +21,7 @@ import io.linuxserver.fleet.delegate.ImageDelegate;
 import io.linuxserver.fleet.model.internal.Image;
 import io.linuxserver.fleet.model.api.ApiResponse;
 import io.linuxserver.fleet.model.api.FleetApiException;
+import io.linuxserver.fleet.model.key.ImageKey;
 import spark.Request;
 import spark.Response;
 import spark.Route;
@@ -40,7 +41,7 @@ public class ManageImageApi implements Route {
 
             int imageId = Integer.parseInt(request.queryParams("imageId"));
 
-            Image image = imageDelegate.fetchImage(imageId);
+            Image image = imageDelegate.fetchImage(ImageKey.makeForLookup(imageId));
             if (null == image) {
 
                 response.status(404);

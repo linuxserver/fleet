@@ -17,9 +17,11 @@
 
 package io.linuxserver.fleet.model.internal;
 
+import io.linuxserver.fleet.model.key.AbstractHasKey;
+import io.linuxserver.fleet.model.key.ImageKey;
+
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.Objects;
 
 /**
  * <p>
@@ -27,36 +29,35 @@ import java.util.Objects;
  * specific information regarding its build status and pull count.
  * </p>
  */
-public class Image extends PersistableItem<Image> {
+public class Image extends AbstractHasKey<ImageKey> {
 
-    private final Repository repository;
-    private final String     name;
+    private static final DateTimeFormatter DATE_PATTERN = DateTimeFormatter.ofPattern("dd MMM yyyy HH:mm:ss");
 
     private Tag              tag;
     private long             pullCount;
     private String           versionMask;
     private boolean          unstable;
     private boolean          hidden;
-
+    private LocalDateTime    modifiedTime;
     private boolean          deprecated;
     private String           deprecationReason;
 
-    public Image(Integer id, Repository repository, String name, Tag latestVersion) {
-
-        super(id);
-
-        this.name           = name;
-        this.repository     = repository;
-        this.tag            = new Tag(latestVersion.getVersion(), latestVersion.getMaskedVersion(), latestVersion.getBuildDate());
+    public Image(final ImageKey imageKey, final Tag latestVersion) {
+        super(imageKey);
+        this.tag  = new Tag(latestVersion.getVersion(), latestVersion.getMaskedVersion(), latestVersion.getBuildDate());
     }
 
-    public Image(Repository repository, String name) {
-        this(null, repository, name, Tag.NONE);
+    public Image(final ImageKey imageKey) {
+        this(imageKey, Tag.NONE);
+    }
+
+    public static Image makeFromKey(ImageKey imageKey) {
+        return new Image(imageKey);
     }
 
     public static Image copyOf(Image image) {
 
-        Image cloned                = new Image(image.getId(), Repository.copyOf(image.repository), image.name, image.tag);
+        Image cloned                = new Image(image.getKey(), image.tag);
         cloned.pullCount            = image.pullCount;
         cloned.versionMask          = image.versionMask;
         cloned.unstable             = image.unstable;
@@ -103,20 +104,22 @@ public class Image extends PersistableItem<Image> {
         return this;
     }
 
+    public Image withModifiedTime(final LocalDateTime modifiedTime) {
+
+        this.modifiedTime = modifiedTime;
+        return this;
+    }
+
     public void updateTag(Tag maskedVersion) {
         this.tag = new Tag(maskedVersion.getVersion(), maskedVersion.getMaskedVersion(), maskedVersion.getBuildDate());
     }
 
     public int getRepositoryId() {
-        return repository.getId();
-    }
-
-    public Repository getRepository() {
-        return repository;
+        return getKey().getRepositoryKey().getId();
     }
 
     public String getName() {
-        return name;
+        return getKey().getName();
     }
 
     public long getPullCount() {
@@ -138,7 +141,7 @@ public class Image extends PersistableItem<Image> {
     public String getBuildDateAsString() {
 
         if (getBuildDate() != null) {
-            return getBuildDate().format(DateTimeFormatter.ofPattern("dd MMM yyyy HH:mm:ss"));
+            return getBuildDate().format(DATE_PATTERN);
         }
 
         return null;
@@ -164,17 +167,20 @@ public class Image extends PersistableItem<Image> {
         return deprecationReason;
     }
 
-    @Override
-    public boolean equals(Object o) {
+    public LocalDateTime getModifiedTime() {
 
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        Image image = (Image) o;
-        return Objects.equals(repository, image.repository) && Objects.equals(name, image.name);
-    }
+        if (null != modifiedTime) {
 
-    @Override
-    public int hashCode() {
-        return Objects.hash(repository, name);
+            return LocalDateTime.of(
+                modifiedTime.getYear(),
+                modifiedTime.getMonth(),
+                modifiedTime.getDayOfMonth(),
+                modifiedTime.getHour(),
+                modifiedTime.getMinute(),
+                modifiedTime.getSecond()
+            );
+        }
+
+        return null;
     }
 }

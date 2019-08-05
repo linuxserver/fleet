@@ -20,8 +20,8 @@ package io.linuxserver.fleet.dockerhub.queue;
 import io.linuxserver.fleet.delegate.DockerHubDelegate;
 import io.linuxserver.fleet.model.internal.Image;
 import io.linuxserver.fleet.queue.FleetRequest;
-
-import java.util.Objects;
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 public class DockerHubSyncRequest implements FleetRequest<DockerHubSyncResponse> {
 
@@ -41,14 +41,15 @@ public class DockerHubSyncRequest implements FleetRequest<DockerHubSyncResponse>
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        DockerHubSyncRequest that = (DockerHubSyncRequest) o;
-        return Objects.equals(image, that.image);
+
+        if (!(o instanceof DockerHubSyncRequest))
+            return false;
+
+        return EqualsBuilder.reflectionEquals(this, "dockerHubDelegate");
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(image);
+        return HashCodeBuilder.reflectionHashCode(this, "dockerHubDelegate");
     }
 }

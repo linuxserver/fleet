@@ -21,6 +21,7 @@ import io.linuxserver.fleet.delegate.RepositoryDelegate;
 import io.linuxserver.fleet.model.internal.Repository;
 import io.linuxserver.fleet.model.api.ApiResponse;
 import io.linuxserver.fleet.model.api.FleetApiException;
+import io.linuxserver.fleet.model.key.RepositoryKey;
 import spark.Request;
 import spark.Response;
 import spark.Route;
@@ -40,7 +41,7 @@ public class ManageRepositoryApi implements Route {
 
             int repositoryId = Integer.parseInt(request.queryParams("repositoryId"));
 
-            Repository repository = repositoryDelegate.fetchRepository(repositoryId);
+            Repository repository = repositoryDelegate.fetchRepository(new RepositoryKey(repositoryId));
             if (null == repository) {
 
                 response.status(404);

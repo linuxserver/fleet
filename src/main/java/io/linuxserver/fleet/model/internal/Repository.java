@@ -17,29 +17,23 @@
 
 package io.linuxserver.fleet.model.internal;
 
-import java.util.Objects;
+import io.linuxserver.fleet.model.key.AbstractHasKey;
+import io.linuxserver.fleet.model.key.RepositoryKey;
 
-public class Repository extends PersistableItem<Repository> {
+import java.time.LocalDateTime;
 
-    private final String name;
+public class Repository extends AbstractHasKey<RepositoryKey> {
 
-    private String       versionMask;
-    private boolean      syncEnabled;
+    private String        versionMask;
+    private boolean       syncEnabled;
+    private LocalDateTime modifiedTime;
 
-    public Repository(Integer id, String name) {
-        super(id);
-
-        this.name = name;
-    }
-
-    public Repository(String name) {
-        super();
-
-        this.name = name;
+    public Repository(final RepositoryKey repositoryKey) {
+        super(repositoryKey);
     }
 
     public static Repository copyOf(Repository repository) {
-        return new Repository(repository.getId(), repository.name).withVersionMask(repository.versionMask).withSyncEnabled(repository.syncEnabled);
+        return new Repository(repository.getKey()).withVersionMask(repository.versionMask).withSyncEnabled(repository.syncEnabled);
     }
 
     public Repository withVersionMask(String versionMask) {
@@ -54,8 +48,14 @@ public class Repository extends PersistableItem<Repository> {
         return this;
     }
 
+    public Repository withModifiedTime(LocalDateTime modifiedTime) {
+
+        this.modifiedTime = modifiedTime;
+        return this;
+    }
+
     public String getName() {
-        return name;
+        return getKey().getName();
     }
 
     public String getVersionMask() {
@@ -66,16 +66,20 @@ public class Repository extends PersistableItem<Repository> {
         return syncEnabled;
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        Repository that = (Repository) o;
-        return Objects.equals(name, that.name);
-    }
+    public LocalDateTime getModifiedTime() {
 
-    @Override
-    public int hashCode() {
-        return Objects.hash(name);
+        if (null != modifiedTime) {
+
+            return LocalDateTime.of(
+                modifiedTime.getYear(),
+                modifiedTime.getMonth(),
+                modifiedTime.getDayOfMonth(),
+                modifiedTime.getHour(),
+                modifiedTime.getMinute(),
+                modifiedTime.getSecond()
+            );
+        }
+
+        return null;
     }
 }

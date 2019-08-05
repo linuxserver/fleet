@@ -41,8 +41,9 @@ public class DockerHubSyncResponse implements FleetResponse {
     @Override
     public void handle() {
 
-        DockerImage dockerImage = dockerHubDelegate.fetchImageFromRepository(image.getRepository().getName(), image.getName());
-        String versionMask      = getVersionMask(image.getRepository().getVersionMask(), image.getVersionMask());
+        DockerImage dockerImage = dockerHubDelegate.fetchImageFromRepository(image.getKey().getRepositoryKey().getName(), image.getName());
+
+        String versionMask      = getVersionMask(null, image.getVersionMask());
         Tag maskedVersion       = getLatestTagAndCreateMaskedVersion(versionMask);
 
         image.withPullCount(dockerImage.getPullCount());
@@ -59,7 +60,7 @@ public class DockerHubSyncResponse implements FleetResponse {
 
     private Tag getLatestTagAndCreateMaskedVersion(String versionMask) {
 
-        DockerTag tag = dockerHubDelegate.fetchLatestImageTag(image.getRepository().getName(), image.getName());
+        DockerTag tag = dockerHubDelegate.fetchLatestImageTag(image.getKey().getRepositoryKey().getName(), image.getName());
 
         if (null == tag)
             return Tag.NONE;

@@ -24,6 +24,8 @@ import io.linuxserver.fleet.db.query.InsertUpdateStatus;
 import io.linuxserver.fleet.exception.SaveException;
 import io.linuxserver.fleet.model.internal.Image;
 import io.linuxserver.fleet.model.internal.ImagePullStat;
+import io.linuxserver.fleet.model.key.ImageKey;
+import io.linuxserver.fleet.model.key.RepositoryKey;
 
 import java.util.List;
 
@@ -45,13 +47,13 @@ public class ImageDelegate {
      * already has the image stored against the repository.
      * </p>
      */
-    public Image findImageByRepositoryAndImageName(int repositoryId, String imageName) {
+    public Image findImageByRepositoryAndImageName(final ImageKey imageKey) {
 
-        Image cachedImage = imageCache.get(repositoryId, imageName);
+        Image cachedImage = imageCache.get(imageKey);
 
         if (null == cachedImage) {
 
-            Image image = imageDAO.findImageByRepositoryAndImageName(repositoryId, imageName);
+            Image image = imageDAO.findImageByRepositoryAndImageName(imageKey);
 
             if (null != image) {
                 imageCache.updateCache(image);
@@ -63,16 +65,16 @@ public class ImageDelegate {
         return cachedImage;
     }
 
-    public Image fetchImage(int id) {
-        return imageDAO.fetchImage(id);
+    public Image fetchImage(ImageKey imageKey) {
+        return imageDAO.fetchImage(imageKey);
     }
 
-    public List<Image> fetchImagesByRepository(int repositoryId) {
+    public List<Image> fetchImagesByRepository(final RepositoryKey repositoryKey) {
 
-        List<Image> cachedImages = imageCache.getAll(repositoryId);
+        List<Image> cachedImages = imageCache.getAll(repositoryKey);
         if (cachedImages.isEmpty()) {
 
-            List<Image> images = imageDAO.fetchImagesByRepository(repositoryId).getResults();
+            List<Image> images = imageDAO.fetchImagesByRepository(repositoryKey).getResults();
             images.forEach(imageCache::updateCache);
 
             return images;
@@ -81,13 +83,13 @@ public class ImageDelegate {
         return cachedImages;
     }
 
-    public void removeImage(Integer id) {
+    public void removeImage(ImageKey imageKey) {
 
-        Image existingImage = imageDAO.fetchImage(id);
+        Image existingImage = imageDAO.fetchImage(imageKey);
         if (null != existingImage) {
 
-            imageDAO.removeImage(id);
-            imageCache.remove(existingImage);
+            imageDAO.removeImage(imageKey);
+            imageCache.remove(imageKey);
         }
     }
 
@@ -106,7 +108,7 @@ public class ImageDelegate {
         throw new SaveException(result.getStatusMessage());
     }
 
-    public List<ImagePullStat> fetchImagePullHistory(int id, ImagePullStat.GroupMode groupMode) {
-        return imageDAO.fetchImagePullHistory(id, groupMode);
+    public List<ImagePullStat> fetchImagePullHistory(ImageKey imageKey, ImagePullStat.GroupMode groupMode) {
+        return imageDAO.fetchImagePullHistory(imageKey, groupMode);
     }
 }

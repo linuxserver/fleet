@@ -85,7 +85,7 @@ public class DefaultUserDAO implements UserDAO {
         try (Connection connection = databaseConnection.getConnection()) {
 
             CallableStatement call = connection.prepareCall("{CALL User_Save(?,?,?,?,?,?)}");
-            setNullableInt(call, 1, user.getId());
+            setNullableInt(call, 1, user.getKey().getId());
             call.setString(2, user.getUsername());
             setNullableString(call, 3, user.getPassword());
 
@@ -137,7 +137,7 @@ public class DefaultUserDAO implements UserDAO {
         try (Connection connection = databaseConnection.getConnection()) {
 
             CallableStatement call = connection.prepareCall("{CALL User_Delete(?)}");
-            call.setInt(1, user.getId());
+            call.setInt(1, user.getKey().getId());
 
             call.executeUpdate();
 

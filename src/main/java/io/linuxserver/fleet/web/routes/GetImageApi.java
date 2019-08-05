@@ -21,6 +21,7 @@ import io.linuxserver.fleet.delegate.ImageDelegate;
 import io.linuxserver.fleet.model.internal.Image;
 import io.linuxserver.fleet.model.api.ApiResponse;
 import io.linuxserver.fleet.model.api.FleetApiException;
+import io.linuxserver.fleet.model.key.ImageKey;
 import spark.Request;
 import spark.Response;
 import spark.Route;
@@ -41,7 +42,7 @@ public class GetImageApi implements Route {
             throw new FleetApiException(400, "Missing imageId param");
         }
 
-        Image image = imageDelegate.fetchImage(Integer.parseInt(imageIdParam));
+        Image image = imageDelegate.fetchImage(ImageKey.makeForLookup(Integer.parseInt(imageIdParam)));
         if (null == image) {
             throw new FleetApiException(404, "Image not found");
         }
