@@ -73,7 +73,7 @@
                                             <tbody>
                                                 <#list populatedRepository.images as image>
                                                     <#if !image.hidden || __AUTHENTICATED_USER?has_content>
-                                                        <tr class="<#if image.hidden>hidden-image</#if><#if image.deprecated>deprecated-image</#if>" data-image-id="#{image.key.id}" data-image-name="${image.name}">
+                                                        <tr class="<#if image.hidden>hidden-image</#if><#if image.deprecated> deprecated-image</#if>" data-image-key="${image.key}" data-image-name="${image.name}">
                                                             <td class="image-name">
                                                                 <span class="image-name--repository">${populatedRepository.repository.name} /</span> <a target="_blank" href="https://hub.docker.com/r/${populatedRepository.repository.name}/${image.name}"><span class="image-name__image">${image.name}</span></a>
                                                                 <#if image.deprecated>
@@ -105,10 +105,10 @@
                                                             <#if __AUTHENTICATED_USER?has_content>
                                                                 <td class="admin-actions">
                                                                     <div class="dropdown">
-                                                                        <button class="btn btn-info btn-xsm dropdown-toggle" type="button" id="admin-actions_#{populatedRepository.repository.key.id}" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                                                        <button class="btn btn-info btn-xsm dropdown-toggle" type="button" id="admin-actions_#{image.key.id}" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                                                             Actions
                                                                         </button>
-                                                                        <div class="dropdown-menu" aria-labelledby="admin-actions_#{populatedRepository.repository.key.id}">
+                                                                        <div class="dropdown-menu" aria-labelledby="admin-actions_#{image.key.id}">
 
                                                                             <#if image.hidden>
                                                                                 <button type="button" class="image--show dropdown-item btn-clickable"><i class="fas fa-eye"></i> Show in list</button>

@@ -64,6 +64,7 @@ public class Image extends AbstractHasKey<ImageKey> {
         cloned.hidden               = image.hidden;
         cloned.deprecated           = image.deprecated;
         cloned.deprecationReason    = image.deprecationReason;
+        cloned.modifiedTime         = image.modifiedTime;
 
         return cloned;
     }

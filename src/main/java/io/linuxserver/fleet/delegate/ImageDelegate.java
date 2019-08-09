@@ -66,7 +66,21 @@ public class ImageDelegate {
     }
 
     public Image fetchImage(ImageKey imageKey) {
-        return imageDAO.fetchImage(imageKey);
+
+        Image cachedImage = imageCache.get(imageKey);
+
+        if (null == cachedImage) {
+
+            Image image = imageDAO.fetchImage(imageKey);
+
+            if (null != image) {
+                imageCache.updateCache(image);
+            }
+
+            return image;
+        }
+
+        return cachedImage;
     }
 
     public List<Image> fetchImagesByRepository(final RepositoryKey repositoryKey) {

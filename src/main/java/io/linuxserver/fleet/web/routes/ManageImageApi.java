@@ -39,9 +39,9 @@ public class ManageImageApi implements Route {
 
         try {
 
-            int imageId = Integer.parseInt(request.queryParams("imageId"));
+            String imageKeyParam = request.queryParams("imageKey");
 
-            Image image = imageDelegate.fetchImage(ImageKey.makeForLookup(imageId));
+            Image image = imageDelegate.fetchImage(ImageKey.parse(imageKeyParam));
             if (null == image) {
 
                 response.status(404);

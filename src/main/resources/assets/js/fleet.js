@@ -111,10 +111,10 @@ var imageListManager = (function($) {
 
     var showImage = function() {
 
-        var option  = $(this);
-        var row     = getImageRow(option);
-        var imageId = getImageId(row);
-        var request = buildRequest('SHOW', imageId)
+        var option   = $(this);
+        var row      = getImageRow(option);
+        var imageKey = getImageKey(row);
+        var request  = buildRequest('SHOW', imageKey)
 
         ajaxManager.call(request, function(data) {
 
@@ -125,10 +125,10 @@ var imageListManager = (function($) {
 
     var hideImage = function() {
 
-        var option  = $(this);
-        var row     = getImageRow(option);
-        var imageId = getImageId(row);
-        var request = buildRequest('HIDE', imageId)
+        var option   = $(this);
+        var row      = getImageRow(option);
+        var imageKey = getImageKey(row);
+        var request  = buildRequest('HIDE', imageKey)
 
         var call = ajaxManager.call(request, function(data) {
 
@@ -139,10 +139,10 @@ var imageListManager = (function($) {
 
     var markImageUnstable = function() {
 
-        var option  = $(this);
-        var row     = getImageRow(option);
-        var imageId = getImageId(row);
-        var request = buildRequest('UNSTABLE', imageId)
+        var option   = $(this);
+        var row      = getImageRow(option);
+        var imageKey = getImageKey(row);
+        var request  = buildRequest('UNSTABLE', imageKey)
 
         var call = ajaxManager.call(request, function(data) {
 
@@ -154,10 +154,10 @@ var imageListManager = (function($) {
 
     var markImageStable = function() {
 
-        var option  = $(this);
-        var row     = getImageRow(option);
-        var imageId = getImageId(row);
-        var request = buildRequest('STABLE', imageId)
+        var option   = $(this);
+        var row      = getImageRow(option);
+        var imageKey = getImageKey(row);
+        var request  = buildRequest('STABLE', imageKey)
 
         var call = ajaxManager.call(request, function(data) {
 
@@ -168,31 +168,31 @@ var imageListManager = (function($) {
 
     var removeDeprecationNotice = function() {
 
-        var option  = $(this);
-        var row     = getImageRow(option);
-        var imageId = getImageId(row);
-        var request = buildRequest('RESTORE', imageId)
+        var option   = $(this);
+        var row      = getImageRow(option);
+        var imageKey = getImageKey(row);
+        var request  = buildRequest('RESTORE', imageKey)
 
         var call = ajaxManager.call(request, function(data) {
 
             row.removeClass('deprecated-image');
             row.find('.deprecation-message').remove();
 
-            option.replaceWith(createDeprecationButton(imageId));
+            option.replaceWith(createDeprecationButton(imageKey.split(':')[1]));
         });
     };
 
     var showImageVersionMask = function(event) {
 
-        var modal   = $(this);
-        var option  = $(event.relatedTarget);
-        var row     = getImageRow(option);
-        var imageId = getImageId(row);
+        var modal    = $(this);
+        var option   = $(event.relatedTarget);
+        var row      = getImageRow(option);
+        var imageKey = getImageKey(row);
 
         modal.find('#selected-mask-image-name').text('Version mask for ' + getImageName(row));
-        modal.find('#submit-version-mask-change').data('image-id', imageId);
+        modal.find('#submit-version-mask-change').data('image-key', imageKey);
 
-        getImageMask(imageId, function(image) {
+        getImageMask(imageKey, function(image) {
             modal.find('#image-version-mask').val(image.data.versionMask);
         });
     };
@@ -200,7 +200,7 @@ var imageListManager = (function($) {
     var submitVersionMaskChange = function() {
 
         var button = $(this);
-        var request = buildRequest('MASK', button.data('image-id'));
+        var request = buildRequest('MASK', button.data('image-key'));
         request.data.versionMask = $('#image-version-mask').val();
 
         ajaxManager.call(request, function() {
@@ -210,22 +210,22 @@ var imageListManager = (function($) {
 
     var showImageDeprecationNotice = function(event) {
 
-        var modal   = $(this);
-        var option  = $(event.relatedTarget);
-        var row     = getImageRow(option);
-        var imageId = getImageId(row);
+        var modal    = $(this);
+        var option   = $(event.relatedTarget);
+        var row      = getImageRow(option);
+        var imageKey = getImageKey(row);
 
         modal.find('#image-deprecation-reason').val('');
         modal.find('#selected-deprecation-image-name').text('Deprecation notice for ' + getImageName(row));
-        modal.find('#submit-deprecation-change').data('image-id', imageId);
+        modal.find('#submit-deprecation-change').data('image-key', imageKey);
         modal.find('#submit-deprecation-change').data('trigger-option', option.attr('id'));
     };
 
     var submitDeprecationNotice = function() {
 
-        var button  = $(this);
-        var imageId = button.data('image-id');
-        var request = buildRequest('DEPRECATE', imageId);
+        var button   = $(this);
+        var imageKey = button.data('image-key');
+        var request  = buildRequest('DEPRECATE', imageKey);
 
         request.data.deprecationReason = $('#image-deprecation-reason').val();
 
@@ -233,7 +233,6 @@ var imageListManager = (function($) {
 
             var trigger = $('#' + button.data('trigger-option'));
             var row     = getImageRow(trigger);
-            var imageId = getImageId(row);
 
             row.addClass('deprecated-image');
             row.find('.image-name').append(createRowDeprecationMessage(data.data.deprecationReason));
@@ -244,14 +243,14 @@ var imageListManager = (function($) {
         });
     };
 
-    var buildRequest = function(action, imageId) {
+    var buildRequest = function(action, imageKey) {
 
         return  {
            url: '/admin/api/manageImage',
            method: 'POST',
            data: {
                action: action,
-               imageId: imageId
+               imageKey: imageKey
            }
        };
     };
@@ -272,8 +271,8 @@ var imageListManager = (function($) {
         return $('<button type="button" class="image--mark-unstable dropdown-item btn-clickable"><i class="fas fa-exclamation-triangle"></i> Mark as unstable</button>');
     };
 
-    var createDeprecationButton = function(imageId) {
-        return $('<button id="deprecate-image_' + imageId + '" type="button" class="dropdown-item btn-clickable" data-toggle="modal" data-target="#update-image-deprecation"><i class="fas fa-exclamation-circle"></i> Mark as deprecated</button>');
+    var createDeprecationButton = function(imageKey) {
+        return $('<button id="deprecate-image_' + imageKey + '" type="button" class="dropdown-item btn-clickable" data-toggle="modal" data-target="#update-image-deprecation"><i class="fas fa-exclamation-circle"></i> Mark as deprecated</button>');
     };
 
     var createRestoreButton = function() {
@@ -296,18 +295,18 @@ var imageListManager = (function($) {
         return item.parents('tr');
     };
 
-    var getImageId = function(row) {
-        return parseInt(row.data('image-id'));
+    var getImageKey = function(row) {
+        return row.data('image-key');
     };
 
     var getImageName = function(row) {
         return row.data('image-name');
     };
 
-    var getImageMask = function(imageId, callback) {
+    var getImageMask = function(imageKey, callback) {
 
         var request = {
-            url: '/admin/api/getImage?imageId=' + imageId,
+            url: '/admin/api/getImage?imageKey=' + imageKey,
             method: 'GET'
         };
 

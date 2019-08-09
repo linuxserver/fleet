@@ -20,21 +20,25 @@ package io.linuxserver.fleet.queue;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.concurrent.atomic.AtomicReference;
+
 public abstract class AbstractQueueConsumer<R extends FleetResponse, T extends FleetRequest<R>> extends Thread implements QueueConsumer<T> {
 
     private final Logger LOGGER = LoggerFactory.getLogger(getClass().getName());
 
-    private final RequestQueue<T> requestQueue;
+    private final RequestQueue<T>                requestQueue;
+    private final AtomicReference<ConsumerState> state;
 
     public AbstractQueueConsumer(final RequestQueue<T> requestQueue, final String name) {
         super(name + "-Consumer");
         this.requestQueue = requestQueue;
+        this.state        = new AtomicReference<>(ConsumerState.Stopped);
     }
 
     @Override
     public void run() {
 
-        while (true) {
+        while (isRunning()) {
             consume();
         }
     }
@@ -44,6 +48,7 @@ public abstract class AbstractQueueConsumer<R extends FleetResponse, T extends F
 
         getLogger().info("Starting...");
         super.start();
+        state.set(ConsumerState.Running);
     }
 
     @Override
@@ -61,9 +66,22 @@ public abstract class AbstractQueueConsumer<R extends FleetResponse, T extends F
         }
     }
 
+    public boolean isRunning() {
+        return state.get().isRunning();
+    }
+
     protected abstract void handleResponse(R response);
 
     public Logger getLogger() {
         return LOGGER;
+    }
+
+    private enum ConsumerState {
+
+        Running, Stopped;
+
+        final boolean isRunning() {
+            return this == Running;
+        }
     }
 }

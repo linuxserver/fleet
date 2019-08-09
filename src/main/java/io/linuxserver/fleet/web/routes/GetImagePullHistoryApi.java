@@ -41,12 +41,12 @@ public class GetImagePullHistoryApi implements Route {
     @Override
     public Object handle(Request request, Response response) {
 
-        String imageIdParam = request.queryParams("imageId");
-        if (null == imageIdParam) {
+        String imageKeyParam = request.queryParams("imageKey");
+        if (null == imageKeyParam) {
             throw new FleetApiException(400, "Missing imageId param");
         }
 
-        final ImageKey lookupKey = ImageKey.makeForLookup(Integer.parseInt(imageIdParam));
+        final ImageKey lookupKey = ImageKey.parse(imageKeyParam);
         List<ImagePullStat> imagePullStats = imageDelegate.fetchImagePullHistory(lookupKey, getGroupMode(request));
 
         Image image = imageDelegate.fetchImage(lookupKey);

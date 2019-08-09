@@ -19,6 +19,8 @@ package io.linuxserver.fleet.model.key;
 
 public class ImageKey extends AbstractKey {
 
+    private static final String KeyPattern = "^\\d+:\\d+:[^/]+/[^/]+$";
+
     private final RepositoryKey repositoryKey;
     private final String        name;
 
@@ -33,8 +35,22 @@ public class ImageKey extends AbstractKey {
         this.name          = name;
     }
 
-    public static ImageKey makeForLookup(final int imageId) {
-        return new ImageKey(imageId, "<LookupKey>", null);
+    public static ImageKey parse(final String keyAsString) {
+
+        if (keyAsString.matches(KeyPattern)) {
+
+            final String[] keyParts = keyAsString.split(":");
+            final String[] names    = keyParts[2].split("/");
+            final int      repositoryId  = Integer.parseInt(keyParts[0]);
+            final int      imageId       = Integer.parseInt(keyParts[1]);
+            final String   repositoryName = names[0];
+            final String   imageName = names[1];
+
+            return new ImageKey(imageId, imageName, new RepositoryKey(repositoryId, repositoryName));
+
+        } else {
+            throw new IllegalArgumentException("Key pattern is malformed");
+        }
     }
 
     public ImageKey cloneWithId(int id) {
@@ -51,6 +67,6 @@ public class ImageKey extends AbstractKey {
 
     @Override
     public String toString() {
-        return super.toString() + ":" + (repositoryKey == null ? "<LookupKey>" : repositoryKey.getName()) + "/" + name;
+        return repositoryKey.getId() + ":" + super.toString() + ":" + repositoryKey.getName() + "/" + name;
     }
 }

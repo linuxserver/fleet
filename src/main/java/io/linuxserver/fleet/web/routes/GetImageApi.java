@@ -18,6 +18,7 @@
 package io.linuxserver.fleet.web.routes;
 
 import io.linuxserver.fleet.delegate.ImageDelegate;
+import io.linuxserver.fleet.model.api.ApiImage;
 import io.linuxserver.fleet.model.internal.Image;
 import io.linuxserver.fleet.model.api.ApiResponse;
 import io.linuxserver.fleet.model.api.FleetApiException;
@@ -37,16 +38,16 @@ public class GetImageApi implements Route {
     @Override
     public Object handle(Request request, Response response) {
 
-        String imageIdParam = request.queryParams("imageId");
-        if (null == imageIdParam) {
-            throw new FleetApiException(400, "Missing imageId param");
+        String imageKeyParam = request.queryParams("imageKey");
+        if (null == imageKeyParam) {
+            throw new FleetApiException(400, "Missing imageKey param");
         }
 
-        Image image = imageDelegate.fetchImage(ImageKey.makeForLookup(Integer.parseInt(imageIdParam)));
+        Image image = imageDelegate.fetchImage(ImageKey.parse(imageKeyParam));
         if (null == image) {
             throw new FleetApiException(404, "Image not found");
         }
 
-        return new ApiResponse<>("OK", image);
+        return new ApiResponse<>("OK", ApiImage.fromImage(image));
     }
 }
