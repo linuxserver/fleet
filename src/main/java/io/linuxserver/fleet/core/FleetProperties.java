@@ -80,7 +80,14 @@ public class FleetProperties {
     }
 
     public int getQueueThreadCount() {
-        return Integer.parseInt(getStringProperty("fleet.queue.threads"));
+        
+        final String numThreads = getStringProperty("fleet.queue.threads");
+        
+        if (null == numThreads) {
+            return 0;
+        }
+        
+        return Integer.parseInt(numThreads);
     }
 
     /**
