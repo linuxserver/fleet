@@ -17,23 +17,23 @@
 
 package io.linuxserver.fleet.model.internal;
 
-public class Repository extends PersistableItem<Repository> {
+import io.linuxserver.fleet.model.key.AbstractHasKey;
+import io.linuxserver.fleet.model.key.RepositoryKey;
 
-    private final String name;
+import java.time.LocalDateTime;
 
-    private String       versionMask;
-    private boolean      syncEnabled;
+public class Repository extends AbstractHasKey<RepositoryKey> {
 
-    public Repository(Integer id, String name) {
-        super(id);
+    private String        versionMask;
+    private boolean       syncEnabled;
+    private LocalDateTime modifiedTime;
 
-        this.name = name;
+    public Repository(final RepositoryKey repositoryKey) {
+        super(repositoryKey);
     }
 
-    public Repository(String name) {
-        super();
-
-        this.name = name;
+    public static Repository copyOf(Repository repository) {
+        return new Repository(repository.getKey()).withVersionMask(repository.versionMask).withSyncEnabled(repository.syncEnabled);
     }
 
     public Repository withVersionMask(String versionMask) {
@@ -48,8 +48,14 @@ public class Repository extends PersistableItem<Repository> {
         return this;
     }
 
+    public Repository withModifiedTime(LocalDateTime modifiedTime) {
+
+        this.modifiedTime = modifiedTime;
+        return this;
+    }
+
     public String getName() {
-        return name;
+        return getKey().getName();
     }
 
     public String getVersionMask() {
@@ -58,5 +64,22 @@ public class Repository extends PersistableItem<Repository> {
 
     public boolean isSyncEnabled() {
         return syncEnabled;
+    }
+
+    public LocalDateTime getModifiedTime() {
+
+        if (null != modifiedTime) {
+
+            return LocalDateTime.of(
+                modifiedTime.getYear(),
+                modifiedTime.getMonth(),
+                modifiedTime.getDayOfMonth(),
+                modifiedTime.getHour(),
+                modifiedTime.getMinute(),
+                modifiedTime.getSecond()
+            );
+        }
+
+        return null;
     }
 }

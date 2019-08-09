@@ -15,39 +15,33 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package io.linuxserver.fleet.web.routes;
+package io.linuxserver.fleet.dockerhub.queue;
 
 import io.linuxserver.fleet.delegate.ImageDelegate;
-import io.linuxserver.fleet.model.api.ApiImage;
+import io.linuxserver.fleet.exception.SaveException;
 import io.linuxserver.fleet.model.internal.Image;
-import io.linuxserver.fleet.model.api.ApiResponse;
-import io.linuxserver.fleet.model.api.FleetApiException;
-import io.linuxserver.fleet.model.key.ImageKey;
-import spark.Request;
-import spark.Response;
-import spark.Route;
+import io.linuxserver.fleet.queue.AbstractQueueConsumer;
+import io.linuxserver.fleet.queue.RequestQueue;
 
-public class GetImageApi implements Route {
+public class DockerHubSyncConsumer extends AbstractQueueConsumer<DockerHubSyncResponse, DockerHubSyncRequest> {
 
     private final ImageDelegate imageDelegate;
 
-    public GetImageApi(ImageDelegate imageDelegate) {
+    public DockerHubSyncConsumer(ImageDelegate imageDelegate, RequestQueue<DockerHubSyncRequest> requestQueue, String name) {
+        super(requestQueue, name);
         this.imageDelegate = imageDelegate;
     }
 
     @Override
-    public Object handle(Request request, Response response) {
+    protected void handleResponse(DockerHubSyncResponse response) {
 
-        String imageKeyParam = request.queryParams("imageKey");
-        if (null == imageKeyParam) {
-            throw new FleetApiException(400, "Missing imageKey param");
+        try {
+
+            final Image image = response.getImage();
+            imageDelegate.saveImage(image);
+
+        } catch (SaveException e) {
+            getLogger().error("handleResponse unable to save image: {}", e.getMessage());
         }
-
-        Image image = imageDelegate.fetchImage(ImageKey.parse(imageKeyParam));
-        if (null == image) {
-            throw new FleetApiException(404, "Image not found");
-        }
-
-        return new ApiResponse<>("OK", ApiImage.fromImage(image));
     }
 }

@@ -63,6 +63,10 @@ public class DockerHubDelegate {
         return images;
     }
 
+    public DockerImage fetchImageFromRepository(String repositoryName, String imageName) {
+        return convertImage(dockerHubClient.fetchImageFromRepository(repositoryName, imageName));
+    }
+
     public List<DockerTag> fetchAllTagsForImage(String repositoryName, String imageName) {
         return dockerHubClient.fetchAllTagsForImage(repositoryName, imageName).stream().map(this::convertTag).collect(Collectors.toList());
     }
@@ -80,6 +84,10 @@ public class DockerHubDelegate {
 
     private DockerImage convertImage(DockerHubV2Image dockerHubV2Image) {
 
+        if (dockerHubV2Image == null) {
+            return null;
+        }
+
         return new DockerImage(
             dockerHubV2Image.getName(),
             dockerHubV2Image.getNamespace(),
@@ -91,6 +99,10 @@ public class DockerHubDelegate {
     }
 
     private DockerTag convertTag(DockerHubV2Tag dockerHubV2Tag) {
+
+        if (dockerHubV2Tag == null) {
+            return null;
+        }
 
         return new DockerTag(
             dockerHubV2Tag.getName(),

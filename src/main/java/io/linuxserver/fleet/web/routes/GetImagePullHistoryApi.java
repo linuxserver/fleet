@@ -23,6 +23,7 @@ import io.linuxserver.fleet.model.internal.ImagePullStat;
 import io.linuxserver.fleet.model.api.ApiImagePullHistory;
 import io.linuxserver.fleet.model.api.ApiResponse;
 import io.linuxserver.fleet.model.api.FleetApiException;
+import io.linuxserver.fleet.model.key.ImageKey;
 import spark.Request;
 import spark.Response;
 import spark.Route;
@@ -40,15 +41,15 @@ public class GetImagePullHistoryApi implements Route {
     @Override
     public Object handle(Request request, Response response) {
 
-        String imageIdParam = request.queryParams("imageId");
-        if (null == imageIdParam) {
+        String imageKeyParam = request.queryParams("imageKey");
+        if (null == imageKeyParam) {
             throw new FleetApiException(400, "Missing imageId param");
         }
 
-        int imageId = Integer.parseInt(imageIdParam);
-        List<ImagePullStat> imagePullStats = imageDelegate.fetchImagePullHistory(imageId, getGroupMode(request));
+        final ImageKey lookupKey = ImageKey.parse(imageKeyParam);
+        List<ImagePullStat> imagePullStats = imageDelegate.fetchImagePullHistory(lookupKey, getGroupMode(request));
 
-        Image image = imageDelegate.fetchImage(imageId);
+        Image image = imageDelegate.fetchImage(lookupKey);
         return new ApiResponse<>("OK", ApiImagePullHistory.fromPullStats(image, imagePullStats));
     }
 

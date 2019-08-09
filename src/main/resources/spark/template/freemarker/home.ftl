@@ -10,7 +10,7 @@
                     <ul class="nav nav--repositories" id="all-repositories-tablist" role="tablist">
                         <#list populatedRepositories as populatedRepository>
                             <li class="nav-item">
-                                <a class="nav-link <#if populatedRepository?index == 0>active</#if>" data-toggle="tab" role="tab" aria-controls="repository_#{populatedRepository.repository.id}" id="repository-tab_#{populatedRepository.repository.id}" href="#repository_#{populatedRepository.repository.id}">${populatedRepository.repository.name}</a>
+                                <a class="nav-link <#if populatedRepository?index == 0>active</#if>" data-toggle="tab" role="tab" aria-controls="repository_#{populatedRepository.repository.key.id}" id="repository-tab_#{populatedRepository.repository.key.id}" href="#repository_#{populatedRepository.repository.key.id}">${populatedRepository.repository.name}</a>
                             </li>
                         </#list>
                     </ul>
@@ -21,7 +21,7 @@
         <div class="tab-content" id="repository-tab-content">
             <#list populatedRepositories as populatedRepository>
 
-                <div class="tab-pane<#if populatedRepository?index == 0> show active</#if>" id="repository_#{populatedRepository.repository.id}" role="tabpanel" aria-labelledby="repository-tab_#{populatedRepository.repository.id}">
+                <div class="tab-pane<#if populatedRepository?index == 0> show active</#if>" id="repository_#{populatedRepository.repository.key.id}" role="tabpanel" aria-labelledby="repository-tab_#{populatedRepository.repository.key.id}">
                     <div class="container">
 
                         <#if populatedRepository.everyImageStable>
@@ -48,15 +48,15 @@
                                 <div class="col-md-8">
                                     <div class="input-group input-group-sm mb-3 mt-3">
                                         <div class="input-group-prepend">
-                                            <span class="input-group-text" id="searchLabel_#{populatedRepository.repository.id}"><i class="fas fa-search"></i> Search ${populatedRepository.repository.name}</span>
+                                            <span class="input-group-text" id="searchLabel_#{populatedRepository.repository.key.id}"><i class="fas fa-search"></i> Search ${populatedRepository.repository.name}</span>
                                         </div>
-                                        <input type="text" class="form-control image-search" id="search_#{populatedRepository.repository.id}" data-repository-id="#{populatedRepository.repository.id}" aria-describedby="searchLabel_#{populatedRepository.repository.id}">
+                                        <input type="text" class="form-control image-search" id="search_#{populatedRepository.repository.key.id}" data-repository-id="#{populatedRepository.repository.key.id}" aria-describedby="searchLabel_#{populatedRepository.repository.key.id}">
                                     </div>
                                 </div>
                                 <div class="col-md-2"></div>
                                 <div class="col-12">
 
-                                    <div class="table-responsive" id="#{populatedRepository.repository.id}_images">
+                                    <div class="table-responsive" id="#{populatedRepository.repository.key.id}_images">
                                         <table class="table table--sortable">
                                             <thead>
                                                 <tr>
@@ -73,7 +73,7 @@
                                             <tbody>
                                                 <#list populatedRepository.images as image>
                                                     <#if !image.hidden || __AUTHENTICATED_USER?has_content>
-                                                        <tr class="<#if image.hidden>hidden-image</#if><#if image.deprecated>deprecated-image</#if>" data-image-id="#{image.id}" data-image-name="${image.name}">
+                                                        <tr class="<#if image.hidden>hidden-image</#if><#if image.deprecated> deprecated-image</#if>" data-image-key="${image.key}" data-image-name="${image.name}">
                                                             <td class="image-name">
                                                                 <span class="image-name--repository">${populatedRepository.repository.name} /</span> <a target="_blank" href="https://hub.docker.com/r/${populatedRepository.repository.name}/${image.name}"><span class="image-name__image">${image.name}</span></a>
                                                                 <#if image.deprecated>
@@ -105,10 +105,10 @@
                                                             <#if __AUTHENTICATED_USER?has_content>
                                                                 <td class="admin-actions">
                                                                     <div class="dropdown">
-                                                                        <button class="btn btn-info btn-xsm dropdown-toggle" type="button" id="admin-actions_#{populatedRepository.repository.id}" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                                                        <button class="btn btn-info btn-xsm dropdown-toggle" type="button" id="admin-actions_#{image.key.id}" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                                                             Actions
                                                                         </button>
-                                                                        <div class="dropdown-menu" aria-labelledby="admin-actions_#{populatedRepository.repository.id}">
+                                                                        <div class="dropdown-menu" aria-labelledby="admin-actions_#{image.key.id}">
 
                                                                             <#if image.hidden>
                                                                                 <button type="button" class="image--show dropdown-item btn-clickable"><i class="fas fa-eye"></i> Show in list</button>
@@ -124,7 +124,7 @@
                                                                             <#if image.deprecated>
                                                                                 <button type="button" class="image--remove-deprecation-notice dropdown-item btn-clickable"><i class="fas fa-thumbs-up"></i> Remove deprecation notice</button>
                                                                             <#else>
-                                                                                <button id="deprecate-image_#{image.id}" type="button" class="dropdown-item btn-clickable" data-toggle="modal" data-target="#update-image-deprecation"><i class="fas fa-exclamation-circle"></i> Mark as deprecated</button>
+                                                                                <button id="deprecate-image_#{image.key.id}" type="button" class="dropdown-item btn-clickable" data-toggle="modal" data-target="#update-image-deprecation"><i class="fas fa-exclamation-circle"></i> Mark as deprecated</button>
                                                                             </#if>
                                                                         </div>
                                                                     </div>

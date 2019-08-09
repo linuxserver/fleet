@@ -24,6 +24,8 @@ import io.linuxserver.fleet.model.docker.DockerTag;
 import io.linuxserver.fleet.model.internal.Image;
 import io.linuxserver.fleet.model.internal.Repository;
 import io.linuxserver.fleet.model.internal.Tag;
+import io.linuxserver.fleet.model.key.ImageKey;
+import io.linuxserver.fleet.model.key.RepositoryKey;
 import io.linuxserver.fleet.sync.event.ImageUpdateEvent;
 import io.linuxserver.fleet.sync.event.RepositoriesScannedEvent;
 import org.slf4j.Logger;
@@ -137,7 +139,7 @@ public class DefaultSynchronisationState implements SynchronisationState {
                 try {
 
                     DockerImage dockerImage = images.get(i);
-                    Image image = configureImage(repository.getId(), dockerImage, context);
+                    Image image = configureImage(repository, dockerImage, context);
 
                     String versionMask = getVersionMask(repository.getVersionMask(), image.getVersionMask());
                     Tag maskedVersion = getLatestTagAndCreateMaskedVersion(repository.getName(), image.getName(), versionMask, context);
@@ -167,7 +169,7 @@ public class DefaultSynchronisationState implements SynchronisationState {
             if (!repositories.contains(storedRepository.getName())) {
 
                 LOGGER.info("Found repository which no longer exists in Docker Hub. Removing {}", storedRepository.getName());
-                context.getRepositoryDelegate().removeRepository(storedRepository.getId());
+                context.getRepositoryDelegate().removeRepository(storedRepository.getKey().getId());
             }
         }
     }
@@ -177,12 +179,12 @@ public class DefaultSynchronisationState implements SynchronisationState {
         List<String> dockerHubImageNames = images.stream().map(DockerImage::getName).collect(Collectors.toList());
 
         LOGGER.info("Checking for any removed images under {}", repository.getName());
-        for (Image storedImage : context.getImageDelegate().fetchImagesByRepository(repository.getId())) {
+        for (Image storedImage : context.getImageDelegate().fetchImagesByRepository(repository.getKey())) {
 
             if (!dockerHubImageNames.contains(storedImage.getName())) {
 
                 LOGGER.info("Found image which no longer exists in Docker Hub. Removing {}", storedImage.getName());
-                context.getImageDelegate().removeImage(storedImage.getId());
+                context.getImageDelegate().removeImage(storedImage.getKey());
             }
         }
     }
@@ -216,7 +218,7 @@ public class DefaultSynchronisationState implements SynchronisationState {
 
             try {
 
-                return context.getRepositoryDelegate().saveRepository(new Repository(repositoryName));
+                return context.getRepositoryDelegate().saveRepository(new Repository(new RepositoryKey(repositoryName)));
 
             } catch (SaveException e) {
                 LOGGER.error("Tried to save new repository during sync but failed", e);
@@ -230,15 +232,16 @@ public class DefaultSynchronisationState implements SynchronisationState {
      * Looks up the image in the database to see if it already exists. If it does, it gets returned, otherwise a base
      * image is created with just the top-level information, as the rest will get updated later.
      */
-    private Image configureImage(int repositoryId, DockerImage dockerHubImage, SynchronisationContext context) {
+    private Image configureImage(Repository repository, DockerImage dockerHubImage, SynchronisationContext context) {
 
-        Image image = context.getImageDelegate().findImageByRepositoryAndImageName(repositoryId, dockerHubImage.getName());
+        final ImageKey baseImageKey = new ImageKey(dockerHubImage.getName(), repository.getKey());
+        final Image    image        = context.getImageDelegate().findImageByRepositoryAndImageName(baseImageKey);
 
         if (isImageNew(image)) {
 
             try {
 
-                return context.getImageDelegate().saveImage(new Image(repositoryId, dockerHubImage.getName()));
+                return context.getImageDelegate().saveImage(Image.makeFromKey(baseImageKey));
 
             } catch (SaveException e) {
                 LOGGER.error("Tried to save new image during sync but failed", e);

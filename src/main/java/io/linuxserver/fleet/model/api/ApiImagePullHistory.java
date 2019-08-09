@@ -49,7 +49,7 @@ public class ApiImagePullHistory {
     public static ApiImagePullHistory fromPullStats(Image image, List<ImagePullStat> stats) {
 
         ApiImagePullHistory history = new ApiImagePullHistory();
-        history.imageId = image.getId();
+        history.imageId = image.getKey().getId();
         history.imageName = image.getName();
         history.groupMode = stats.get(0).getGroupMode().toString();
 

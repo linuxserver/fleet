@@ -78,6 +78,7 @@ input[type="text"], textarea {
 
 .table tbody tr td {
     border-color: #eaeaea;
+    white-space: nowrap;
 }
 
 .table tbody tr td a {

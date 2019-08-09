@@ -21,12 +21,17 @@ import io.linuxserver.fleet.model.internal.Image;
 
 public class ApiImage {
 
+    private String  imageKey;
     private String  name;
     private long    pullCount;
     private String  version;
     private boolean stable;
     private boolean deprecated;
     private String  buildDate;
+
+    public String getImageKey() {
+        return imageKey;
+    }
 
     public String getName() {
         return name;
@@ -56,6 +61,7 @@ public class ApiImage {
 
         ApiImage apiImage = new ApiImage();
 
+        apiImage.imageKey   = image.getKey().toString();
         apiImage.name       = image.getName();
         apiImage.pullCount  = image.getPullCount();
         apiImage.version    = image.getMaskedVersion();

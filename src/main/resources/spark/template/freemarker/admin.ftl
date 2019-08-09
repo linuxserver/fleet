@@ -34,7 +34,7 @@
                     <tbody>
 
                         <#list repositories as repository>
-                            <tr data-repository-id="#{repository.id}">
+                            <tr data-repository-id="#{repository.key.id}">
                                 <td>
                                     ${repository.name}
                                 </td>

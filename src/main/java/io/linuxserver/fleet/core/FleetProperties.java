@@ -79,6 +79,10 @@ public class FleetProperties {
         return new DockerHubCredentials(username, password);
     }
 
+    public int getQueueThreadCount() {
+        return Integer.parseInt(getStringProperty("fleet.queue.threads"));
+    }
+
     /**
      * <p>
      * Obtains the property value from three separate sources: first from the config file. If not present, it will look
