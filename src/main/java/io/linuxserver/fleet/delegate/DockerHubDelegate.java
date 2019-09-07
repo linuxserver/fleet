@@ -27,7 +27,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -113,16 +112,18 @@ public class DockerHubDelegate {
 
     private LocalDateTime parseDockerHubDate(String date) {
 
-        if (null == date)
+        if (null == date) {
             return null;
+        }
 
         try {
-            return LocalDateTime.parse(date, DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSSSS'Z'"));
-        } catch (DateTimeParseException e) {
-            return LocalDateTime.parse(date, DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss'Z'"));
-        } catch (Exception e) {
 
-            LOGGER.warn("parseDockerHubDate(" + date + ") unable to parse date.");
+            final String dateToParse = (date.endsWith("Z") ? date.substring(0, date.length() - 1) : date);
+            return LocalDateTime.parse(dateToParse);
+
+        } catch (DateTimeParseException e) {
+
+            LOGGER.error("parseDockerHubDate(" + date + ") unable to leniently parse date.", e);
             return null;
         }
     }
