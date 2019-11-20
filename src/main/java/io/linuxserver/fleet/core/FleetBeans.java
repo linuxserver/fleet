@@ -72,6 +72,7 @@ public class FleetBeans {
         dockerHubDelegate       = new DockerHubDelegate(new DockerHubV2Client(properties.getDockerHubCredentials()));
         taskManager             = new TaskManager();
         synchronisationDelegate = new SynchronisationDelegate(imageDelegate, repositoryDelegate, dockerHubDelegate);
+        synchronisationDelegate.setFullRmProtected(properties.isFullRmProtected());
         userDelegate            = new UserDelegate(passwordEncoder, new DefaultUserDAO(databaseConnection));
         taskDelegate            = new TaskDelegate(this);
         authenticationDelegate  = new DefaultAuthenticationDelegate(AuthenticatorFactory.getAuthenticator(this));

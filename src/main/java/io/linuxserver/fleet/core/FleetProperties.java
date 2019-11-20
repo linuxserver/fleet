@@ -71,6 +71,16 @@ public class FleetProperties {
         return Integer.parseInt(getStringProperty("fleet.refresh.interval"));
     }
 
+    public boolean isFullRmProtected() {
+
+        final String safe = getStringProperty("fleet.sync.fullrm.protected");
+        if (null == safe) {
+            return true;
+        }
+
+        return "true".equalsIgnoreCase(safe);
+    }
+
     public DockerHubCredentials getDockerHubCredentials() {
 
         String username = getStringProperty("fleet.dockerhub.username");

@@ -36,4 +36,6 @@ public interface SynchronisationContext {
     RepositoryDelegate getRepositoryDelegate();
 
     DockerHubDelegate getDockerHubDelegate();
+
+    boolean isFullRmProtected();
 }

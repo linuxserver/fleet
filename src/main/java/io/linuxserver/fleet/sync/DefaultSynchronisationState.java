@@ -163,28 +163,47 @@ public class DefaultSynchronisationState implements SynchronisationState {
 
     private void checkAndRemoveMissingRepositories(List<String> repositories, SynchronisationContext context) {
 
+        final List<Repository> storedRepositories = context.getRepositoryDelegate().fetchAllRepositories();
+
         LOGGER.info("Checking for any removed repositories.");
-        for (Repository storedRepository : context.getRepositoryDelegate().fetchAllRepositories()) {
+        if (repositories.isEmpty() && !storedRepositories.isEmpty() && context.isFullRmProtected()) {
 
-            if (!repositories.contains(storedRepository.getName())) {
+            LOGGER.warn("Docker Hub returned an empty list of repositories, but Fleet already has a stored set. " +
+                    "Rm protection is enabled, so will not remove stored repositories as this may be a glitch in the Docker Hub API.");
 
-                LOGGER.info("Found repository which no longer exists in Docker Hub. Removing {}", storedRepository.getName());
-                context.getRepositoryDelegate().removeRepository(storedRepository.getKey().getId());
+        } else {
+
+            for (Repository storedRepository : storedRepositories) {
+
+                if (!repositories.contains(storedRepository.getName())) {
+
+                    LOGGER.info("Found repository which no longer exists in Docker Hub. Removing {}", storedRepository.getName());
+                    context.getRepositoryDelegate().removeRepository(storedRepository.getKey().getId());
+                }
             }
         }
     }
 
     private void checkAndRemoveMissingImages(Repository repository, List<DockerImage> images, SynchronisationContext context) {
 
-        List<String> dockerHubImageNames = images.stream().map(DockerImage::getName).collect(Collectors.toList());
+        final List<String> dockerHubImageNames = images.stream().map(DockerImage::getName).collect(Collectors.toList());
+        final List<Image>  storedImages        = context.getImageDelegate().fetchImagesByRepository(repository.getKey());
 
         LOGGER.info("Checking for any removed images under {}", repository.getName());
-        for (Image storedImage : context.getImageDelegate().fetchImagesByRepository(repository.getKey())) {
+        if (images.isEmpty() && !storedImages.isEmpty() && context.isFullRmProtected()) {
 
-            if (!dockerHubImageNames.contains(storedImage.getName())) {
+            LOGGER.warn("Docker Hub returned an empty list of images for {}, but Fleet already has a stored set. " +
+                "Rm protection is enabled, so will not remove stored images as this may be a glitch in the Docker Hub API.", repository);
 
-                LOGGER.info("Found image which no longer exists in Docker Hub. Removing {}", storedImage.getName());
-                context.getImageDelegate().removeImage(storedImage.getKey());
+        } else {
+
+            for (Image storedImage : storedImages) {
+
+                if (!dockerHubImageNames.contains(storedImage.getName())) {
+
+                    LOGGER.info("Found image which no longer exists in Docker Hub. Removing {}", storedImage.getName());
+                    context.getImageDelegate().removeImage(storedImage.getKey());
+                }
             }
         }
     }
