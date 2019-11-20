@@ -40,6 +40,8 @@ public class SynchronisationDelegate implements SynchronisationContext {
 
     private List<SynchronisationListener> listeners;
 
+    private boolean fullRmProtected;
+
     public SynchronisationDelegate(ImageDelegate imageDelegate, RepositoryDelegate repositoryDelegate, DockerHubDelegate dockerHubDelegate) {
 
         this.imageDelegate = imageDelegate;
@@ -48,6 +50,10 @@ public class SynchronisationDelegate implements SynchronisationContext {
 
         this.listeners = new ArrayList<>();
         registerListener(new DefaultLoggingSyncListener());
+    }
+
+    public final void setFullRmProtected(final boolean fullRmProtected) {
+        this.fullRmProtected = fullRmProtected;
     }
 
     /**
@@ -85,5 +91,10 @@ public class SynchronisationDelegate implements SynchronisationContext {
     @Override
     public DockerHubDelegate getDockerHubDelegate() {
         return dockerHubDelegate;
+    }
+
+    @Override
+    public boolean isFullRmProtected() {
+        return fullRmProtected;
     }
 }
