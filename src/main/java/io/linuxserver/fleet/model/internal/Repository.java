@@ -17,8 +17,8 @@
 
 package io.linuxserver.fleet.model.internal;
 
-import io.linuxserver.fleet.model.key.AbstractHasKey;
-import io.linuxserver.fleet.model.key.RepositoryKey;
+import io.linuxserver.fleet.v2.key.AbstractHasKey;
+import io.linuxserver.fleet.v2.key.RepositoryKey;
 
 import java.time.LocalDateTime;
 

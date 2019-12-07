@@ -20,6 +20,7 @@ package io.linuxserver.fleet.core;
 import io.linuxserver.fleet.auth.authenticator.AuthenticatorFactory;
 import io.linuxserver.fleet.auth.security.PBKDF2PasswordEncoder;
 import io.linuxserver.fleet.auth.security.PasswordEncoder;
+import io.linuxserver.fleet.core.config.AppProperties;
 import io.linuxserver.fleet.db.DefaultDatabaseConnection;
 import io.linuxserver.fleet.db.dao.DefaultImageDAO;
 import io.linuxserver.fleet.db.dao.DefaultRepositoryDAO;
@@ -42,7 +43,7 @@ public class FleetBeans {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(FleetBeans.class);
 
-    private final FleetProperties           properties;
+    private final AppProperties properties;
     private final ImageDelegate             imageDelegate;
     private final RepositoryDelegate        repositoryDelegate;
     private final AuthenticationDelegate    authenticationDelegate;
@@ -86,7 +87,7 @@ public class FleetBeans {
         }
     }
 
-    public FleetProperties getProperties() {
+    public AppProperties getProperties() {
         return properties;
     }
 

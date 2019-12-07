@@ -21,8 +21,8 @@ import io.linuxserver.fleet.dockerhub.DockerHubClient;
 import io.linuxserver.fleet.dockerhub.model.DockerHubV2Image;
 import io.linuxserver.fleet.dockerhub.model.DockerHubV2Tag;
 import io.linuxserver.fleet.dockerhub.util.DockerTagFinder;
-import io.linuxserver.fleet.model.docker.DockerImage;
-import io.linuxserver.fleet.model.docker.DockerTag;
+import io.linuxserver.fleet.v2.types.docker.DockerImage;
+import io.linuxserver.fleet.v2.types.docker.DockerTag;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

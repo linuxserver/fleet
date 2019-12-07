@@ -18,7 +18,7 @@
 package io.linuxserver.fleet.auth.authenticator;
 
 import io.linuxserver.fleet.core.FleetBeans;
-import io.linuxserver.fleet.core.FleetProperties;
+import io.linuxserver.fleet.core.config.AppProperties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -28,7 +28,7 @@ public class AuthenticatorFactory {
 
     public static UserAuthenticator getAuthenticator(FleetBeans beans) {
 
-        FleetProperties properties = beans.getProperties();
+        AppProperties properties = beans.getProperties();
 
         AuthenticationType authType = AuthenticationType.valueOf(properties.getAuthenticationType().toUpperCase());
         switch (authType) {

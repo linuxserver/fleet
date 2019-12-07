@@ -18,7 +18,7 @@
 package io.linuxserver.fleet.db.dao;
 
 import io.linuxserver.fleet.db.query.InsertUpdateResult;
-import io.linuxserver.fleet.model.internal.User;
+import io.linuxserver.fleet.v2.types.User;
 
 import java.util.List;
 

@@ -2,7 +2,7 @@ package io.linuxserver.fleet.db.dao;
 
 import io.linuxserver.fleet.db.query.InsertUpdateResult;
 import io.linuxserver.fleet.model.internal.Repository;
-import io.linuxserver.fleet.model.key.RepositoryKey;
+import io.linuxserver.fleet.v2.key.RepositoryKey;
 
 import java.util.List;
 

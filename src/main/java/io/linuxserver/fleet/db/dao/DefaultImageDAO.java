@@ -23,9 +23,9 @@ import io.linuxserver.fleet.db.query.InsertUpdateStatus;
 import io.linuxserver.fleet.db.query.LimitedResult;
 import io.linuxserver.fleet.model.internal.Image;
 import io.linuxserver.fleet.model.internal.ImagePullStat;
-import io.linuxserver.fleet.model.internal.Tag;
-import io.linuxserver.fleet.model.key.ImageKey;
-import io.linuxserver.fleet.model.key.RepositoryKey;
+import io.linuxserver.fleet.v2.types.Tag;
+import io.linuxserver.fleet.v2.key.ImageKey;
+import io.linuxserver.fleet.v2.key.RepositoryKey;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

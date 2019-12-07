@@ -21,7 +21,7 @@ import io.linuxserver.fleet.db.PoolingDatabaseConnection;
 import io.linuxserver.fleet.db.query.InsertUpdateResult;
 import io.linuxserver.fleet.db.query.InsertUpdateStatus;
 import io.linuxserver.fleet.model.internal.Repository;
-import io.linuxserver.fleet.model.key.RepositoryKey;
+import io.linuxserver.fleet.v2.key.RepositoryKey;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

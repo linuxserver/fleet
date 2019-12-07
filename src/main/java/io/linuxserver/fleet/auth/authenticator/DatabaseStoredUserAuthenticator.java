@@ -22,7 +22,7 @@ import io.linuxserver.fleet.auth.AuthenticationResult;
 import io.linuxserver.fleet.auth.UserCredentials;
 import io.linuxserver.fleet.auth.security.PasswordEncoder;
 import io.linuxserver.fleet.delegate.UserDelegate;
-import io.linuxserver.fleet.model.internal.User;
+import io.linuxserver.fleet.v2.types.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

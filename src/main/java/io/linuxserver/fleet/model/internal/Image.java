@@ -17,8 +17,9 @@
 
 package io.linuxserver.fleet.model.internal;
 
-import io.linuxserver.fleet.model.key.AbstractHasKey;
-import io.linuxserver.fleet.model.key.ImageKey;
+import io.linuxserver.fleet.v2.key.AbstractHasKey;
+import io.linuxserver.fleet.v2.key.ImageKey;
+import io.linuxserver.fleet.v2.types.Tag;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -33,7 +34,7 @@ public class Image extends AbstractHasKey<ImageKey> {
 
     private static final DateTimeFormatter DATE_PATTERN = DateTimeFormatter.ofPattern("dd MMM yyyy HH:mm:ss");
 
-    private Tag              tag;
+    private Tag tag;
     private long             pullCount;
     private String           versionMask;
     private boolean          unstable;

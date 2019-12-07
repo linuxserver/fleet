@@ -19,13 +19,13 @@ package io.linuxserver.fleet.sync;
 
 import io.linuxserver.fleet.dockerhub.DockerHubException;
 import io.linuxserver.fleet.exception.SaveException;
-import io.linuxserver.fleet.model.docker.DockerImage;
-import io.linuxserver.fleet.model.docker.DockerTag;
+import io.linuxserver.fleet.v2.types.docker.DockerImage;
+import io.linuxserver.fleet.v2.types.docker.DockerTag;
 import io.linuxserver.fleet.model.internal.Image;
 import io.linuxserver.fleet.model.internal.Repository;
-import io.linuxserver.fleet.model.internal.Tag;
-import io.linuxserver.fleet.model.key.ImageKey;
-import io.linuxserver.fleet.model.key.RepositoryKey;
+import io.linuxserver.fleet.v2.types.Tag;
+import io.linuxserver.fleet.v2.key.ImageKey;
+import io.linuxserver.fleet.v2.key.RepositoryKey;
 import io.linuxserver.fleet.sync.event.ImageUpdateEvent;
 import io.linuxserver.fleet.sync.event.RepositoriesScannedEvent;
 import org.slf4j.Logger;

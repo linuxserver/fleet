@@ -18,10 +18,10 @@
 package io.linuxserver.fleet.dockerhub.queue;
 
 import io.linuxserver.fleet.delegate.DockerHubDelegate;
-import io.linuxserver.fleet.model.docker.DockerImage;
-import io.linuxserver.fleet.model.docker.DockerTag;
+import io.linuxserver.fleet.v2.types.docker.DockerImage;
+import io.linuxserver.fleet.v2.types.docker.DockerTag;
 import io.linuxserver.fleet.model.internal.Image;
-import io.linuxserver.fleet.model.internal.Tag;
+import io.linuxserver.fleet.v2.types.Tag;
 import io.linuxserver.fleet.queue.FleetResponse;
 
 import java.util.regex.Matcher;

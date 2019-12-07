@@ -17,7 +17,7 @@
 
 package io.linuxserver.fleet.dockerhub.util;
 
-import io.linuxserver.fleet.model.docker.DockerTag;
+import io.linuxserver.fleet.v2.types.docker.DockerTag;
 
 import java.util.List;
 import java.util.Optional;

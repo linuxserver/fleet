@@ -1,0 +1,85 @@
+/*
+ * Copyright (c) 2019 LinuxServer.io
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
+package io.linuxserver.fleet.v2.web.routes;
+
+import io.javalin.http.Context;
+import io.javalin.http.Handler;
+import io.linuxserver.fleet.v2.web.PageModelAttributes;
+import io.linuxserver.fleet.v2.web.PageModelSpec;
+import io.linuxserver.fleet.v2.web.SessionAttributes;
+import org.jetbrains.annotations.NotNull;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import static io.javalin.plugin.rendering.template.TemplateUtil.model;
+
+public abstract class AbstractPageHandler implements Handler {
+
+    private final Logger LOGGER = LoggerFactory.getLogger(getClass());
+
+    AbstractPageHandler() {
+        LOGGER.info("Registering web route.");
+    }
+
+    @Override
+    public final void handle(@NotNull Context ctx) {
+
+        try {
+
+            PageModelSpec spec;
+            if ("get".equalsIgnoreCase(ctx.method())) {
+                spec = handlePageLoad(ctx);
+            } else if ("post".equalsIgnoreCase(ctx.method())) {
+                spec = handleFormSubmission(ctx);
+            } else {
+
+                ctx.render("views/pages/error.ftl", model("error", "You can't load the page this way."));
+                return;
+            }
+
+            injectTopLevelModelAttributes(ctx, spec);
+            checkViewForRedirect(ctx, spec);
+
+        } catch (Exception e) {
+
+            LOGGER.error("Unexpected error occurred when loading page.", e);
+            ctx.render("views/pages/error.ftl", model("error", "Something unexepected happened", "exception", e));
+        }
+    }
+
+    protected abstract PageModelSpec handlePageLoad(Context ctx);
+
+    protected abstract PageModelSpec handleFormSubmission(Context ctx);
+
+    private void injectTopLevelModelAttributes(final Context ctx, final PageModelSpec spec) {
+        spec.addModelAttribute(PageModelAttributes.AuthenticatedUser, ctx.sessionAttribute(SessionAttributes.AuthenticatedUser));
+    }
+
+    private void checkViewForRedirect(final Context ctx, final PageModelSpec spec) {
+
+        if (isRedirect(spec.getViewName())) {
+            ctx.redirect(spec.getViewName().split(":")[1]);
+        } else {
+            ctx.render(spec.getViewName(), spec.getModel());
+        }
+    }
+
+    private boolean isRedirect(final String view) {
+        return null != view && view.startsWith("redirect:");
+    }
+}

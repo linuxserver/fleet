@@ -17,6 +17,7 @@
 
 package io.linuxserver.fleet.core;
 
+import io.linuxserver.fleet.core.config.AppProperties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -38,7 +39,7 @@ class PropertiesLoader extends BaseRuntimeLoader {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(PropertiesLoader.class);
 
-    private final FleetProperties properties;
+    private final AppProperties properties;
 
     PropertiesLoader() {
 
@@ -51,7 +52,7 @@ class PropertiesLoader extends BaseRuntimeLoader {
             Properties properties = new Properties();
             properties.load(new FileInputStream(FleetRuntime.CONFIG_BASE + "/fleet.properties"));
 
-            this.properties = new FleetProperties(properties);
+            this.properties = new AppProperties(properties);
 
             printProperties();
 
@@ -113,7 +114,7 @@ class PropertiesLoader extends BaseRuntimeLoader {
      * @return
      *      All application properties.
      */
-    FleetProperties getProperties() {
+    AppProperties getProperties() {
         return properties;
     }
 

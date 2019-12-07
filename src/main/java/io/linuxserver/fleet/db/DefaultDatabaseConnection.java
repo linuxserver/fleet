@@ -17,7 +17,7 @@
 
 package io.linuxserver.fleet.db;
 
-import io.linuxserver.fleet.core.FleetProperties;
+import io.linuxserver.fleet.core.config.AppProperties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -25,7 +25,7 @@ public class DefaultDatabaseConnection extends PoolingDatabaseConnection {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DefaultDatabaseConnection.class);
 
-    public DefaultDatabaseConnection(FleetProperties properties) {
+    public DefaultDatabaseConnection(AppProperties properties) {
         super(properties);
     }
 }

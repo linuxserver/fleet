@@ -1,0 +1,133 @@
+span.icon i.fas, span.icon i.far, span.icon i.fab {
+    margin: 0;
+}
+
+i.fas, i.far, i.fab {
+    margin-right: .5rem;
+}
+
+.navbar-title {
+    font-family: 'Nunito', sans-serif !important;
+    font-size: 1.8rem;
+    font-weight: 600;
+    letter-spacing: .01rem;
+}
+
+.image-title {
+    font-family: 'Nunito', sans-serif !important;
+}
+
+.has-icon-large i.fas, .has-icon-large i.far, .has-icon-large i.fab {
+    font-size: 3rem;
+}
+
+span.image-title {
+    font-size: 1.2rem;
+}
+
+/* The switch - the box around the slider */
+.switch {
+    position: relative;
+    display: inline-block;
+    width: 30px;
+    height: 20px;
+    margin: 0;
+}
+
+.switch.switch.is-large {
+    height: 26px;
+    width: 40px;
+}
+
+/* Hide default HTML checkbox */
+.switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+/* The slider */
+.slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #e0e0e0;
+    -webkit-transition: .4s;
+    transition: .4s;
+}
+
+.slider:before {
+    position: absolute;
+    content: "";
+    height: 16px;
+    width: 16px;
+    left: 2px;
+    bottom: 2px;
+    background-color: white;
+    -webkit-transition: .4s;
+    transition: .4s;
+    box-shadow: 1px 1px 2px #98a0a6;
+}
+
+.switch.is-primary input:checked + .slider {
+    background-color: #00d1b2;
+}
+
+.switch.is-danger input:checked + .slider {
+    background-color: #ff3860;
+}
+
+.switch.is-warning input:checked + .slider {
+    background-color: #ffdd57;
+}
+
+.switch.is-info input:checked + .slider {
+    background-color: #209cee;
+}
+
+.switch.is-link input:checked + .slider {
+    background-color: #3273dc;
+}
+
+.switch.is-success input:checked + .slider {
+    background-color: #23d160
+}
+
+.switch.is-large .slider:before {
+
+    height: 22px;
+    width: 22px;
+    left: 2px;
+    bottom: 2px;
+}
+
+input:disabled + .slider {
+    background-color: #f7f7f7;
+}
+
+input:disabled + .slider:before {
+    box-shadow: none;
+}
+
+input:checked + .slider:before {
+    -webkit-transform: translateX(10px);
+    -ms-transform: translateX(10px);
+    transform: translateX(10px);
+}
+
+.switch.is-large input:checked + .slider:before {
+    -webkit-transform: translateX(14px);
+    -ms-transform: translateX(14px);
+    transform: translateX(14px);
+}
+
+.slider.round {
+    border-radius: 26px;
+}
+
+.slider.round:before {
+    border-radius: 50%;
+}

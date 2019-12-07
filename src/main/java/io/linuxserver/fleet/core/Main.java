@@ -20,6 +20,6 @@ package io.linuxserver.fleet.core;
 public class Main {
 
     public static void main(String[] args) {
-        FleetApp.instance().run();
+        FleetAppController.instance().run();
     }
 }
