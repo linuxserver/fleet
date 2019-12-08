@@ -17,39 +17,20 @@
 
 package io.linuxserver.fleet.v2.types;
 
-import org.apache.commons.lang3.builder.ToStringBuilder;
-import org.apache.commons.lang3.builder.ToStringStyle;
-
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
-import java.util.TreeSet;
+import java.util.*;
 
 public class Tag {
 
-    public static final Tag NONE = new Tag("<Never Built>", "<Never Built>", null);
-
     private final String         version;
-    private final String         maskedVersion;
     private final Set<TagDigest> digests;
     private final LocalDateTime  buildDate;
 
-    public Tag(String version, String maskedVersion, LocalDateTime buildDate) {
+    public Tag(final String version, final LocalDateTime buildDate, final Set<TagDigest> digests) {
 
-        this.version        = version;
-        this.maskedVersion  = maskedVersion;
-        this.digests        = new TreeSet<>();
-
-        if (null != buildDate) {
-            this.buildDate = LocalDateTime.of(buildDate.toLocalDate(), buildDate.toLocalTime());
-        } else {
-            this.buildDate = null;
-        }
-    }
-
-    public final void addDigest(final TagDigest digest) {
-        digests.add(digest);
+        this.version   = version;
+        this.digests   = Collections.unmodifiableSet(digests);
+        this.buildDate = (null == buildDate ? null : LocalDateTime.of(buildDate.toLocalDate(), buildDate.toLocalTime()));
     }
 
     public final List<TagDigest> getDigests() {
@@ -60,10 +41,6 @@ public class Tag {
         return version;
     }
 
-    public String getMaskedVersion() {
-        return maskedVersion;
-    }
-
     public LocalDateTime getBuildDate() {
 
         if (null != buildDate) {
@@ -71,10 +48,5 @@ public class Tag {
         }
 
         return null;
-    }
-
-    @Override
-    public String toString() {
-        return ToStringBuilder.reflectionToString(this, ToStringStyle.SHORT_PREFIX_STYLE);
     }
 }

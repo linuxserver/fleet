@@ -17,21 +17,30 @@
 
 package io.linuxserver.fleet.v2.types;
 
-import io.linuxserver.fleet.v2.key.AbstractHasKey;
 import io.linuxserver.fleet.v2.key.RepositoryKey;
+import io.linuxserver.fleet.v2.types.meta.ItemSyncSpec;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
-public class Repository extends AbstractHasKey<RepositoryKey> {
+public class Repository extends AbstractSyncItem<Repository, RepositoryKey> {
 
     private final Set<Image> images;
 
-    public Repository(final RepositoryKey key) {
-        super(key);
+    public Repository(final RepositoryKey key, final ItemSyncSpec syncSpec) {
+        super(key, syncSpec);
         images = new TreeSet<>();
+    }
+
+    @Override
+    public Repository cloneWithSyncSpec(final ItemSyncSpec syncSpec) {
+
+        final Repository cloned = new Repository(getKey(), syncSpec);
+        images.forEach(cloned::addImage);
+
+        return cloned;
     }
 
     public final void addImage(final Image image) {
@@ -44,5 +53,20 @@ public class Repository extends AbstractHasKey<RepositoryKey> {
 
     public final List<Image> getImages() {
         return new ArrayList<>(images);
+    }
+
+    @Override
+    public final boolean isHidden() {
+        return !isSyncEnabled();
+    }
+
+    @Override
+    public final boolean isStable() {
+        return true;
+    }
+
+    @Override
+    public final boolean isDeprecated() {
+        return false;
     }
 }

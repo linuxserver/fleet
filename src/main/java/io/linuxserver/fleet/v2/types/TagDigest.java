@@ -17,18 +17,14 @@
 
 package io.linuxserver.fleet.v2.types;
 
-import io.linuxserver.fleet.v2.key.AbstractHasKey;
-import io.linuxserver.fleet.v2.key.TagDigestKey;
-
-public class TagDigest extends AbstractHasKey<TagDigestKey> {
+public class TagDigest {
 
     private final long   size;
     private final String digest;
     private final String architecture;
     private final String archVariant;
 
-    public TagDigest(final TagDigestKey key, final long size, final String digest, final String architecture, final String archVariant) {
-        super(key);
+    public TagDigest(final long size, final String digest, final String architecture, final String archVariant) {
 
         this.size         = size;
         this.digest       = digest;

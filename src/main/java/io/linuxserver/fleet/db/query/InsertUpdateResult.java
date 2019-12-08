@@ -23,6 +23,10 @@ public class InsertUpdateResult<T> {
     private final int       status;
     private final String    statusMessage;
 
+    public InsertUpdateResult(T result) {
+        this(result, InsertUpdateStatus.OK, "OK");
+    }
+
     public InsertUpdateResult(T result, int status, String statusMessage) {
 
         this.result = result;

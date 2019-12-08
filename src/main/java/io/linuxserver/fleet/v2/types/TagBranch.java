@@ -20,20 +20,22 @@ package io.linuxserver.fleet.v2.types;
 import io.linuxserver.fleet.v2.key.AbstractHasKey;
 import io.linuxserver.fleet.v2.key.TagBranchKey;
 
+import java.util.concurrent.atomic.AtomicReference;
+
 public class TagBranch extends AbstractHasKey<TagBranchKey> {
 
-    private final String branchName;
-    private final Tag    latestTag;
+    private final String               branchName;
+    private final AtomicReference<Tag> latestTag;
 
     public TagBranch(final TagBranchKey tagBranchKey, final String tagBranchName, final Tag latestTag) {
         super(tagBranchKey);
 
         this.branchName = tagBranchName;
-        this.latestTag  = latestTag;
+        this.latestTag  = new AtomicReference<>(latestTag);
     }
 
-    public final TagBranch cloneWithLatestTag(final Tag latestTag) {
-        return new TagBranch(getKey(), getBranchName(), latestTag);
+    public final void updateLatestTag(final Tag latestTag) {
+        this.latestTag.set(latestTag);
     }
 
     public final String getBranchName() {
@@ -41,10 +43,10 @@ public class TagBranch extends AbstractHasKey<TagBranchKey> {
     }
 
     public final Tag getLatestTag() {
-        return latestTag;
+        return latestTag.get();
     }
     
-    public final boolean isTrueLatest() {
+    public final boolean isNamedLatest() {
         return "latest".equals(getBranchName());
     }
 }
