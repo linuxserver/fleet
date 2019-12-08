@@ -19,22 +19,37 @@ package io.linuxserver.fleet.v2.cache;
 
 import io.linuxserver.fleet.v2.key.HasKey;
 import io.linuxserver.fleet.v2.key.Key;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 public abstract class AbstractItemCache<KEY extends Key, ITEM extends HasKey<KEY>> implements ItemCache<KEY, ITEM> {
 
-    private final Map<KEY, ITEM> items;
+    private final Logger LOGGER = LoggerFactory.getLogger(getClass());
+
+    private final List<ItemCacheListener<ITEM>> listeners;
+    private final Map<KEY, ITEM>                items;
 
     public AbstractItemCache() {
-        items = new HashMap<>();
+
+        listeners = new ArrayList<>();
+        items     = new HashMap<>();
+    }
+
+    public final void registerCacheListener(final ItemCacheListener<ITEM> listener) {
+
+        LOGGER.info("Registering new cache listener {}", listener);
+        listeners.add(listener);
     }
 
     @Override
     public final void addItem(final ITEM item) {
-        items.put(item.getKey(), item);
+
+        final ITEM cached = items.put(item.getKey(), item);
+
+        LOGGER.info("Item {} cached", item);
+        listeners.forEach(l -> l.onItemCached(cached));
     }
 
     @Override
@@ -44,7 +59,11 @@ public abstract class AbstractItemCache<KEY extends Key, ITEM extends HasKey<KEY
 
     @Override
     public final void removeItem(final KEY key) {
-        items.remove(key);
+
+        final ITEM removed = items.remove(key);
+
+        LOGGER.info("Item {} removed from cache");
+        listeners.forEach(l -> l.onItemRemoved(removed));
     }
 
     @Override

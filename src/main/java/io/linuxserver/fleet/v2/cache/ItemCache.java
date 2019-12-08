@@ -33,4 +33,10 @@ public interface ItemCache<KEY extends Key, ITEM extends HasKey<KEY>> {
     boolean isItemCached(KEY key);
 
     Collection<ITEM> getAllItems();
+
+    interface ItemCacheListener<ITEM> {
+
+        void onItemCached(final ITEM item);
+        void onItemRemoved(final ITEM item);
+    }
 }

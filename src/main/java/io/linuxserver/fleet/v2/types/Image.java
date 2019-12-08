@@ -21,6 +21,7 @@ import io.linuxserver.fleet.v2.key.AbstractHasKey;
 import io.linuxserver.fleet.v2.key.HasKey;
 import io.linuxserver.fleet.v2.key.ImageKey;
 import io.linuxserver.fleet.v2.key.RepositoryKey;
+import io.linuxserver.fleet.v2.types.meta.ImageMetaData;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -29,21 +30,29 @@ import java.util.TreeSet;
 
 public class Image extends AbstractHasKey<ImageKey> {
 
-    private final long           pullCount;
-    private final int            starCount;
+    private final ImageCountData countData;
+    private final ImageMetaData  metaData;
     private final Set<TagBranch> tagBranches;
 
-    public Image(final ImageKey key, final long pullCount, final int starCount) {
+    public Image(final ImageKey key, final ImageMetaData imageMetaData, final ImageCountData countData) {
         super(key);
 
-        this.pullCount   = pullCount;
-        this.starCount   = starCount;
+        this.countData   = countData;
+        this.metaData    = imageMetaData;
         this.tagBranches = new TreeSet<>();
     }
 
     public final Image cloneWithPullAndStarCount(final long pullCount, final int starCount) {
 
-        final Image cloned = new Image(getKey(), pullCount, starCount);
+        final Image cloned = new Image(getKey(), getMetaData(), new ImageCountData(pullCount, starCount));
+        tagBranches.forEach(cloned::addTagBranch);
+
+        return cloned;
+    }
+
+    public final Image cloneWithMetaData(final ImageMetaData metaData) {
+
+        final Image cloned = new Image(getKey(), metaData, countData);
         tagBranches.forEach(cloned::addTagBranch);
 
         return cloned;
@@ -53,8 +62,16 @@ public class Image extends AbstractHasKey<ImageKey> {
         return getKey().getRepositoryKey();
     }
 
+    public final String getRepositoryName() {
+        return getRepositoryKey().getName();
+    }
+
     public final String getName() {
         return getKey().getName();
+    }
+
+    public final ImageMetaData getMetaData() {
+        return metaData;
     }
 
 
@@ -82,11 +99,11 @@ public class Image extends AbstractHasKey<ImageKey> {
     }
 
     public final long getPullCount() {
-        return pullCount;
+        return countData.getPullCount();
     }
 
     public final int getStarCount() {
-        return starCount;
+        return countData.getStarCount();
     }
 
     public final Tag getLatestTag() {

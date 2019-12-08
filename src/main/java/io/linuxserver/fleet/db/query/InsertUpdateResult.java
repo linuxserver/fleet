@@ -34,15 +34,19 @@ public class InsertUpdateResult<T> {
         this(null, status, statusMessage);
     }
 
-    public T getResult() {
+    public final T getResult() {
         return result;
     }
 
-    public int getStatus() {
+    public final int getStatus() {
         return status;
     }
 
-    public String getStatusMessage() {
+    public final String getStatusMessage() {
         return statusMessage;
+    }
+
+    public final boolean isError() {
+        return status != InsertUpdateStatus.OK;
     }
 }

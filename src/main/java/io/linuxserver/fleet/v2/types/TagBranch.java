@@ -45,6 +45,6 @@ public class TagBranch extends AbstractHasKey<TagBranchKey> {
     }
     
     public final boolean isTrueLatest() {
-        return "latest".equals(branchName);
+        return "latest".equals(getBranchName());
     }
 }
