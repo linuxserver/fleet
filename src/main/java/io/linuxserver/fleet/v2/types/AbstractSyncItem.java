@@ -21,6 +21,9 @@ import io.linuxserver.fleet.v2.key.AbstractHasKey;
 import io.linuxserver.fleet.v2.key.Key;
 import io.linuxserver.fleet.v2.types.meta.ItemSyncSpec;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 public abstract class AbstractSyncItem<ITEM extends AbstractSyncItem, KEY extends Key> extends AbstractHasKey<KEY> implements HasSyncSpec {
 
     private final ItemSyncSpec syncSpec;
@@ -60,4 +63,32 @@ public abstract class AbstractSyncItem<ITEM extends AbstractSyncItem, KEY extend
     public boolean isHidden() {
         return getSpec().isHidden();
     }
+
+    public final String getMaskedVersion(final Tag tag) {
+        return extractMaskedVersion(tag.getVersion());
+    }
+
+    private String extractMaskedVersion(final String tagVersion) {
+
+        final String versionMask = getVersionMask();
+
+        if (null != versionMask) {
+
+            final Pattern pattern = Pattern.compile(versionMask);
+            final Matcher matcher = pattern.matcher(tagVersion);
+
+            if (matcher.matches()) {
+
+                final StringBuilder tagBuilder = new StringBuilder();
+
+                for (int groupNum = 1; groupNum <= matcher.groupCount(); groupNum++)
+                    tagBuilder.append(matcher.group(groupNum));
+
+                return tagBuilder.toString();
+            }
+        }
+
+        return tagVersion;
+    }
+
 }

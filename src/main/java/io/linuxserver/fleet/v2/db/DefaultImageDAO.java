@@ -27,11 +27,9 @@ import io.linuxserver.fleet.v2.types.*;
 import io.linuxserver.fleet.v2.types.internal.ImageOutlineRequest;
 import io.linuxserver.fleet.v2.types.internal.TagBranchOutlineRequest;
 import io.linuxserver.fleet.v2.types.meta.ItemSyncSpec;
+import sun.util.locale.provider.LocaleServiceProviderPool;
 
-import java.sql.CallableStatement;
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -42,7 +40,7 @@ public class DefaultImageDAO extends AbstractDAO implements ImageDAO {
     private static final String GetRepository      = "{CALL Repository_Get(?)}";
     private static final String GetImageKeys       = "{CALL Repository_GetImageKeys(?)}";
 
-    private static final String StoreImage         = "{CALL Image_Store(?,?,?,?,?,?,?,?,?)}";
+    private static final String StoreImage         = "{CALL Image_Store(?,?,?,?,?,?,?,?,?,?)}";
     private static final String StoreTagBranch     = "{CALL Image_StoreTagBranch(?,?,?,?)}";
     private static final String StoreTagDigest     = "{CALL Image_StoreTagDigest(?,?,?,?,?)}";
     private static final String CreateImageOutline = "{CALL Image_CreateOutline(?,?,?,?)}";
@@ -87,6 +85,7 @@ public class DefaultImageDAO extends AbstractDAO implements ImageDAO {
                 call.setBoolean(i++, image.isDeprecated());
                 call.setBoolean(i++, image.isHidden());
                 call.setBoolean(i++, image.isStable());
+                call.setBoolean(i++, image.isSyncEnabled());
                 Utils.setNullableString(call, i, image.getVersionMask());
 
                 final ResultSet results = call.executeQuery();
@@ -192,7 +191,13 @@ public class DefaultImageDAO extends AbstractDAO implements ImageDAO {
             try (final CallableStatement call = connection.prepareCall(DeleteImage)) {
 
                 call.setInt(1, image.getKey().getId());
+                call.registerOutParameter(2, Types.VARCHAR);
                 call.executeUpdate();
+
+                final DbUpdateStatus status = DbUpdateStatus.valueOf(call.getString(2));
+                if (status.isNoChange()) {
+                    getLogger().warn("removeImage attempted to remove an image which did not exist in the database: {}", image);
+                }
             }
 
         } catch (SQLException e) {
@@ -257,12 +262,11 @@ public class DefaultImageDAO extends AbstractDAO implements ImageDAO {
 
         if (results.next()) {
 
-            final ImageKey imageKey = makeImageKey(results);
-            final Image    image    = new Image(imageKey,
-                                                makeSyncSpec(results),
-                                                makeCountData(results),
-                                                results.getString("Description"),
-                                                results.getTimestamp("LastUpdated").toLocalDateTime());
+            final Image image = new Image(makeImageKey(results),
+                                          makeSyncSpec(results),
+                                          makeCountData(results),
+                                          results.getString("Description"),
+                                          results.getTimestamp("LastUpdated").toLocalDateTime());
 
             enrichImageWithTagBranches(image, connection);
 
@@ -340,7 +344,7 @@ public class DefaultImageDAO extends AbstractDAO implements ImageDAO {
     private ImageCountData makeCountData(final ResultSet results) throws SQLException {
 
         return new ImageCountData(results.getLong("LatestPullCount"),
-                                  results.getInt("StarCount"));
+                                  results.getInt("LatestStarCount"));
     }
 
     private void enrichImageWithTagBranches(final Image image, final Connection connection) throws SQLException {

@@ -27,8 +27,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 public class Image extends AbstractSyncItem<Image, ImageKey> {
 
@@ -142,36 +140,9 @@ public class Image extends AbstractSyncItem<Image, ImageKey> {
         return null;
     }
 
-    public final String getMaskedVersion(final Tag tag) {
-        return extractMaskedVersion(tag.getVersion());
-    }
-
     @Override
     public final int compareTo(final HasKey<ImageKey> o) {
         return o.getKey().getName().compareTo(getKey().getName());
-    }
-
-    private String extractMaskedVersion(final String tagVersion) {
-
-        final String versionMask = getVersionMask();
-
-        if (null != versionMask) {
-
-            final Pattern pattern = Pattern.compile(versionMask);
-            final Matcher matcher = pattern.matcher(tagVersion);
-
-            if (matcher.matches()) {
-
-                final StringBuilder tagBuilder = new StringBuilder();
-
-                for (int groupNum = 1; groupNum <= matcher.groupCount(); groupNum++)
-                    tagBuilder.append(matcher.group(groupNum));
-
-                return tagBuilder.toString();
-            }
-        }
-
-        return tagVersion;
     }
 
     private LocalDateTime parseDateTime(final LocalDateTime dateTime) {
