@@ -27,7 +27,6 @@ import io.linuxserver.fleet.v2.types.*;
 import io.linuxserver.fleet.v2.types.internal.ImageOutlineRequest;
 import io.linuxserver.fleet.v2.types.internal.TagBranchOutlineRequest;
 import io.linuxserver.fleet.v2.types.meta.ItemSyncSpec;
-import sun.util.locale.provider.LocaleServiceProviderPool;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -37,17 +36,16 @@ import java.util.Set;
 
 public class DefaultImageDAO extends AbstractDAO implements ImageDAO {
 
-    private static final String GetRepository      = "{CALL Repository_Get(?)}";
-    private static final String GetImageKeys       = "{CALL Repository_GetImageKeys(?)}";
+    private static final String GetRepository = "{CALL Repository_Get(?)}";
+    private static final String GetImageKeys  = "{CALL Repository_GetImageKeys(?)}";
 
-    private static final String StoreImage         = "{CALL Image_Store(?,?,?,?,?,?,?,?,?,?)}";
-    private static final String StoreTagBranch     = "{CALL Image_StoreTagBranch(?,?,?,?)}";
-    private static final String StoreTagDigest     = "{CALL Image_StoreTagDigest(?,?,?,?,?)}";
-    private static final String CreateImageOutline = "{CALL Image_CreateOutline(?,?,?,?)}";
-    private static final String GetImage           = "{CALL Image_Get(?)}";
-    private static final String GetTagBranches     = "{CALL Image_GetTagBranches(?)}";
-    private static final String GetTagDigests      = "{CALL Image_GetTagDigests(?)}";
-    private static final String DeleteImage        = "{CALL Image_Delete(?)}";
+    private static final String StoreImage             = "{CALL Image_Store(?,?,?,?,?,?,?,?,?,?)}";
+    private static final String CreateTagBranchOutline = "{CALL Image_CreateTagBranchOutline(?,?)}";
+    private static final String StoreTagDigest         = "{CALL Image_StoreTagDigest(?,?,?,?,?)}";
+    private static final String CreateImageOutline     = "{CALL Image_CreateOutline(?,?,?,?)}";
+    private static final String GetImage               = "{CALL Image_Get(?)}";
+    private static final String GetTagBranches         = "{CALL Image_GetTagBranches(?)}";
+    private static final String DeleteImage            = "{CALL Image_Delete(?)}";
 
     public DefaultImageDAO(final DefaultDatabaseConnection databaseConnection) {
         super(databaseConnection);
@@ -132,32 +130,28 @@ public class DefaultImageDAO extends AbstractDAO implements ImageDAO {
     }
 
     @Override
-    public InsertUpdateResult<TagBranch> storeTagBranchOutline(final TagBranchOutlineRequest request) {
+    public InsertUpdateResult<TagBranch> createTagBranchOutline(final TagBranchOutlineRequest request) {
 
 
         try (final Connection connection = getConnection()) {
 
-            try (final CallableStatement call = connection.prepareCall(StoreTagBranch)) {
+            try (final CallableStatement call = connection.prepareCall(CreateTagBranchOutline)) {
 
                 int i = 1;
                 call.setInt(i++, request.getImageKey().getId());
-                call.setString(i++, request.getBranchName());
-                call.setString(i++, request.getLatestTag().getVersion());
-                Utils.setNullableTimestamp(call, i, request.getLatestTag().getBuildDate());
+                call.setString(i, request.getBranchName());
 
                 final ResultSet results = call.executeQuery();
                 if (results.next()) {
-
-                    storeTagDigests(connection, makeTagBranchKey(results, request.getImageKey()), request.getLatestTag().getDigests());
-                    return new InsertUpdateResult<>(makeTagBranch(results, connection, request.getImageKey()));
+                    return new InsertUpdateResult<>(makeTagBranch(results, call, request.getImageKey()));
                 }
 
-                return new InsertUpdateResult<>(InsertUpdateStatus.FAILED, "storeTagBranchOutline did not return anything.");
+                return new InsertUpdateResult<>(InsertUpdateStatus.FAILED, "createTagBranchOutline did not return anything.");
             }
 
         } catch (SQLException e) {
 
-            getLogger().error("Error caught when executing SQL: storeTagBranchOutline", e);
+            getLogger().error("Error caught when executing SQL: createTagBranchOutline", e);
             return new InsertUpdateResult<>(InsertUpdateStatus.FAILED, e.getMessage());
         }
     }
@@ -355,40 +349,37 @@ public class DefaultImageDAO extends AbstractDAO implements ImageDAO {
 
             final ResultSet results = call.executeQuery();
             while (results.next()) {
-                image.addTagBranch(makeTagBranch(results, connection, image.getKey()));
+                image.addTagBranch(makeTagBranch(results, call, image.getKey()));
             }
         }
     }
 
-    private TagBranch makeTagBranch(final ResultSet results, final Connection connection, final ImageKey imageKey) throws SQLException {
+    private TagBranch makeTagBranch(final ResultSet results, final CallableStatement call, final ImageKey imageKey) throws SQLException {
 
-        final TagBranchKey branchKey = makeTagBranchKey(results, imageKey);
-
-        return new TagBranch(branchKey,
+        return new TagBranch(makeTagBranchKey(results, imageKey),
                              results.getString("BranchName"),
-                             makeTag(results, connection, branchKey));
+                             results.getBoolean("BranchProtected"),
+                             makeTag(results, call));
     }
 
     private TagBranchKey makeTagBranchKey(ResultSet results, ImageKey imageKey) throws SQLException {
         return new TagBranchKey(results.getInt("BranchId"), imageKey);
     }
 
-    private Tag makeTag(final ResultSet results, final Connection connection, final TagBranchKey tagBranchKey) throws SQLException {
+    private Tag makeTag(final ResultSet results, final CallableStatement call) throws SQLException {
 
         return new Tag(results.getString("TagVersion"),
                        results.getTimestamp("TagBuildDate").toLocalDateTime(),
-                       makeTagDigests(tagBranchKey, connection));
+                       makeTagDigests(call));
     }
 
-    private Set<TagDigest> makeTagDigests(final TagBranchKey tagBranchKey, final Connection connection) throws SQLException {
+    private Set<TagDigest> makeTagDigests(final CallableStatement call) throws SQLException {
 
         final Set<TagDigest> digests = new HashSet<>();
 
-        try (final CallableStatement call = connection.prepareCall(GetTagDigests)) {
+        while (call.getMoreResults() && call.getUpdateCount() == -1) {
 
-            call.setInt(1, tagBranchKey.getId());
-
-            final ResultSet results = call.executeQuery();
+            final ResultSet results = call.getResultSet();
             while (results.next()) {
                 digests.add(makeTagDigest(results));
             }

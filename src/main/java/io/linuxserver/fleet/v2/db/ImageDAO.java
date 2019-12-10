@@ -34,7 +34,7 @@ public interface ImageDAO {
 
     InsertUpdateResult<Image> createImageOutline(final ImageOutlineRequest request);
 
-    InsertUpdateResult<TagBranch> storeTagBranchOutline(final TagBranchOutlineRequest request);
+    InsertUpdateResult<TagBranch> createTagBranchOutline(final TagBranchOutlineRequest request);
 
     void removeImage(final Image image);
 

@@ -24,18 +24,24 @@ import java.util.concurrent.atomic.AtomicReference;
 
 public class TagBranch extends AbstractHasKey<TagBranchKey> {
 
-    private final String               branchName;
-    private final AtomicReference<Tag> latestTag;
+    private final String                   branchName;
+    private final AtomicReference<Boolean> branchProtected;
+    private final AtomicReference<Tag>     latestTag;
 
-    public TagBranch(final TagBranchKey tagBranchKey, final String tagBranchName, final Tag latestTag) {
+    public TagBranch(final TagBranchKey tagBranchKey, final String tagBranchName, final boolean branchProtected, final Tag latestTag) {
         super(tagBranchKey);
 
-        this.branchName = tagBranchName;
-        this.latestTag  = new AtomicReference<>(latestTag);
+        this.branchName      = tagBranchName;
+        this.branchProtected = new AtomicReference<>(branchProtected);
+        this.latestTag       = new AtomicReference<>(latestTag);
     }
 
     public final void updateLatestTag(final Tag latestTag) {
         this.latestTag.set(latestTag);
+    }
+
+    public final void setBranchProtected(final boolean branchProtected) {
+        this.branchProtected.set(branchProtected);
     }
 
     public final String getBranchName() {
@@ -48,5 +54,9 @@ public class TagBranch extends AbstractHasKey<TagBranchKey> {
     
     public final boolean isNamedLatest() {
         return "latest".equals(getBranchName());
+    }
+
+    public final boolean isBranchProtected() {
+        return branchProtected.get();
     }
 }

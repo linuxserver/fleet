@@ -24,13 +24,11 @@ public class TagBranchOutlineRequest {
 
     private final ImageKey imageKey;
     private final String   branchName;
-    private final Tag      latestTag;
 
     public TagBranchOutlineRequest(final ImageKey imageKey, final String branchName, final Tag latestTag) {
 
         this.imageKey      = imageKey;
         this.branchName    = branchName;
-        this.latestTag      = latestTag;
     }
 
     public final ImageKey getImageKey() {
@@ -39,9 +37,5 @@ public class TagBranchOutlineRequest {
 
     public final String getBranchName() {
         return branchName;
-    }
-
-    public final Tag getLatestTag() {
-        return latestTag;
     }
 }
