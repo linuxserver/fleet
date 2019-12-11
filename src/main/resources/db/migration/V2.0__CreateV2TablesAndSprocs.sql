@@ -8,7 +8,7 @@ CREATE TABLE Repository (
     `hidden`            TINYINT         NOT NULL DEFAULT 0,
     `stable`            TINYINT         NOT NULL DEFAULT 1,
     `deprecated`        TINYINT         NOT NULL DEFAULT 0,
-    `modified`          TIMESTAMP       NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    `modified`          TIMESTAMP       NOT NULL DEFAULT CURRENT_TIMESTAMP() ON UPDATE CURRENT_TIMESTAMP(),
     UNIQUE KEY (`name`)
 ) ENGINE=InnoDB;
 //
@@ -20,13 +20,12 @@ CREATE TABLE Image (
     `description`               TEXT            DEFAULT NULL,
     `pulls`                     BIGINT          DEFAULT 0,
     `stars`                     BIGINT          DEFAULT 0,
-    `latest_version`            VARCHAR(255)    DEFAULT NULL,
     `sync_enabled`              TINYINT         NOT NULL DEFAULT 1,
     `version_mask`              VARCHAR(255)    DEFAULT NULL,
     `hidden`                    TINYINT         NOT NULL DEFAULT 0,
     `stable`                    TINYINT         NOT NULL DEFAULT 1,
     `deprecated`                TINYINT         NOT NULL DEFAULT 0,
-    `modified`                  TIMESTAMP       NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    `modified`                  TIMESTAMP       NOT NULL DEFAULT CURRENT_TIMESTAMP() ON UPDATE CURRENT_TIMESTAMP(),
     UNIQUE KEY (`repository`, `name`),
     FOREIGN KEY (`repository`) REFERENCES Repository(`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB;
@@ -38,7 +37,7 @@ CREATE TABLE TagBranch (
     `name`           VARCHAR(255) NOT NULL,
     `latest_version` VARCHAR(255) NOT NULL DEFAULT 'Unknown',
     `protected`      TINYINT NOT NULL DEFAULT 0,
-    `build_date`     TIMESTAMP DEFAULT NULL,
+    `build_date`     TIMESTAMP DEFAULT CURRENT_TIMESTAMP(),
     UNIQUE KEY (`image_id`, `name`),
     FOREIGN KEY (`image_id`) REFERENCES Image(`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB;
@@ -49,10 +48,42 @@ CREATE TABLE TagDigest (
     `size`      BIGINT NOT NULL,
     `arch`      VARCHAR(100) NOT NULL,
     `digest`    VARCHAR(255) NOT NULL,
-    `variant`   VARCHAR(50) DEFAULT NULL,
+    `variant`   VARCHAR(50) DEFAULT CURRENT_TIMESTAMP(),
     UNIQUE KEY (`branch_id`, `digest`),
     FOREIGN KEY (`branch_id`) REFERENCES TagBranch(`id`)
 ) ENGINE=InnoDB;
+//
+
+CREATE OR REPLACE VIEW `Image_View` AS (
+
+   SELECT
+
+       -- Key
+       images.`id`         AS `ImageId`,
+       images.`name`       AS `ImageName`,
+       images.`repository` AS `RepositoryId`,
+       repositories.`name` AS `RepositoryName`,
+
+       -- Counts
+       images.`pulls` AS `LatestPullCount`,
+       images.`stars` AS `LatestStarCount`,
+
+       -- Spec
+       images.`sync_enabled` AS `SyncEnabled`,
+       images.`version_mask` AS `VersionMask`,
+       images.`hidden`       AS `Hidden`,
+       images.`stable`       AS `Stable`,
+       images.`deprecated`   AS `Deprecated`,
+
+       -- General
+       images.`description` AS `Description`,
+       images.`modified`    AS `LastUpdated`
+
+   FROM
+       Image images
+   JOIN
+       Repository repositories ON repositories.`id` = images.`repository`
+);
 //
 
 CREATE OR REPLACE VIEW `ImageKey_View` AS (
@@ -66,38 +97,6 @@ CREATE OR REPLACE VIEW `ImageKey_View` AS (
 
     FROM
         Image_View image_view
-);
-//
-
-CREATE OR REPLACE VIEW `Image_View` AS (
-
-    SELECT
-
-        -- Key
-        images.`id`         AS `ImageId`,
-        images.`name`       AS `ImageName`,
-        images.`repository` AS `RepositoryId`,
-        repositories.`name` AS `RepositoryName`,
-
-        -- Counts
-        images.`pulls` AS `LatestPullCount`,
-        images.`stars` AS `LatestStarCount`,
-
-        -- Spec
-        images.`sync_enabled` AS `SyncEnabled`,
-        images.`version_mask` AS `VersionMask`,
-        images.`hidden`       AS `Hidden`,
-        images.`stable`       AS `Stable`,
-        images.`deprecated`   AS `Deprecated`,
-
-        -- General
-        images.`description` AS `Description`,
-        images.`modified`    AS `LastUpdated`
-
-    FROM
-        Image images
-    JOIN
-        Repository repositories ON repositories.`id` = images.`repository`
 );
 //
 
@@ -118,12 +117,12 @@ CREATE OR REPLACE VIEW `TagBranch_View` AS (
 CREATE OR REPLACE VIEW `TagDigest_View` AS (
 
     SELECT
-        tag_branch.`image_id` AS `ImageId`,
-        tag_branch.`branch_id AS `BranchId`,
-        tag_digest.`size`     AS `DigestSize`,
-        tag_digest.`digest`   AS `DigestSha`,
-        tag_digest.`arch`     AS `DigestArch`,
-        tag_digest.`variant`  AS `DigestVariant`,
+        tag_branch.`image_id`  AS `ImageId`,
+        tag_branch.`id`        AS `BranchId`,
+        tag_digest.`size`      AS `DigestSize`,
+        tag_digest.`digest`    AS `DigestSha`,
+        tag_digest.`arch`      AS `DigestArch`,
+        tag_digest.`variant`   AS `DigestVariant`
     FROM
         TagDigest tag_digest
     JOIN
@@ -142,7 +141,7 @@ BEGIN
     FROM
         TagBranch_View
     WHERE
-        `image_id` = in_image_id;
+        `ImageId` = in_image_id;
 
     -- All digests for the given tag in the branch.
     SELECT *
@@ -182,7 +181,7 @@ CREATE OR REPLACE PROCEDURE `Image_StoreTagDigest`
 (
     in_branch_id INT,
     in_size      BIGINT,
-    in_digest    VARCHAR(255)
+    in_digest    VARCHAR(255),
     in_arch      VARCHAR(255),
     in_variant   VARCHAR(100),
 
@@ -233,9 +232,9 @@ CREATE OR REPLACE PROCEDURE `Image_Delete`
 )
 BEGIN
 
-    IF EXISTS(SELECT `id` FROM ImagesV2 WHERE `id` = in_id`) THEN
+    IF EXISTS(SELECT `id` FROM Image WHERE `id` = in_id) THEN
 
-        DELETE FROM ImagesV2 WHERE `id` = in_id;
+        DELETE FROM Image WHERE `id` = in_id;
         SET out_status = 'Updated';
 
     ELSE
@@ -256,11 +255,11 @@ CREATE OR REPLACE PROCEDURE `Image_CreateOutline`
 )
 BEGIN
 
-    IF EXISTS(SELECT `id` FROM ImagesV2 WHERE `id` = in_id`) THEN
+    IF EXISTS(SELECT `id` FROM Image WHERE `repository` = in_repository AND `name` = in_name) THEN
         SET out_status = 'Exists';
     ELSE
 
-        INSERT INTO ImagesV2 (`repository`, `name`, `description`, `modified`)
+        INSERT INTO Image (`repository`, `name`, `description`, `modified`)
         VALUES
         (
             in_repository,

@@ -18,7 +18,7 @@
 package io.linuxserver.fleet.db;
 
 import com.zaxxer.hikari.HikariDataSource;
-import io.linuxserver.fleet.core.config.AppProperties;
+import io.linuxserver.fleet.core.config.DatabaseConnectionProperties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -32,10 +32,10 @@ public abstract class PoolingDatabaseConnection {
 
     private final HikariDataSource dataSource;
 
-    PoolingDatabaseConnection(AppProperties properties) {
+    PoolingDatabaseConnection(final DatabaseConnectionProperties properties) {
 
         dataSource = new HikariDataSource();
-        dataSource.setDriverClassName(properties.getDatabaseDriverClassName());
+        dataSource.setDriverClassName(properties.getDatabaseDriverClass());
         dataSource.setJdbcUrl(properties.getDatabaseUrl());
         dataSource.setUsername(properties.getDatabaseUsername());
         dataSource.setPassword(properties.getDatabasePassword());

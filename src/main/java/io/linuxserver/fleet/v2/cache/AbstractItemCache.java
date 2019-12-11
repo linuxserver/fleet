@@ -62,7 +62,7 @@ public abstract class AbstractItemCache<KEY extends Key, ITEM extends HasKey<KEY
 
         final ITEM removed = items.remove(key);
 
-        LOGGER.info("Item {} removed from cache");
+        LOGGER.info("Item {} removed from cache", removed);
         listeners.forEach(l -> l.onItemRemoved(removed));
     }
 

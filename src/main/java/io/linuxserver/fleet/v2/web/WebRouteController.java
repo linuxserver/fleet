@@ -45,7 +45,7 @@ public class WebRouteController {
         webInstance.routes(() -> {
 
             webInstance.get(Locations.Login, new LoginController());
-            webInstance.get(Locations.Home,  new HomeController());
+            webInstance.get(Locations.Home,  new HomeController(app.getRepositoryManager()));
         });
     }
 

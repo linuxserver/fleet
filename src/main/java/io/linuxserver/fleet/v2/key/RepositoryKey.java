@@ -19,15 +19,23 @@ package io.linuxserver.fleet.v2.key;
 
 public class RepositoryKey extends AbstractKey {
 
+    private static final String KeyPattern = "^\\d+:[^/]++$";
+
     private final String name;
 
-    public RepositoryKey(final int id) {
-        this(id, "<LookupKey>");
-    }
+    public static RepositoryKey parse(final String keyAsString) {
 
-    @Deprecated
-    public RepositoryKey(final String name) {
-        this(null, name);
+        if (keyAsString.matches(KeyPattern)) {
+
+            final String[] keyParts       = keyAsString.split(":");
+            final int      repositoryId   = Integer.parseInt(keyParts[0]);
+            final String   repositoryName = keyParts[1];
+
+            return new RepositoryKey(repositoryId, repositoryName);
+
+        } else {
+            throw new IllegalArgumentException("Key pattern is malformed");
+        }
     }
 
     public RepositoryKey(final Integer id, final String name) {

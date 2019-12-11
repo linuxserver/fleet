@@ -17,34 +17,34 @@
 
 package io.linuxserver.fleet.v2.types;
 
+import io.linuxserver.fleet.v2.cache.ImageCache;
 import io.linuxserver.fleet.v2.key.RepositoryKey;
 import io.linuxserver.fleet.v2.types.meta.ItemSyncSpec;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
-import java.util.Set;
-import java.util.TreeSet;
 
 public class Repository extends AbstractSyncItem<Repository, RepositoryKey> {
 
-    private final Set<Image> images;
+    private final ImageCache images;
 
     public Repository(final RepositoryKey key, final ItemSyncSpec syncSpec) {
         super(key, syncSpec);
-        images = new TreeSet<>();
+        images = new ImageCache();
     }
 
     @Override
     public Repository cloneWithSyncSpec(final ItemSyncSpec syncSpec) {
 
         final Repository cloned = new Repository(getKey(), syncSpec);
-        images.forEach(cloned::addImage);
+        images.getAllItems().forEach(cloned::addImage);
 
         return cloned;
     }
 
     public final void addImage(final Image image) {
-        images.add(image);
+        images.addItem(image);
     }
 
     public final String getName() {
@@ -52,7 +52,10 @@ public class Repository extends AbstractSyncItem<Repository, RepositoryKey> {
     }
 
     public final List<Image> getImages() {
-        return new ArrayList<>(images);
+
+        final List<Image> imageList = new ArrayList<>(images.getAllItems());
+        Collections.sort(imageList);
+        return imageList;
     }
 
     @Override

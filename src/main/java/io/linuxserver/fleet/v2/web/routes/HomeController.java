@@ -18,13 +18,39 @@
 package io.linuxserver.fleet.v2.web.routes;
 
 import io.javalin.http.Context;
+import io.linuxserver.fleet.v2.key.RepositoryKey;
+import io.linuxserver.fleet.v2.service.RepositoryManager;
+import io.linuxserver.fleet.v2.types.Repository;
 import io.linuxserver.fleet.v2.web.PageModelSpec;
+
+import java.util.Collections;
 
 public class HomeController extends AbstractPageHandler {
 
+    private final RepositoryManager repositoryManager;
+
+    public HomeController(final RepositoryManager repositoryManager) {
+        this.repositoryManager = repositoryManager;
+    }
+
     @Override
     protected PageModelSpec handlePageLoad(final Context ctx) {
-        return new PageModelSpec("views/pages/home.ftl");
+
+        final PageModelSpec modelSpec = new PageModelSpec("views/pages/home.ftl");
+
+        final String repositoryLookupParam = ctx.queryParam("repositoryId");
+        if (null == repositoryLookupParam) {
+            modelSpec.addModelAttribute("repositories", repositoryManager.getAllRepositories());
+        } else {
+
+            final RepositoryKey repositoryLookupKey = RepositoryKey.parse(repositoryLookupParam);
+            final Repository repository = repositoryManager.getRepository(repositoryLookupKey);
+            if (null != repository) {
+                modelSpec.addModelAttribute("repositories", Collections.singletonList(repository));
+            }
+        }
+
+        return modelSpec;
     }
 
     @Override

@@ -29,6 +29,14 @@ public class AppProperties {
         this.properties = properties;
     }
 
+    public DatabaseConnectionProperties getDatabaseProperties() {
+
+        return new DatabaseConnectionProperties(getDatabaseDriverClassName(),
+                                                getDatabaseUrl(),
+                                                getDatabaseUsername(),
+                                                getDatabasePassword());
+    }
+
     public String getDatabaseDriverClassName() {
         return getStringProperty("fleet.database.driver");
     }

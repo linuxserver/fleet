@@ -39,4 +39,6 @@ public interface ImageDAO {
     void removeImage(final Image image);
 
     Repository fetchRepository(final RepositoryKey repositoryKey);
+
+    InsertUpdateResult<Repository> storeRepository(Repository repository);
 }

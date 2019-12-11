@@ -213,6 +213,11 @@ public class DefaultImageDAO extends AbstractDAO implements ImageDAO {
         }
     }
 
+    @Override
+    public InsertUpdateResult<Repository> storeRepository(Repository repository) {
+        return null;
+    }
+
     private Image makeImage(final ImageKey imageKey, final Connection connection) throws SQLException {
 
         try (final CallableStatement call = connection.prepareCall(GetImage)) {

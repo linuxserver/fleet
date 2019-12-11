@@ -26,7 +26,7 @@ import io.linuxserver.fleet.v2.web.WebRouteController;
  * through this class.
  * </p>
  */
-public class FleetAppController {
+public class FleetAppController extends AbstractAppController {
 
     private static FleetAppController instance;
 
@@ -45,24 +45,14 @@ public class FleetAppController {
         return instance;
     }
 
-    private final FleetBeans beans;
-
-    private FleetAppController() {
-        beans = new FleetBeans();
-    }
-
-    void run() {
-
-        migrateDatabase();
+    @Override
+    protected final void run() {
+        super.run();
         configureWeb();
     }
 
-    private void migrateDatabase() {
-        beans.getDatabaseVersion().migrate();
-    }
-
     public final WebConfiguration getWebConfiguration() {
-        return new WebConfiguration(beans.getProperties());
+        return new WebConfiguration(getAppProperties());
     }
 
     private void configureWeb() {

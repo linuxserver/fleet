@@ -15,32 +15,10 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package io.linuxserver.fleet.sync.event;
+package io.linuxserver.fleet.v2.cache;
 
-import io.linuxserver.fleet.model.internal.Image;
+import io.linuxserver.fleet.v2.key.ImageKey;
+import io.linuxserver.fleet.v2.types.Image;
 
-public class ImageUpdateEvent {
-
-    private final Image image;
-    private final int currentPosition;
-    private final int totalImages;
-
-    public ImageUpdateEvent(Image image, int currentPosition, int totalImages) {
-
-        this.image = image;
-        this.currentPosition = currentPosition;
-        this.totalImages = totalImages;
-    }
-
-    public Image getImage() {
-        return image;
-    }
-
-    public int getCurrentPosition() {
-        return currentPosition;
-    }
-
-    public int getTotalImages() {
-        return totalImages;
-    }
+public class ImageCache extends AbstractItemCache<ImageKey, Image> {
 }

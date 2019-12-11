@@ -17,11 +17,11 @@
 
 package io.linuxserver.fleet.db;
 
-import io.linuxserver.fleet.core.config.AppProperties;
+import io.linuxserver.fleet.core.config.DatabaseConnectionProperties;
 
 public class DefaultDatabaseConnection extends PoolingDatabaseConnection {
 
-    public DefaultDatabaseConnection(final AppProperties properties) {
+    public DefaultDatabaseConnection(final DatabaseConnectionProperties properties) {
         super(properties);
     }
 }
