@@ -28,7 +28,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
-public class Image extends AbstractSyncItem<Image, ImageKey> {
+public class Image extends AbstractSyncItem<ImageKey, Image> {
 
     private final ImageCountData countData;
     private final String         description;
@@ -49,10 +49,18 @@ public class Image extends AbstractSyncItem<Image, ImageKey> {
         this.tagBranches = new TreeSet<>();
     }
 
+    public final Image cloneForUpdate() {
+
+        final Image cloned = new Image(getKey(), getSpec(), countData, getDescription(), getLastUpdated());
+        tagBranches.forEach(t -> cloned.addTagBranch(t.cloneForUpdate()));
+
+        return cloned;
+    }
+
     public final Image cloneWithPullAndStarCount(final long pullCount, final int starCount) {
 
         final Image cloned = new Image(getKey(), getSpec(), new ImageCountData(pullCount, starCount), getDescription(), getLastUpdated());
-        tagBranches.forEach(cloned::addTagBranch);
+        tagBranches.forEach(t -> cloned.addTagBranch(t.cloneForUpdate()));
 
         return cloned;
     }
@@ -61,7 +69,7 @@ public class Image extends AbstractSyncItem<Image, ImageKey> {
     public final Image cloneWithSyncSpec(final ItemSyncSpec syncSpec) {
 
         final Image cloned = new Image(getKey(), syncSpec, countData, getDescription(), getLastUpdated());
-        tagBranches.forEach(cloned::addTagBranch);
+        tagBranches.forEach(t -> cloned.addTagBranch(t.cloneForUpdate()));
 
         return cloned;
     }
@@ -111,13 +119,7 @@ public class Image extends AbstractSyncItem<Image, ImageKey> {
     }
 
     public final void removeTagBranch(final TagBranch tagBranch) {
-
-        for (TagBranch storedTagBranch : getTagBranches()) {
-
-            if (storedTagBranch.equals(tagBranch)) {
-                getTagBranches().remove(storedTagBranch);
-            }
-        }
+        getTagBranches().removeIf(storedTagBranch -> storedTagBranch.equals(tagBranch));
     }
 
     public final long getPullCount() {
@@ -137,12 +139,17 @@ public class Image extends AbstractSyncItem<Image, ImageKey> {
             }
         }
 
-        return null;
+        return Tag.DefaultUnknown;
     }
 
     @Override
     public final int compareTo(final HasKey<ImageKey> o) {
-        return o.getKey().getName().compareTo(getKey().getName());
+        return getKey().getName().compareTo(o.getKey().getName());
+    }
+
+    @Override
+    public String toString() {
+        return getRepositoryName() + "/" + getName() + "@" + getLatestTag();
     }
 
     private LocalDateTime parseDateTime(final LocalDateTime dateTime) {

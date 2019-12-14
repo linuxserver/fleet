@@ -17,7 +17,7 @@
 
 package io.linuxserver.fleet.v2.key;
 
-public class ImageKey extends AbstractKey {
+public class ImageKey extends AbstractDatabaseKey {
 
     private static final String KeyPattern = "^\\d+:\\d+:[^/]+/[^/]+$";
 
@@ -52,6 +52,10 @@ public class ImageKey extends AbstractKey {
         } else {
             throw new IllegalArgumentException("Key pattern is malformed");
         }
+    }
+
+    public final ImageLookupKey getAsLookupKey() {
+        return new ImageLookupKey(getRepositoryKey().getName() + "/" + getName());
     }
 
     public ImageKey cloneWithId(int id) {

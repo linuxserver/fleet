@@ -56,6 +56,5 @@ public abstract class AbstractAppController {
 
     protected void run() {
 
-        databaseVersion.migrate();
     }
 }

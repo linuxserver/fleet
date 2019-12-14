@@ -17,7 +17,7 @@
 
 package io.linuxserver.fleet.v2.key;
 
-public class RepositoryKey extends AbstractKey {
+public class RepositoryKey extends AbstractDatabaseKey {
 
     private static final String KeyPattern = "^\\d+:[^/]++$";
 

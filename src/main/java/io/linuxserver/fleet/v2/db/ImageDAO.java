@@ -26,6 +26,8 @@ import io.linuxserver.fleet.v2.types.TagBranch;
 import io.linuxserver.fleet.v2.types.internal.ImageOutlineRequest;
 import io.linuxserver.fleet.v2.types.internal.TagBranchOutlineRequest;
 
+import java.util.List;
+
 public interface ImageDAO {
 
     Image fetchImage(final ImageKey imageKey);
@@ -39,6 +41,8 @@ public interface ImageDAO {
     void removeImage(final Image image);
 
     Repository fetchRepository(final RepositoryKey repositoryKey);
+
+    List<Repository> fetchAllRepositories();
 
     InsertUpdateResult<Repository> storeRepository(Repository repository);
 }

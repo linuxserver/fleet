@@ -17,6 +17,8 @@
 
 package io.linuxserver.fleet.v2.key;
 
+import javax.naming.OperationNotSupportedException;
+
 public interface Key {
 
     Integer getId();

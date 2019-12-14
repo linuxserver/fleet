@@ -17,7 +17,7 @@
 
 package io.linuxserver.fleet.v2.key;
 
-public class TagBranchKey extends AbstractKey {
+public class TagBranchKey extends AbstractDatabaseKey {
 
     private final ImageKey imageKey;
 

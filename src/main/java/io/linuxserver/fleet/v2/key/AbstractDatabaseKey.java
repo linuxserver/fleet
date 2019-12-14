@@ -17,13 +17,45 @@
 
 package io.linuxserver.fleet.v2.key;
 
-public class UserKey extends AbstractDatabaseKey {
+public abstract class AbstractDatabaseKey implements Key {
 
-    public UserKey() {
-        this(null);
+    private final Integer id;
+
+    AbstractDatabaseKey(final Integer id) {
+        this.id = id;
     }
 
-    public UserKey(Integer id) {
-        super(id);
+    @Override
+    public final Integer getId() {
+        return id;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+
+        if (!(o instanceof Key)) {
+            return false;
+        }
+
+        if (null == id) {
+            return ((Key) o).getId() == null;
+        }
+
+        return ((Key) o).getId().equals(id);
+    }
+
+    @Override
+    public int hashCode() {
+
+        if (null == id) {
+            return -1;
+        }
+
+        return id.hashCode();
+    }
+
+    @Override
+    public String toString() {
+        return null == id ? "<NO_ID>" : String.valueOf(id);
     }
 }

@@ -25,7 +25,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public class Repository extends AbstractSyncItem<Repository, RepositoryKey> {
+public class Repository extends AbstractSyncItem<RepositoryKey, Repository> {
 
     private final ImageCache images;
 
@@ -56,6 +56,24 @@ public class Repository extends AbstractSyncItem<Repository, RepositoryKey> {
         final List<Image> imageList = new ArrayList<>(images.getAllItems());
         Collections.sort(imageList);
         return imageList;
+    }
+
+    public final int getTotalPulls() {
+
+        int totalPulls = 0;
+        for (Image image : getImages()) {
+            totalPulls += image.getPullCount();
+        }
+        return totalPulls;
+    }
+
+    public final int getTotalStars() {
+
+        int totalStars = 0;
+        for (Image image : getImages()) {
+            totalStars += image.getStarCount();
+        }
+        return totalStars;
     }
 
     @Override

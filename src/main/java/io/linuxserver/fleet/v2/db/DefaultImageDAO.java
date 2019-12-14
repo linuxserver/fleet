@@ -36,15 +36,17 @@ import java.util.Set;
 
 public class DefaultImageDAO extends AbstractDAO implements ImageDAO {
 
-    private static final String GetRepository = "{CALL Repository_Get(?)}";
-    private static final String GetImageKeys  = "{CALL Repository_GetImageKeys(?)}";
+    public static final String  GetRepositoryKeys = "{CALL Repository_GetRepositoryKeys()}";
+    private static final String GetRepository     = "{CALL Repository_Get(?)}";
+    private static final String GetImageKeys      = "{CALL Repository_GetImageKeys(?)}";
 
     private static final String StoreImage             = "{CALL Image_Store(?,?,?,?,?,?,?,?,?,?)}";
     private static final String CreateTagBranchOutline = "{CALL Image_CreateTagBranchOutline(?,?)}";
     private static final String StoreTagDigest         = "{CALL Image_StoreTagDigest(?,?,?,?,?)}";
+    private static final String GetTagBranches         = "{CALL Image_GetTagBranches(?)}";
+    public static final String  GetTagDigests          = "{CALL Image_GetTagDigests(?)}";
     private static final String CreateImageOutline     = "{CALL Image_CreateOutline(?,?,?,?)}";
     private static final String GetImage               = "{CALL Image_Get(?)}";
-    private static final String GetTagBranches         = "{CALL Image_GetTagBranches(?)}";
     private static final String DeleteImage            = "{CALL Image_Delete(?)}";
 
     public DefaultImageDAO(final DefaultDatabaseConnection databaseConnection) {
@@ -112,7 +114,12 @@ public class DefaultImageDAO extends AbstractDAO implements ImageDAO {
                 call.setInt(i++, request.getRepositoryKey().getId());
                 call.setString(i++, request.getImageName());
                 call.setString(i++, request.getImageDescription());
-                Utils.setNullableTimestamp(call, i, request.getImageLastUpdated());
+                Utils.setNullableTimestamp(call, i++, request.getImageLastUpdated());
+                call.setBoolean(i++, ItemSyncSpec.Default.isDeprecated());
+                call.setBoolean(i++, ItemSyncSpec.Default.isHidden());
+                call.setBoolean(i++, ItemSyncSpec.Default.isStable());
+                call.setBoolean(i++, ItemSyncSpec.Default.isSynchronised());
+                call.setString(i, ItemSyncSpec.Default.getVersionMask());
 
                 final ResultSet results = call.executeQuery();
                 if (results.next()) {
@@ -143,7 +150,7 @@ public class DefaultImageDAO extends AbstractDAO implements ImageDAO {
 
                 final ResultSet results = call.executeQuery();
                 if (results.next()) {
-                    return new InsertUpdateResult<>(makeTagBranch(results, call, request.getImageKey()));
+                    return new InsertUpdateResult<>(makeTagBranch(results, connection, request.getImageKey()));
                 }
 
                 return new InsertUpdateResult<>(InsertUpdateStatus.FAILED, "createTagBranchOutline did not return anything.");
@@ -214,8 +221,51 @@ public class DefaultImageDAO extends AbstractDAO implements ImageDAO {
     }
 
     @Override
+    public List<Repository> fetchAllRepositories() {
+
+        try (final Connection connection = getConnection()) {
+
+            try (final CallableStatement call = connection.prepareCall(GetRepositoryKeys)) {
+
+                final ResultSet results = call.executeQuery();
+
+                final List<RepositoryKey> repositoryKeys = new ArrayList<>();
+                while (results.next()) {
+                    repositoryKeys.add(makeRepositoryKey(results));
+                }
+                return makeRepositories(repositoryKeys, connection);
+            }
+
+        } catch (SQLException e) {
+
+            getLogger().error("Error caught when executing SQL: fetchAllRepositories", e);
+            throw new RuntimeException("fetchAllRepositories", e);
+        }
+    }
+
+    @Override
     public InsertUpdateResult<Repository> storeRepository(Repository repository) {
         return null;
+    }
+
+    private List<Repository> makeRepositories(final List<RepositoryKey> repositoryKeys, final Connection connection) throws SQLException {
+
+        final List<Repository> repositories = new ArrayList<>();
+        try (final CallableStatement call = connection.prepareCall(GetRepository)) {
+
+            for (RepositoryKey key : repositoryKeys) {
+
+                call.setInt(1, key.getId());
+
+                final Repository repository = makeOneRepository(connection, call);
+                if (null != repository) {
+                    repositories.add(repository);
+                } else {
+                    getLogger().warn("makeRepositories attempted to make repository for key {} but none exists. Skipping.", key);
+                }
+            }
+        }
+        return repositories;
     }
 
     private Image makeImage(final ImageKey imageKey, final Connection connection) throws SQLException {
@@ -354,37 +404,37 @@ public class DefaultImageDAO extends AbstractDAO implements ImageDAO {
 
             final ResultSet results = call.executeQuery();
             while (results.next()) {
-                image.addTagBranch(makeTagBranch(results, call, image.getKey()));
+                image.addTagBranch(makeTagBranch(results, connection, image.getKey()));
             }
         }
     }
 
-    private TagBranch makeTagBranch(final ResultSet results, final CallableStatement call, final ImageKey imageKey) throws SQLException {
+    private TagBranch makeTagBranch(final ResultSet results, final Connection connection, final ImageKey imageKey) throws SQLException {
 
         return new TagBranch(makeTagBranchKey(results, imageKey),
                              results.getString("BranchName"),
                              results.getBoolean("BranchProtected"),
-                             makeTag(results, call));
+                             makeTag(results, connection));
     }
 
     private TagBranchKey makeTagBranchKey(ResultSet results, ImageKey imageKey) throws SQLException {
         return new TagBranchKey(results.getInt("BranchId"), imageKey);
     }
 
-    private Tag makeTag(final ResultSet results, final CallableStatement call) throws SQLException {
+    private Tag makeTag(final ResultSet results, final Connection connection) throws SQLException {
 
         return new Tag(results.getString("TagVersion"),
                        results.getTimestamp("TagBuildDate").toLocalDateTime(),
-                       makeTagDigests(call));
+                       makeTagDigests(connection));
     }
 
-    private Set<TagDigest> makeTagDigests(final CallableStatement call) throws SQLException {
+    private Set<TagDigest> makeTagDigests(final Connection connection) throws SQLException {
 
         final Set<TagDigest> digests = new HashSet<>();
 
-        while (call.getMoreResults() && call.getUpdateCount() == -1) {
+        try (final CallableStatement call = connection.prepareCall(GetTagDigests)) {
 
-            final ResultSet results = call.getResultSet();
+            final ResultSet results = call.executeQuery();
             while (results.next()) {
                 digests.add(makeTagDigest(results));
             }

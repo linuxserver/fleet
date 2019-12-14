@@ -86,6 +86,37 @@ CREATE OR REPLACE VIEW `Image_View` AS (
 );
 //
 
+CREATE OR REPLACE VIEW `RepositoryKey_View` AS
+(
+    SELECT
+        `id`     AS `RepositoryId`,
+        `name`   AS `RepositoryName`
+    FROM
+        Repository
+);
+//
+
+CREATE OR REPLACE VIEW `Repository_View` AS
+(
+    SELECT
+
+        -- General
+        `id`     AS `RepositoryId`,
+        `name`   AS `RepositoryName`,
+
+        -- Spec
+        `sync_enabled` AS `SyncEnabled`,
+        `version_mask` AS `VersionMask`,
+        `hidden`       AS `Hidden`,
+        `stable`       AS `Stable`,
+        `deprecated`   AS `Deprecated`,
+        `modified`     AS `LastUpdated`
+
+    FROM
+        Repository
+);
+//
+
 CREATE OR REPLACE VIEW `ImageKey_View` AS (
 
     SELECT
@@ -130,6 +161,39 @@ CREATE OR REPLACE VIEW `TagDigest_View` AS (
 );
 //
 
+CREATE OR REPLACE PROCEDURE `Repository_Get`
+(
+    in_id INT
+)
+BEGIN
+
+    SELECT
+        *
+    FROM
+         Repository_View
+    WHERE
+        `RepositoryId` = in_id;
+
+END //
+
+CREATE OR REPLACE PROCEDURE `Repository_GetRepositoryKeys` ()
+BEGIN
+    SELECT * FROM RepositoryKey_View;
+END //
+
+CREATE OR REPLACE PROCEDURE `Repository_GetImageKeys`
+(
+    in_id INT
+)
+BEGIN
+    SELECT
+        *
+    FROM
+         ImageKey_View
+    WHERE
+        `RepositoryId` = in_id;
+END //
+
 CREATE OR REPLACE PROCEDURE `Image_GetTagBranches`
 (
     in_image_id INT
@@ -143,15 +207,23 @@ BEGIN
     WHERE
         `ImageId` = in_image_id;
 
-    -- All digests for the given tag in the branch.
-    SELECT *
+END;
+//
+
+CREATE OR REPLACE PROCEDURE `Image_GetTagDigests`
+(
+    in_branch_id INT
+)
+BEGIN
+
+    SELECT
+        *
     FROM
         TagDigest_View tag_digest
     WHERE
-        tag_digest.`ImageId` = in_image_id;
+        tag_digest.`BranchId` = in_branch_id;
 
-END;
-//
+END //
 
 CREATE OR REPLACE PROCEDURE `Image_CreateTagBranchOutline`
 (
@@ -244,14 +316,57 @@ BEGIN
 END;
 //
 
+CREATE OR REPLACE PROCEDURE `Repository_CreateOutline`
+(
+    in_name VARCHAR(255),
+    in_modified     TIMESTAMP,
+    in_deprecated   TINYINT,
+    in_hidden       TINYINT,
+    in_stable       TINYINT,
+    in_synchronised TINYINT,
+    in_version_mask VARCHAR(255),
+
+    OUT out_status enum('Inserted', 'Exists')
+)
+BEGIN
+
+    IF EXISTS(SELECT `id` FROM Repository WHERE `name` = in_name) THEN
+        SET out_status = 'Exists';
+    ELSE
+
+        INSERT INTO Repository (`name`, `modified`, `deprecated`, `hidden`, `stable`, `sync_enabled`, `version_mask`)
+        VALUES
+        (
+            in_name,
+            in_modified,
+            in_deprecated,
+            in_hidden,
+            in_stable,
+            in_synchronised,
+            in_version_mask
+        );
+
+        SET out_status = 'Inserted';
+
+        SELECT * FROM RepositoryKey_View WHERE RepositoryId = LAST_INSERT_ID();
+
+    END IF;
+
+END //
+
 CREATE OR REPLACE PROCEDURE `Image_CreateOutline`
 (
-    in_repository  INT,
-    in_name        VARCHAR(255),
-    in_description TEXT,
-    in_modified    TIMESTAMP,
+    in_repository   INT,
+    in_name         VARCHAR(255),
+    in_description  TEXT,
+    in_modified     TIMESTAMP,
+    in_deprecated   TINYINT,
+    in_hidden       TINYINT,
+    in_stable       TINYINT,
+    in_synchronised TINYINT,
+    in_version_mask VARCHAR(255),
 
-    OUT out_status enum('Inserted', 'NoChange', 'Exists')
+    OUT out_status enum('Inserted', 'Exists')
 )
 BEGIN
 
@@ -259,14 +374,21 @@ BEGIN
         SET out_status = 'Exists';
     ELSE
 
-        INSERT INTO Image (`repository`, `name`, `description`, `modified`)
+        INSERT INTO Image (`repository`, `name`, `description`, `modified`, `deprecated`, `hidden`, `stable`, `sync_enabled`, `version_mask`)
         VALUES
         (
             in_repository,
             in_name,
             in_description,
-            in_modified
+            in_modified,
+            in_deprecated,
+            in_hidden,
+            in_stable,
+            in_synchronised,
+            in_version_mask
         );
+
+        SET out_status = 'Inserted';
 
         SELECT * FROM ImageKey_View image_key WHERE image_key.`ImageId` = LAST_INSERT_ID();
 

@@ -24,6 +24,8 @@ import java.util.Collection;
 
 public interface ItemCache<KEY extends Key, ITEM extends HasKey<KEY>> {
 
+    boolean isEmpty();
+
     void addItem(ITEM item);
 
     ITEM findItem(KEY key);
@@ -33,6 +35,8 @@ public interface ItemCache<KEY extends Key, ITEM extends HasKey<KEY>> {
     boolean isItemCached(KEY key);
 
     Collection<ITEM> getAllItems();
+
+    void addAllItems(Collection<ITEM> items);
 
     interface ItemCacheListener<ITEM> {
 

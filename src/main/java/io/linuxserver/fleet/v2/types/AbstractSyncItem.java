@@ -24,7 +24,7 @@ import io.linuxserver.fleet.v2.types.meta.ItemSyncSpec;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public abstract class AbstractSyncItem<ITEM extends AbstractSyncItem, KEY extends Key> extends AbstractHasKey<KEY> implements HasSyncSpec {
+public abstract class AbstractSyncItem<KEY extends Key, ITEM extends AbstractSyncItem<KEY, ITEM>> extends AbstractHasKey<KEY> implements HasSyncSpec {
 
     private final ItemSyncSpec syncSpec;
 

@@ -59,4 +59,8 @@ public class TagBranch extends AbstractHasKey<TagBranchKey> {
     public final boolean isBranchProtected() {
         return branchProtected.get();
     }
+
+    public final TagBranch cloneForUpdate() {
+        return new TagBranch(getKey(), getBranchName(), isBranchProtected(), getLatestTag());
+    }
 }

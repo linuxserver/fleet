@@ -36,7 +36,10 @@ public class DatabaseVersion {
     private final Flyway flyway;
 
     public DatabaseVersion(PoolingDatabaseConnection databaseConnection) {
+
         flyway = Flyway.configure().dataSource(databaseConnection.getDataSource()).load();
+
+        migrate();
     }
 
     /**

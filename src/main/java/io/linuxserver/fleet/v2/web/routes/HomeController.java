@@ -38,19 +38,29 @@ public class HomeController extends AbstractPageHandler {
 
         final PageModelSpec modelSpec = new PageModelSpec("views/pages/home.ftl");
 
-        final String repositoryLookupParam = ctx.queryParam("repositoryId");
+        final String repositoryLookupParam = ctx.queryParam("key");
         if (null == repositoryLookupParam) {
-            modelSpec.addModelAttribute("repositories", repositoryManager.getAllRepositories());
+
+            final Repository repository = repositoryManager.getFirstRepository();
+            setSingleRepository(modelSpec, repository);
+
         } else {
 
             final RepositoryKey repositoryLookupKey = RepositoryKey.parse(repositoryLookupParam);
             final Repository repository = repositoryManager.getRepository(repositoryLookupKey);
-            if (null != repository) {
-                modelSpec.addModelAttribute("repositories", Collections.singletonList(repository));
-            }
+            setSingleRepository(modelSpec, repository);
         }
 
+        modelSpec.addModelAttribute("availableRepositories", repositoryManager.getAllSynchronisedRepositories());
+
         return modelSpec;
+    }
+
+    private void setSingleRepository(PageModelSpec modelSpec, Repository repository) {
+
+        if (null != repository) {
+            modelSpec.addModelAttribute("selectedRepository", repository);
+        }
     }
 
     @Override

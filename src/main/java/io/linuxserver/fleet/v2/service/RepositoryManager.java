@@ -29,6 +29,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class RepositoryManager {
 
@@ -41,6 +42,12 @@ public class RepositoryManager {
 
         this.imageDAO        = imageDAO;
         this.repositoryCache = new RepositoryCache();
+
+        reloadCache();
+    }
+
+    public final void reloadCache() {
+        repositoryCache.addAllItems(imageDAO.fetchAllRepositories());
     }
 
     public final Repository storeRepository(final Repository repository) {
@@ -83,7 +90,15 @@ public class RepositoryManager {
         return repositoryCache.findItem(repositoryKey);
     }
 
+    public final Repository getFirstRepository() {
+        return repositoryCache.getAllItems().stream().findFirst().orElse(null);
+    }
+
     public final List<Repository> getAllRepositories() {
         return new ArrayList<>(repositoryCache.getAllItems());
+    }
+
+    public final List<Repository> getAllSynchronisedRepositories() {
+        return getAllRepositories().stream().filter(Repository::isSyncEnabled).collect(Collectors.toList());
     }
 }

@@ -46,7 +46,7 @@ public abstract class AbstractHasKey<KEY extends Key> implements HasKey<KEY> {
     }
 
     @Override
-    public final String toString() {
+    public String toString() {
         return key.toString();
     }
 

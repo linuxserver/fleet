@@ -22,6 +22,8 @@ import java.util.*;
 
 public class Tag {
 
+    public static final Tag DefaultUnknown = new Tag("Unknown", null, Collections.emptySet());
+
     private final String         version;
     private final Set<TagDigest> digests;
     private final LocalDateTime  buildDate;
@@ -48,5 +50,10 @@ public class Tag {
         }
 
         return null;
+    }
+
+    @Override
+    public String toString() {
+        return version;
     }
 }

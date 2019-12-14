@@ -1,3 +1,15 @@
+body.has-context-home {
+    background-color: #eaeaea;
+}
+
+.card  {
+    box-shadow: 0 2px 3px rgba(10,10,10,.1),0 0 0 1px rgba(10,10,10,.05);
+}
+
+.has-text-weight-500 {
+    font-weight: 500 !important;
+}
+
 span.icon i.fas, span.icon i.far, span.icon i.fab {
     margin: 0;
 }
@@ -6,23 +18,35 @@ i.fas, i.far, i.fab {
     margin-right: .5rem;
 }
 
-.navbar-title {
+.navbar-title, .repository-title {
     font-family: 'Nunito', sans-serif !important;
     font-size: 1.8rem;
     font-weight: 600;
     letter-spacing: .01rem;
 }
 
-.image-title {
-    font-family: 'Nunito', sans-serif !important;
-}
-
 .has-icon-large i.fas, .has-icon-large i.far, .has-icon-large i.fab {
     font-size: 3rem;
 }
 
+.media-content {
+    overflow-x: inherit !important;
+}
+
 span.image-title {
     font-size: 1.2rem;
+}
+
+.has-margin-left {
+    margin-left: 1rem;
+}
+
+.has-margin-top {
+    margin-top: 1rem;
+}
+
+.is-paddingless-top {
+    padding-top: 0 !important;
 }
 
 /* The switch - the box around the slider */

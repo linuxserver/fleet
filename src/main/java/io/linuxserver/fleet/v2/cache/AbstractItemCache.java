@@ -19,6 +19,7 @@ package io.linuxserver.fleet.v2.cache;
 
 import io.linuxserver.fleet.v2.key.HasKey;
 import io.linuxserver.fleet.v2.key.Key;
+import io.linuxserver.fleet.v2.types.Repository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -53,6 +54,11 @@ public abstract class AbstractItemCache<KEY extends Key, ITEM extends HasKey<KEY
     }
 
     @Override
+    public boolean isEmpty() {
+        return items.isEmpty();
+    }
+
+    @Override
     public final ITEM findItem(final KEY key) {
         return items.get(key);
     }
@@ -74,5 +80,10 @@ public abstract class AbstractItemCache<KEY extends Key, ITEM extends HasKey<KEY
     @Override
     public Collection<ITEM> getAllItems() {
         return items.values();
+    }
+
+    @Override
+    public final void addAllItems(Collection<ITEM> fetchAllRepositories) {
+        fetchAllRepositories.forEach(this::addItem);
     }
 }

@@ -17,13 +17,9 @@
 
 package io.linuxserver.fleet.v2.key;
 
-public class UserKey extends AbstractDatabaseKey {
+public class ImageLookupKey extends AbstractLookupKey {
 
-    public UserKey() {
-        this(null);
-    }
-
-    public UserKey(Integer id) {
-        super(id);
+    public ImageLookupKey(final String query) {
+        super(query);
     }
 }
