@@ -17,7 +17,7 @@
 
 package io.linuxserver.fleet.v2.key;
 
-public class AbstractLookupKey implements Key {
+public abstract class AbstractLookupKey<TYPE extends HasKey<?>> implements Key {
 
     private final String query;
 
@@ -33,4 +33,11 @@ public class AbstractLookupKey implements Key {
     public final Integer getId() {
         return null;
     }
+
+    @Override
+    public String toString() {
+        return query;
+    }
+
+    public abstract boolean isLookupKeyFor(final TYPE type);
 }

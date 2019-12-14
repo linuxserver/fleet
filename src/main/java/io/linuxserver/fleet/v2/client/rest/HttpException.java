@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package io.linuxserver.fleet.rest;
+package io.linuxserver.fleet.v2.client.rest;
 
 public class HttpException extends RuntimeException {
 

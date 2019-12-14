@@ -17,9 +17,36 @@
 
 package io.linuxserver.fleet.v2.key;
 
-public class ImageLookupKey extends AbstractLookupKey {
+import io.linuxserver.fleet.v2.types.Image;
+
+public class ImageLookupKey extends AbstractLookupKey<Image> {
+
+    private static final String KeyPattern = "^[^/]+/[^/]+$";
+
+    private final String lookupRepositoryName;
+    private final String lookupImageName;
 
     public ImageLookupKey(final String query) {
         super(query);
+
+        if (query.matches(KeyPattern)) {
+
+            final String[] names = query.split("/");
+            lookupRepositoryName = names[0];
+            lookupImageName      = names[1];
+
+        } else {
+            throw new IllegalArgumentException("Malformed lookup query for ImageLookupKey");
+        }
+    }
+
+    @Override
+    public final boolean isLookupKeyFor(final Image image) {
+
+        if (null == image) {
+            return false;
+        }
+
+        return image.getRepositoryName().equals(lookupRepositoryName) && image.getName().equals(lookupImageName);
     }
 }

@@ -22,6 +22,7 @@ import io.linuxserver.fleet.core.FleetAppController;
 import io.linuxserver.fleet.core.config.WebConfiguration;
 import io.linuxserver.fleet.v2.web.routes.DefaultAccessManager;
 import io.linuxserver.fleet.v2.web.routes.HomeController;
+import io.linuxserver.fleet.v2.web.routes.ImageController;
 import io.linuxserver.fleet.v2.web.routes.LoginController;
 
 public class WebRouteController {
@@ -46,6 +47,7 @@ public class WebRouteController {
 
             webInstance.get(Locations.Login, new LoginController());
             webInstance.get(Locations.Home,  new HomeController(app.getRepositoryManager()));
+            webInstance.get(Locations.Image, new ImageController(app.getRepositoryManager()));
         });
     }
 

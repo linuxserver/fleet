@@ -44,7 +44,7 @@ public class DefaultImageDAO extends AbstractDAO implements ImageDAO {
     private static final String CreateTagBranchOutline = "{CALL Image_CreateTagBranchOutline(?,?)}";
     private static final String StoreTagDigest         = "{CALL Image_StoreTagDigest(?,?,?,?,?)}";
     private static final String GetTagBranches         = "{CALL Image_GetTagBranches(?)}";
-    public static final String  GetTagDigests          = "{CALL Image_GetTagDigests(?)}";
+    private static final String GetTagDigests          = "{CALL Image_GetTagDigests(?)}";
     private static final String CreateImageOutline     = "{CALL Image_CreateOutline(?,?,?,?)}";
     private static final String GetImage               = "{CALL Image_Get(?)}";
     private static final String DeleteImage            = "{CALL Image_Delete(?)}";

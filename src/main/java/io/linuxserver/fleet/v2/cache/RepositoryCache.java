@@ -18,11 +18,25 @@
 package io.linuxserver.fleet.v2.cache;
 
 import io.linuxserver.fleet.v2.key.ImageKey;
+import io.linuxserver.fleet.v2.key.ImageLookupKey;
 import io.linuxserver.fleet.v2.key.RepositoryKey;
 import io.linuxserver.fleet.v2.types.Image;
 import io.linuxserver.fleet.v2.types.Repository;
 
 public class RepositoryCache extends AbstractItemCache<RepositoryKey, Repository> {
+
+    public final Image lookupImage(final ImageLookupKey lookupKey) {
+
+        for (Repository repository : getAllItems()) {
+            for (Image image : repository.getImages()) {
+                if (lookupKey.isLookupKeyFor(image)) {
+                    return image;
+                }
+            }
+        }
+
+        return null;
+    }
 
     public final Image findImage(final ImageKey imageKey) {
 

@@ -23,6 +23,7 @@ import io.linuxserver.fleet.v2.key.RepositoryKey;
 import io.linuxserver.fleet.v2.types.meta.ItemSyncSpec;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -74,6 +75,10 @@ public class Image extends AbstractSyncItem<ImageKey, Image> {
         return cloned;
     }
 
+    public final String getFullName() {
+        return getRepositoryName() + "/" + getName();
+    }
+
     public final RepositoryKey getRepositoryKey() {
         return getKey().getRepositoryKey();
     }
@@ -92,6 +97,12 @@ public class Image extends AbstractSyncItem<ImageKey, Image> {
 
     public final LocalDateTime getLastUpdated() {
         return parseDateTime(lastUpdated);
+    }
+
+    public final String getLastUpdatedAsString() {
+
+        final LocalDateTime lastUpdated = parseDateTime(this.lastUpdated);
+        return null == lastUpdated ? null : DateTimeFormatter.ISO_DATE_TIME.format(lastUpdated);
     }
 
     public final List<TagBranch> getTagBranches() {

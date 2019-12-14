@@ -34,7 +34,7 @@ public interface Locations {
     // All pages
     String Home  = "/";
     String Login = "/login";
-    String Image = "/image/:imageKey";
+    String Image = "/image";
 
     // Api endpoints
     String ApiImages = "/api/v1/images";

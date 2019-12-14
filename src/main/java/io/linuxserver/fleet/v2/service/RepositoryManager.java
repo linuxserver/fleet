@@ -21,6 +21,7 @@ import io.linuxserver.fleet.db.query.InsertUpdateResult;
 import io.linuxserver.fleet.v2.cache.RepositoryCache;
 import io.linuxserver.fleet.v2.db.ImageDAO;
 import io.linuxserver.fleet.v2.key.ImageKey;
+import io.linuxserver.fleet.v2.key.ImageLookupKey;
 import io.linuxserver.fleet.v2.key.RepositoryKey;
 import io.linuxserver.fleet.v2.types.Image;
 import io.linuxserver.fleet.v2.types.Repository;
@@ -84,6 +85,10 @@ public class RepositoryManager {
 
     public final Image getImage(final ImageKey imageKey) {
         return repositoryCache.findImage(imageKey);
+    }
+
+    public final Image lookupImage(final ImageLookupKey imageLookupKey) {
+        return repositoryCache.lookupImage(imageLookupKey);
     }
 
     public final Repository getRepository(final RepositoryKey repositoryKey) {

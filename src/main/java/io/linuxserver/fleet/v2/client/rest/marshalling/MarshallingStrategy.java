@@ -1,4 +1,4 @@
-package io.linuxserver.fleet.rest.marshalling;
+package io.linuxserver.fleet.v2.client.rest.marshalling;
 
 import java.io.IOException;
 

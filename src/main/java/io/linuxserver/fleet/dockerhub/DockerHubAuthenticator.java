@@ -17,8 +17,8 @@
 
 package io.linuxserver.fleet.dockerhub;
 
-import io.linuxserver.fleet.rest.RestClient;
-import io.linuxserver.fleet.rest.RestResponse;
+import io.linuxserver.fleet.v2.client.rest.RestClient;
+import io.linuxserver.fleet.v2.client.rest.RestResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

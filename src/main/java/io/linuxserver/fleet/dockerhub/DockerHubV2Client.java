@@ -18,9 +18,9 @@
 package io.linuxserver.fleet.dockerhub;
 
 import io.linuxserver.fleet.dockerhub.model.*;
-import io.linuxserver.fleet.rest.HttpException;
-import io.linuxserver.fleet.rest.RestClient;
-import io.linuxserver.fleet.rest.RestResponse;
+import io.linuxserver.fleet.v2.client.rest.HttpException;
+import io.linuxserver.fleet.v2.client.rest.RestClient;
+import io.linuxserver.fleet.v2.client.rest.RestResponse;
 
 import java.util.*;
 

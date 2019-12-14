@@ -1,5 +1,5 @@
-body.has-context-home {
-    background-color: #eaeaea;
+body {
+    font-size: 0.8rem;
 }
 
 .card  {
@@ -154,4 +154,8 @@ input:checked + .slider:before {
 
 .slider.round:before {
     border-radius: 50%;
+}
+
+table tbody th.is-half {
+    width: 50%;
 }

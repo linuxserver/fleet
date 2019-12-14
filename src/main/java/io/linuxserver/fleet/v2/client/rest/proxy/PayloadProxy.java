@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package io.linuxserver.fleet.rest.proxy;
+package io.linuxserver.fleet.v2.client.rest.proxy;
 
 public interface PayloadProxy<T> {
 

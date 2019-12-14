@@ -15,11 +15,11 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package io.linuxserver.fleet.rest;
+package io.linuxserver.fleet.v2.client.rest;
 
-import io.linuxserver.fleet.rest.marshalling.JacksonMarshallingStrategy;
-import io.linuxserver.fleet.rest.marshalling.MarshallingStrategy;
-import io.linuxserver.fleet.rest.proxy.LazyLoadPayloadProxy;
+import io.linuxserver.fleet.v2.client.rest.marshalling.JacksonMarshallingStrategy;
+import io.linuxserver.fleet.v2.client.rest.marshalling.MarshallingStrategy;
+import io.linuxserver.fleet.v2.client.rest.proxy.LazyLoadPayloadProxy;
 import org.apache.http.HttpEntity;
 import org.apache.http.StatusLine;
 import org.apache.http.client.methods.CloseableHttpResponse;
@@ -36,7 +36,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.Map;
 
 /**
@@ -85,7 +85,7 @@ public class RestClient {
         try {
 
             HttpPost post = new HttpPost(url + parseQueryParameters(queryParameters));
-            post.setEntity(new StringEntity(marshallingStrategy.marshall(payload), Charset.forName("UTF-8")));
+            post.setEntity(new StringEntity(marshallingStrategy.marshall(payload), StandardCharsets.UTF_8));
             post.setHeader("Content-Type", marshallingStrategy.getContentType());
 
             return executeBaseRequest(responseType, headers, post);

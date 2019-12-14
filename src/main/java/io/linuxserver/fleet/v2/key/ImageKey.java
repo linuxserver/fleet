@@ -74,4 +74,9 @@ public class ImageKey extends AbstractDatabaseKey {
     public String toString() {
         return repositoryKey.getId() + ":" + super.toString() + ":" + repositoryKey.getName() + "/" + name;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        return super.equals(o) && ((ImageKey) o).name.equals(name);
+    }
 }

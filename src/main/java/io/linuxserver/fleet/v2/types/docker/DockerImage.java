@@ -44,27 +44,27 @@ public class DockerImage {
         this.buildDate = buildDate;
     }
 
-    public String getName() {
+    public final String getName() {
         return name;
     }
 
-    public String getRepository() {
+    public final String getRepository() {
         return repository;
     }
 
-    public String getDescription() {
+    public final String getDescription() {
         return description;
     }
 
-    public int getStarCount() {
+    public final int getStarCount() {
         return starCount;
     }
 
-    public long getPullCount() {
+    public final long getPullCount() {
         return pullCount;
     }
 
-    public LocalDateTime getBuildDate() {
+    public final LocalDateTime getBuildDate() {
         return buildDate;
     }
 }
