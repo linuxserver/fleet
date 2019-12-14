@@ -31,6 +31,8 @@ import java.util.TreeSet;
 
 public class Image extends AbstractSyncItem<ImageKey, Image> {
 
+    private static final DateTimeFormatter DefaultImageTimeFormat = DateTimeFormatter.ofPattern("dd MMM yyyy HH:mm:ss");
+
     private final ImageCountData countData;
     private final String         description;
     private final LocalDateTime  lastUpdated;
@@ -102,7 +104,7 @@ public class Image extends AbstractSyncItem<ImageKey, Image> {
     public final String getLastUpdatedAsString() {
 
         final LocalDateTime lastUpdated = parseDateTime(this.lastUpdated);
-        return null == lastUpdated ? null : DateTimeFormatter.ISO_DATE_TIME.format(lastUpdated);
+        return null == lastUpdated ? null : DefaultImageTimeFormat.format(lastUpdated);
     }
 
     public final List<TagBranch> getTagBranches() {

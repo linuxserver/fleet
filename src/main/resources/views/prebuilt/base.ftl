@@ -57,6 +57,7 @@
     <#nested>
 
     <script type="text/javascript" src="assets/js/jquery-3.3.1.min.js"></script>
+    <script type="text/javascript" src="assets/js/jquery.tablesorter.js"></script>
     <script type="text/javascript" src="assets/js/app.js"></script>
     <script type="text/javascript">
 
@@ -66,6 +67,21 @@
 
             formValidationManager.init();
             bulmaManager.init();
+
+            jQuery.tablesorter.addParser({
+                id: "pullCount",
+                is: function(s) {
+                    return /^[0-9]?[0-9,.]*$/.test(s);
+                },
+                format: function(s) {
+                    return jQuery.tablesorter.formatFloat( s.replace(/,/g,'') );
+                },
+                type: "numeric"
+            });
+
+            $(function() {
+                $("table.table--sortable").tablesorter();
+            });
 
           }, false);
         })();

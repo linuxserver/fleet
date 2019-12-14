@@ -18,46 +18,30 @@
 package io.linuxserver.fleet.v2.web.routes;
 
 import io.javalin.http.Context;
-import io.linuxserver.fleet.v2.key.RepositoryKey;
+import io.linuxserver.fleet.v2.key.ImageLookupKey;
 import io.linuxserver.fleet.v2.service.RepositoryManager;
-import io.linuxserver.fleet.v2.types.Repository;
 import io.linuxserver.fleet.v2.web.PageModelSpec;
 
-public class HomeController extends AbstractPageHandler {
+public class ImageController extends AbstractPageHandler {
 
     private final RepositoryManager repositoryManager;
 
-    public HomeController(final RepositoryManager repositoryManager) {
+    public ImageController(final RepositoryManager repositoryManager) {
         this.repositoryManager = repositoryManager;
     }
 
     @Override
     protected PageModelSpec handlePageLoad(final Context ctx) {
 
-        final PageModelSpec modelSpec = new PageModelSpec("views/pages/home.ftl");
+        final String imageLookupParam = ctx.queryParam("name");
+        if (null != imageLookupParam) {
 
-        final String repositoryLookupParam = ctx.queryParam("key");
-        if (null == repositoryLookupParam) {
-
-            final Repository repository = repositoryManager.getFirstRepository();
-            setSingleRepository(modelSpec, repository);
+            final PageModelSpec modelSpec = new PageModelSpec("views/pages/image.ftl");
+            modelSpec.addModelAttribute("image", repositoryManager.lookupImage(new ImageLookupKey(imageLookupParam)));
+            return modelSpec;
 
         } else {
-
-            final RepositoryKey repositoryLookupKey = RepositoryKey.parse(repositoryLookupParam);
-            final Repository repository = repositoryManager.getRepository(repositoryLookupKey);
-            setSingleRepository(modelSpec, repository);
-        }
-
-        modelSpec.addModelAttribute("availableRepositories", repositoryManager.getAllSynchronisedRepositories());
-
-        return modelSpec;
-    }
-
-    private void setSingleRepository(PageModelSpec modelSpec, Repository repository) {
-
-        if (null != repository) {
-            modelSpec.addModelAttribute("selectedRepository", repository);
+            return new PageModelSpec("views/pages/not-found.ftl");
         }
     }
 

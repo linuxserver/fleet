@@ -45,9 +45,9 @@ Generates an anchor link with the same styling as a button.
 
 </#macro>
 
-<#macro buttons isGrouped=false size="normal">
+<#macro buttons isGrouped=false size="normal" isRightAligned=false>
 
-    <div class="buttons<#if isGrouped> has-addons</#if> are-${size}">
+    <div class="buttons<#if isGrouped> has-addons</#if><#if isRightAligned> is-right</#if> are-${size}">
         <#nested />
     </div>
 

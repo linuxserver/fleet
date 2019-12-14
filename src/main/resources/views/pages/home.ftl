@@ -19,49 +19,36 @@
 <#import "../ui/components/message.ftl"    as message />
 <#import "../ui/elements/box.ftl"          as box />
 <#import "../prebuilt/base.ftl"            as base />
-<#import "../prebuilt/image-list-item.ftl" as imageListItem />
+<#import "../ui/elements/table.ftl"        as table />
+<#import "../ui/elements/button.ftl"       as button />
+
+<#import "../prebuilt/image-list-table-item.ftl" as imageListTableItem />
+<#import "../prebuilt/image-list-item.ftl"       as imageListBoxItem />
 
 <@base.base title="Images" context="home" showTitle=false>
-
-    <section class="section">
-        <div class="container">
-
-            <div class="columns is-multiline is-centered">
-                <div class="column is-8-desktop">
-                    <@input.text id="SearchImages" icon="search" placeholder="Search..." />
-                </div>
-            </div>
-
-        </div>
-    </section>
 
     <section class="section is-paddingless-top">
         <div class="container">
 
-            <div class="columns">
-                <div class="column is-12">
-                    <#if availableRepositories?has_content && availableRepositories?size &gt; 0>
-                        <@input.dropdown id="RepositorySelection" size="normal" icon="cubes">
-                            <#list availableRepositories as repository>
-                                <option value="${repository.key}"<#if repository.name==selectedRepository.name> selected</#if>>${repository.name}</option>
-                            </#list>
-                        </@input.dropdown>
-                    <#else>
-                        There are currently no available repositories.
-                    </#if>
-                </div>
-            </div>
+<#--            <div class="columns">-->
+<#--                <div class="column is-12 has-text-right">-->
+<#--                    <#if availableRepositories?has_content && availableRepositories?size &gt; 0>-->
+<#--                        <@input.dropdown id="RepositorySelection" size="normal" icon="cubes">-->
+<#--                            <#list availableRepositories as repository>-->
+<#--                                <option value="${repository.key}"<#if repository.name==selectedRepository.name> selected</#if>>${repository.name}</option>-->
+<#--                            </#list>-->
+<#--                        </@input.dropdown>-->
+<#--                    <#else>-->
+<#--                        There are currently no available repositories.-->
+<#--                    </#if>-->
+<#--                </div>-->
+<#--            </div>-->
 
             <#if selectedRepository?has_content>
 
                 <div class="columns is-multiline">
-                    <div class="column is-12">
-                        <h2 class="title is-4 repository-title">
-                            <i class="fas fa-cubes"></i> ${selectedRepository.name}<span class="has-text-primary">.</span>
-                        </h2>
-                    </div>
 
-                    <div class="column is-12">
+                    <div class="column is-12 has-margin-top">
                         <nav class="level">
                             <div class="level-item has-text-centered">
                                 <div>
@@ -83,16 +70,69 @@
                             </div>
                         </nav>
                     </div>
+
+                    <div class="column is-12 has-margin-top">
+                        <h2 class="title is-3 repository-title">
+                            <i class="fas fa-cubes"></i> ${selectedRepository.name}<span class="has-text-primary">.</span>
+                        </h2>
+                    </div>
+
+                    <div class="column is-12 has-margin-top">
+                        <@input.text id="SearchImages" icon="search" placeholder="Search..." />
+                    </div>
+
                 </div>
-                <div class="columns is-centered is-multiline has-margin-top">
-                    <#if selectedRepository.images?has_content>
+                <div class="columns has-margin-top">
+
+                    <div class="column is-12">
+                        <@button.buttons isGrouped=true isRightAligned=true>
+                            <@button.button id="DisplayImageTable" colour="normal-colour" title="Display as table" extraClasses="is-active">
+                                <i class="fas fa-table is-marginless"></i>
+                            </@button.button>
+                            <@button.button id="DisplayImageGrid" colour="normal-colour" title="Display as grid">
+                                <i class="fas fa-th-large is-marginless"></i>
+                            </@button.button>
+                        </@button.buttons>
+                    </div>
+                </div>
+
+                <#if selectedRepository.images?has_content>
+
+                    <div id="ImageTableHolder" class="columns is-multiline">
+
+                        <div class="column is-12">
+                            <@table.table id="ImageTable" isFullWidth=true isScrollable=true extraClasses="table--sortable">
+                                <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th></th>
+                                    <th>Latest Version</th>
+                                    <th>Build Time</th>
+                                    <th class="sorter-pullCount">Pulls</th>
+                                    <th>Stars</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <#list selectedRepository.images as image>
+                                    <@imageListTableItem.imageListItem image=image />
+                                </#list>
+                                </tbody>
+                            </@table.table>
+                        </div>
+
+                    </div>
+
+                    <div id="ImageGridHolder" class="columns is-multiline is-hidden">
                         <#list selectedRepository.images as image>
-                            <@imageListItem.imageListItem image=image />
+                            <@imageListBoxItem.imageListItem image=image />
                         </#list>
-                    <#else>
+                    </div>
+
+                <#else>
+                    <div class="column is-12">
                         No images
-                    </#if>
-                </div>
+                    </div>
+                </#if>
 
             </#if>
 

@@ -20,40 +20,50 @@
 <#macro imageListItem image>
 
     <#if !image.hidden>
-        <div class="column has-margin-top is-12 is-12-tablet is-8-desktop">
-            <article class="media">
-                <figure class="media-left">
-                    <p class="icon has-text-centered">
-                        <i class="fas fa-cube"></i>
-                    </p>
-                </figure>
-                <div class="media-content">
-                    <div class="content">
+        <div class="column is-12-mobile is-6-tablet is-4-desktop" data-image-name="${image.name}">
+            <div class="box">
+                <article class="media">
+                    <figure class="media-left">
+                        <p class="icon has-text-centered">
+                            <i class="fas fa-cube"></i>
+                        </p>
+                    </figure>
+                    <div class="media-content">
+                        <div class="content">
 
-                        <h4 class="title is-6">
-                            <a class="has-text-grey-dark" href="/image?name=${image.fullName}">
-                                <span class="has-text-weight-light">${image.repositoryKey.name}/</span><span class="has-text-weight-500">${image.name}</span>
-                            </a>
-                        </h4>
+                            <h4 class="title is-6 is-marginless">
+                                <a class="has-text-grey-dark" href="/image?name=${image.fullName}">
+                                    <span class="has-text-weight-light">${image.repositoryKey.name}/</span><span class="has-text-weight-500">${image.name}</span>
+                                </a>
+                            </h4>
 
-                        ${image.description!""}
+                            <small>
+                                <em>
+                                    ${image.lastUpdatedAsString}
+                                </em>
+                            </small>
 
-                        <div class="tags has-margin-top">
-                            <#list image.tagBranches as tagBranch>
-                                <@tag.tag colour="light" value='<i class="fas fa-tag"></i> ${tagBranch.latestTag.version}' extraAttributes='title="Latest Version"' />
-                            </#list>
+                            <div class="tags has-margin-top">
+                                <#list image.tagBranches as tagBranch>
+                                    <@tag.tag colour="light" value='<i class="fas fa-tag"></i> ${tagBranch.latestTag.version}' extraAttributes='title="Latest Version"' />
+                                </#list>
 
-                            <@tag.tag colour="light" value='<i class="fas fa-download"></i> ${image.pullCount}' extraAttributes='title="Pulls"' />
-                            <@tag.tag colour="light" value='<i class="fas fa-star"></i> ${image.starCount}' />
+                                <@tag.tag colour="light" value='<i class="fas fa-download"></i> ${image.pullCount}' extraAttributes='title="Pulls"' />
+                                <@tag.tag colour="light" value='<i class="fas fa-star"></i> ${image.starCount}' />
 
-                            <#if image.deprecated>
-                                <@tag.tag colour="warning" value='<i class="fas fa-exclamation-circle"></i> Deprecated' />
-                            </#if>
+                                <#if image.deprecated>
+                                    <@tag.tag colour="warning" value='<i class="fas fa-exclamation-circle"></i> Deprecated' />
+                                </#if>
+
+                                <#if !image.stable>
+                                    <@tag.tag colour="danger" value='<i class="fas fa-exclamation-triangle"></i> Unstable!' />
+                                </#if>
+                            </div>
+
                         </div>
-
                     </div>
-                </div>
-            </article>
+                </article>
+            </div>
         </div>
     </#if>
 

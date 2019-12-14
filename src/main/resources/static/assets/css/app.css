@@ -159,3 +159,16 @@ input:checked + .slider:before {
 table tbody th.is-half {
     width: 50%;
 }
+
+table tbody tr td.is-vcentered {
+    vertical-align: middle;
+}
+
+#ImageTable tr td {
+    white-space: nowrap;
+}
+
+table tr th.tablesorter-header {
+    outline: none;
+    cursor: pointer;
+}
