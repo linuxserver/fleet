@@ -58,9 +58,9 @@ public class Repository extends AbstractSyncItem<RepositoryKey, Repository> {
         return imageList;
     }
 
-    public final int getTotalPulls() {
+    public final long getTotalPulls() {
 
-        int totalPulls = 0;
+        long totalPulls = 0;
         for (Image image : getImages()) {
             totalPulls += image.getPullCount();
         }
@@ -89,5 +89,9 @@ public class Repository extends AbstractSyncItem<RepositoryKey, Repository> {
     @Override
     public final boolean isDeprecated() {
         return false;
+    }
+
+    public final void removeImage(final Image image) {
+        images.removeItem(image.getKey());
     }
 }

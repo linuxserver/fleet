@@ -30,15 +30,24 @@
             <div class="columns is-multiline">
 
                 <div class="column is-12">
-                    <h2 class="title is-3 repository-title">
+                    <h2 class="title is-size-3-desktop is-size-4-mobile repository-title">
                         <i class="fas fa-cube"></i> <span class="has-text-weight-light">${image.repositoryName}/</span>${image.name}<span class="has-text-primary">.</span>
                         <#if image.deprecated>
                             <@tag.tag colour="warning" value="Deprecated" />
                         </#if>
                     </h2>
                     <div class="tags is-right">
+
+                        <#assign latestBranch=image.findTagBranchByName("latest") />
+                        <#if latestBranch?has_content>
+                            <#list latestBranch.latestTag.digests as digest>
+                                <@tag.tag colour="dark" value='<i class="fas fa-microchip"></i> ${digest.architecture}' extraAttributes='title="Architecture"' />
+                            </#list>
+                        </#if>
+
                         <@tag.tag colour="light" value='<i class="fas fa-download"></i> ${image.pullCount}' extraAttributes='title="Pulls"' />
                         <@tag.tag colour="light" value='<i class="fas fa-star"></i> ${image.starCount}' extraAttributes='title="Stars"' />
+
                     </div>
 
                 </div>

@@ -21,7 +21,7 @@
 
     <#if !image.hidden>
 
-        <tr data-image-name="${image.name}">
+        <tr class="image-row" data-image-name="${image.name}">
             <td class="is-vcentered">
                 <h4 class="title is-6">
                     <a class="has-text-grey-dark" href="/image?name=${image.fullName}">
@@ -41,13 +41,13 @@
                 <@tag.tag colour="light" value='<i class="fas fa-tag"></i> ${image.latestTag.version}' extraAttributes='title="Latest Version"' />
             </td>
             <td class="is-vcentered">
-                ${image.lastUpdatedAsString!""}
-            </td>
-            <td class="is-vcentered">
                 ${image.pullCount}
             </td>
             <td class="is-vcentered">
                 ${image.starCount}
+            </td>
+            <td class="is-vcentered">
+            ${image.lastUpdatedAsString!""}
             </td>
         </tr>
     </#if>

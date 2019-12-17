@@ -18,6 +18,8 @@
 package io.linuxserver.fleet.v2.types.docker;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 public class DockerTag {
 
@@ -25,11 +27,21 @@ public class DockerTag {
     private final long          size;
     private final LocalDateTime buildDate;
 
+    private final List<DockerTagManifestDigest> digests = new ArrayList<>();
+
     public DockerTag(String name, long size, LocalDateTime buildDate) {
 
         this.name = name;
         this.size = size;
         this.buildDate = buildDate;
+    }
+
+    public final void addDigest(final DockerTagManifestDigest digest) {
+        digests.add(digest);
+    }
+
+    public final List<DockerTagManifestDigest> getDigests() {
+        return digests;
     }
 
     public String getName() {

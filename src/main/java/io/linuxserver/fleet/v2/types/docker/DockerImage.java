@@ -18,6 +18,8 @@
 package io.linuxserver.fleet.v2.types.docker;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * <p>
@@ -34,6 +36,8 @@ public class DockerImage {
     private final long          pullCount;
     private final LocalDateTime buildDate;
 
+    private List<DockerTag> tags = new ArrayList<>();
+
     public DockerImage(String name, String repository, String description, int starCount, long pullCount, LocalDateTime buildDate) {
 
         this.name = name;
@@ -42,6 +46,14 @@ public class DockerImage {
         this.starCount = starCount;
         this.pullCount = pullCount;
         this.buildDate = buildDate;
+    }
+
+    public final void addTag(final DockerTag tag) {
+        tags.add(tag);
+    }
+
+    public final List<DockerTag> getTags() {
+        return tags;
     }
 
     public final String getName() {

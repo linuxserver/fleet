@@ -17,7 +17,9 @@
 
 package io.linuxserver.fleet.v2.client.docker;
 
-public interface DockerApiRequest<RESPONSE_TYPE> {
+public class DockerImageNotFoundException extends RuntimeException {
 
-    RESPONSE_TYPE performRequest();
+    public DockerImageNotFoundException(final String reason) {
+        super(reason);
+    }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 LinuxServer.io
+ * Copyright (c)  2019 LinuxServer.io
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -15,24 +15,11 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package io.linuxserver.fleet.dockerhub;
+package io.linuxserver.fleet.v2.client.docker.queue;
 
-public class DockerHubCredentials {
+import io.linuxserver.fleet.v2.key.ImageKey;
+import io.linuxserver.fleet.v2.thread.AsyncTask;
 
-    private final String username;
-    private final String password;
-
-    public DockerHubCredentials(String username, String password) {
-
-        this.username = username;
-        this.password = password;
-    }
-
-    public String getUsername() {
-        return username;
-    }
-
-    public String getPassword() {
-        return password;
-    }
+public interface AsyncDockerApiRequest<R extends AsyncDockerApiResponse> extends AsyncTask<DockerApiDelegate, R> {
+    ImageKey getImageKey();
 }

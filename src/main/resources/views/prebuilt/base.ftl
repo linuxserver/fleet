@@ -17,6 +17,7 @@
 
 <#import "../ui/components/navbar.ftl" as navbar />
 <#import "../ui/elements/button.ftl"   as button />
+<#import "../ui/form/input.ftl"        as input />
 
 <#macro base title context showTitle=true backgroundColour="white">
 
@@ -39,6 +40,20 @@
 <body class="has-background-${backgroundColour} has-text-grey-dark">
 
     <@navbar.navbar id="MainNav" hasShadow=false itemPlacement="end">
+
+        <#if context="home">
+            <div class="navbar-item">
+                <#if availableRepositories?has_content && availableRepositories?size &gt; 0>
+                    <@input.dropdown id="RepositorySelection" size="normal" icon="cubes">
+                        <#list availableRepositories as repository>
+                            <option value="${repository.key}"<#if repository.name==selectedRepository.name> selected</#if>>${repository.name}</option>
+                        </#list>
+                    </@input.dropdown>
+                <#else>
+                    There are currently no available repositories.
+                </#if>
+            </div>
+        </#if>
 
         <#if __AuthenticatedUser?has_content>
             <@navbar.dropdown displayText=__AuthenticatedUser.name>
@@ -66,7 +81,11 @@
           window.addEventListener('load', function() {
 
             formValidationManager.init();
-            bulmaManager.init();
+            appManager.init();
+
+            <#if context=='home'>
+            imageSearchManager.init();
+            </#if>
 
             jQuery.tablesorter.addParser({
                 id: "pullCount",

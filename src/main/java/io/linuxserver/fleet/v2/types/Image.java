@@ -25,9 +25,9 @@ import io.linuxserver.fleet.v2.types.meta.ItemSyncSpec;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.TreeSet;
 
 public class Image extends AbstractSyncItem<ImageKey, Image> {
 
@@ -49,20 +49,15 @@ public class Image extends AbstractSyncItem<ImageKey, Image> {
         this.countData   = countData;
         this.description = description;
         this.lastUpdated = parseDateTime(lastUpdated);
-        this.tagBranches = new TreeSet<>();
+        this.tagBranches = new HashSet<>();
     }
 
-    public final Image cloneForUpdate() {
+    public final Image cloneForUpdate(final long pullCount,
+                                      final int starCount,
+                                      final String description,
+                                      final LocalDateTime lastUpdated) {
 
-        final Image cloned = new Image(getKey(), getSpec(), countData, getDescription(), getLastUpdated());
-        tagBranches.forEach(t -> cloned.addTagBranch(t.cloneForUpdate()));
-
-        return cloned;
-    }
-
-    public final Image cloneWithPullAndStarCount(final long pullCount, final int starCount) {
-
-        final Image cloned = new Image(getKey(), getSpec(), new ImageCountData(pullCount, starCount), getDescription(), getLastUpdated());
+        final Image cloned = new Image(getKey(), getSpec(), new ImageCountData(pullCount,starCount), description, lastUpdated);
         tagBranches.forEach(t -> cloned.addTagBranch(t.cloneForUpdate()));
 
         return cloned;

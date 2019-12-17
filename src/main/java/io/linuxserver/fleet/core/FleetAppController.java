@@ -18,6 +18,14 @@
 package io.linuxserver.fleet.core;
 
 import io.linuxserver.fleet.core.config.WebConfiguration;
+import io.linuxserver.fleet.v2.client.docker.DockerApiClient;
+import io.linuxserver.fleet.v2.client.docker.dockerhub.DockerHubApiClient;
+import io.linuxserver.fleet.v2.client.docker.queue.DockerApiDelegate;
+import io.linuxserver.fleet.v2.client.docker.queue.DockerApiTaskConsumer;
+import io.linuxserver.fleet.v2.client.docker.queue.DockerImageUpdateRequest;
+import io.linuxserver.fleet.v2.client.docker.queue.TaskQueue;
+import io.linuxserver.fleet.v2.key.ImageKey;
+import io.linuxserver.fleet.v2.key.RepositoryKey;
 import io.linuxserver.fleet.v2.web.WebRouteController;
 
 /**
@@ -27,6 +35,17 @@ import io.linuxserver.fleet.v2.web.WebRouteController;
  * </p>
  */
 public class FleetAppController extends AbstractAppController {
+
+    public  final DockerApiDelegate                   dockerApiDelegate;
+    private final TaskQueue<DockerImageUpdateRequest> syncQueue;
+    private final DockerApiTaskConsumer               syncConsumer;
+
+    public FleetAppController() {
+
+        syncQueue         = new TaskQueue<>();
+        dockerApiDelegate = new DockerApiDelegate(this);
+        syncConsumer      = new DockerApiTaskConsumer(this);
+    }
 
     private static FleetAppController instance;
 
@@ -48,7 +67,16 @@ public class FleetAppController extends AbstractAppController {
     @Override
     protected final void run() {
         super.run();
+
         configureWeb();
+
+        syncConsumer.start();
+
+//        getRepositoryManager().getAllRepositories().forEach(r -> {
+//            r.getImages().forEach(i -> {
+//                submitSyncRequest(new DockerImageUpdateRequest(i.getKey()));
+//            });
+//        });
     }
 
     public final WebConfiguration getWebConfiguration() {
@@ -57,5 +85,25 @@ public class FleetAppController extends AbstractAppController {
 
     private void configureWeb() {
         new WebRouteController(this);
+    }
+
+    public final void handleException(final Exception e) {
+
+    }
+
+    public final DockerApiClient getDockerClient() {
+        return new DockerHubApiClient();
+    }
+
+    public final boolean submitSyncRequest(final DockerImageUpdateRequest request) {
+        return syncQueue.submitTask(request);
+    }
+
+    public final TaskQueue<DockerImageUpdateRequest> getSyncQueue() {
+        return syncQueue;
+    }
+
+    public final DockerApiDelegate getConfiguredDockerDelegate() {
+        return dockerApiDelegate;
     }
 }

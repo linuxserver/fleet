@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 LinuxServer.io
+ * Copyright (c)  2019 LinuxServer.io
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -15,21 +15,22 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package io.linuxserver.fleet.dockerhub;
+package io.linuxserver.fleet.v2.thread;
 
-import io.linuxserver.fleet.dockerhub.model.DockerHubV2Image;
-import io.linuxserver.fleet.dockerhub.model.DockerHubV2NamespaceLookupResult;
-import io.linuxserver.fleet.dockerhub.model.DockerHubV2Tag;
+import io.linuxserver.fleet.core.FleetAppController;
 
-import java.util.List;
+public class TaskResponseControllerProxy<R extends AsyncTaskResponse> implements AsyncTaskResponse {
 
-public interface DockerHubClient {
+    private final FleetAppController controller;
+    private final R                  response;
 
-    DockerHubV2NamespaceLookupResult fetchAllRepositories();
+    public TaskResponseControllerProxy(final FleetAppController controller, final R response) {
+        this.controller = controller;
+        this.response   = response;
+    }
 
-    List<DockerHubV2Image> fetchImagesFromRepository(String repositoryName);
+    @Override
+    public void handleResponse() {
 
-    DockerHubV2Image fetchImageFromRepository(String repositoryName, String imageName);
-
-    List<DockerHubV2Tag> fetchAllTagsForImage(String repositoryName, String imageName);
+    }
 }

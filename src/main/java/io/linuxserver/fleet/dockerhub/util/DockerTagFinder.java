@@ -24,19 +24,19 @@ import java.util.Optional;
 
 public class DockerTagFinder {
 
-    public DockerTag findVersionedTagMatchingBranch(List<DockerTag> tags, String namedBranch) {
+    public static DockerTag findVersionedTagMatchingBranch(List<DockerTag> tags, String namedBranch) {
 
         Optional<DockerTag> tagBranchName = tags.stream().filter(tag -> namedBranch.equals(tag.getName())).findFirst();
 
         if (tagBranchName.isPresent()) {
 
-            DockerTag trueLatestTag = tagBranchName.get();
+            DockerTag namedTagForBranch = tagBranchName.get();
             Optional<DockerTag> versionedLatestTag = tags.stream()
-                .filter(tag -> !tag.equals(trueLatestTag) && tag.getSize() == trueLatestTag.getSize()).findFirst();
+                .filter(tag -> !tag.equals(namedTagForBranch) && tag.getSize() == namedTagForBranch.getSize()).findFirst();
 
-            return versionedLatestTag.orElse(trueLatestTag);
+            return versionedLatestTag.orElse(namedTagForBranch);
         }
 
-        return tags.get(0);
+        return tags.isEmpty() ? null : tags.get(0);
     }
 }

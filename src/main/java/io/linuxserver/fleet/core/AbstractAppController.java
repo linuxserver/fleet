@@ -27,7 +27,6 @@ import io.linuxserver.fleet.v2.types.Image;
 public abstract class AbstractAppController {
 
     private final AppProperties             appProperties;
-    private final DefaultDatabaseConnection databaseConnection;
     private final DatabaseVersion           databaseVersion;
 
     private final RepositoryManager repositoryManager;
@@ -35,11 +34,11 @@ public abstract class AbstractAppController {
     public AbstractAppController() {
 
         this.appProperties      = new PropertiesLoader().getProperties();
-        this.databaseConnection = new DefaultDatabaseConnection(appProperties.getDatabaseProperties());
+
+        final DefaultDatabaseConnection databaseConnection = new DefaultDatabaseConnection(appProperties.getDatabaseProperties());
+
         this.databaseVersion    = new DatabaseVersion(databaseConnection);
-
-        this.repositoryManager = new RepositoryManager(new DefaultImageDAO(databaseConnection));
-
+        this.repositoryManager  = new RepositoryManager(new DefaultImageDAO(databaseConnection));
     }
 
     public final AppProperties getAppProperties() {

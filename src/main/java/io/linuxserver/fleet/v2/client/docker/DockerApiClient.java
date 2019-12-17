@@ -17,7 +17,16 @@
 
 package io.linuxserver.fleet.v2.client.docker;
 
+import io.linuxserver.fleet.v2.types.docker.DockerImage;
+import io.linuxserver.fleet.v2.types.docker.DockerTag;
+
+import java.util.List;
+
 public interface DockerApiClient {
 
-    <RESPONSE, REQUEST extends DockerApiRequest<RESPONSE>> RESPONSE executeRequest(REQUEST request);
+    DockerImage fetchImage(final String imageName);
+
+    List<DockerImage> fetchAllImages(final String repositoryName);
+
+    List<DockerTag> fetchImageTags(final String imageName);
 }

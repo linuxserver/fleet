@@ -15,9 +15,20 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package io.linuxserver.fleet.v2.client.docker;
+package io.linuxserver.fleet.v2.client.docker.queue;
 
-public abstract class AbstractDockerApiClient implements DockerApiClient {
+import io.linuxserver.fleet.core.FleetAppController;
+import io.linuxserver.fleet.v2.key.ImageKey;
 
+public class DockerImageMissingUpdateResponse extends DockerImageUpdateResponse {
 
+    public DockerImageMissingUpdateResponse(final FleetAppController controller,
+                                            final ImageKey imageKey) {
+        super(controller, imageKey, null);
+    }
+
+    @Override
+    public final void handleDockerApiResponse() {
+        // Remove image.
+    }
 }

@@ -58,6 +58,10 @@ public class ImageKey extends AbstractDatabaseKey {
         return new ImageLookupKey(getRepositoryKey().getName() + "/" + getName());
     }
 
+    public final String getAsRepositoryAndImageName() {
+        return getAsLookupKey().toString();
+    }
+
     public ImageKey cloneWithId(int id) {
         return new ImageKey(id, name, repositoryKey);
     }

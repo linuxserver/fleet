@@ -18,18 +18,21 @@
 package io.linuxserver.fleet.v2.service;
 
 import io.linuxserver.fleet.db.query.InsertUpdateResult;
+import io.linuxserver.fleet.dockerhub.util.DockerTagFinder;
 import io.linuxserver.fleet.v2.cache.RepositoryCache;
 import io.linuxserver.fleet.v2.db.ImageDAO;
 import io.linuxserver.fleet.v2.key.ImageKey;
 import io.linuxserver.fleet.v2.key.ImageLookupKey;
 import io.linuxserver.fleet.v2.key.RepositoryKey;
-import io.linuxserver.fleet.v2.types.Image;
-import io.linuxserver.fleet.v2.types.Repository;
+import io.linuxserver.fleet.v2.types.*;
+import io.linuxserver.fleet.v2.types.docker.DockerImage;
+import io.linuxserver.fleet.v2.types.docker.DockerTag;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 public class RepositoryManager {
@@ -66,6 +69,14 @@ public class RepositoryManager {
         return storedRepository;
     }
 
+    public final void removeImage(final ImageKey imageKey) {
+
+        final Image cachedImage = repositoryCache.findImage(imageKey);
+        if (null != cachedImage) {
+            repositoryCache.findItem(cachedImage.getRepositoryKey()).removeImage(cachedImage);
+        }
+    }
+
     public final Image storeImage(final Image image) {
 
         final InsertUpdateResult<Image> result = imageDAO.storeImage(image);
@@ -78,7 +89,11 @@ public class RepositoryManager {
         final Image      storedImage           = result.getResult();
         final Repository imageParentRepository = repositoryCache.findItem(storedImage.getRepositoryKey());
 
-        imageParentRepository.addImage(storedImage);
+        if (null != imageParentRepository) {
+            imageParentRepository.addImage(storedImage);
+        } else {
+            LOGGER.warn("Could not find repository for image {}", storedImage);
+        }
 
         return storedImage;
     }
@@ -105,5 +120,42 @@ public class RepositoryManager {
 
     public final List<Repository> getAllSynchronisedRepositories() {
         return getAllRepositories().stream().filter(Repository::isSyncEnabled).collect(Collectors.toList());
+    }
+
+    public Image applyImageUpdate(final ImageKey imageKey, final DockerImage latestImage) {
+
+        final Image cachedImage = getImage(imageKey);
+        if (null == cachedImage) {
+
+            LOGGER.warn("Attempted to update an image which is not currently cached. {} Skipping...", imageKey);
+            return null;
+
+        } else {
+
+            final Image cloned = cachedImage.cloneForUpdate(latestImage.getPullCount(),
+                                                            latestImage.getStarCount(),
+                                                            latestImage.getDescription(),
+                                                            latestImage.getBuildDate());
+
+            for (TagBranch branch : cloned.getTagBranches()) {
+
+                final DockerTag matchingTag = DockerTagFinder.findVersionedTagMatchingBranch(latestImage.getTags(), branch.getBranchName());
+                if (null == matchingTag) {
+                    LOGGER.warn("Unable to find tag for branch {} in image {}. Will not update tags.", branch.getBranchName(), cloned.getFullName());
+                } else {
+
+                    branch.updateLatestTag(new Tag(matchingTag.getName(),
+                            matchingTag.getBuildDate(),
+                            matchingTag.getDigests().stream()
+                                    .filter(Objects::nonNull)
+                                    .map(d -> new TagDigest(d.getSize(),
+                                            d.getDigest(),
+                                            d.getArchitecture(),
+                                            d.getArchVariant())).collect(Collectors.toSet())));
+                }
+            }
+
+            return storeImage(cloned);
+        }
     }
 }

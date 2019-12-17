@@ -249,38 +249,50 @@ BEGIN
 END;
 //
 
+CREATE OR REPLACE PROCEDURE `Image_StoreTagBranch`
+(
+    in_image_id       INT,
+    in_branch_id      INT,
+    in_latest_version VARCHAR(255),
+    in_build_date     TIMESTAMP
+)
+BEGIN
+
+   UPDATE
+       TagBranch
+   SET
+        `latest_version` = in_latest_version,
+        `build_date`     = in_build_date
+   WHERE
+        `id` = in_branch_id
+   AND
+        `image_id` = in_image_id;
+
+   -- Updating a tag branch should come hand-in-hand with updating digests.
+   DELETE FROM TagDigest WHERE `branch_id` = in_branch_id;
+
+END;
+//
+
 CREATE OR REPLACE PROCEDURE `Image_StoreTagDigest`
 (
     in_branch_id INT,
     in_size      BIGINT,
     in_digest    VARCHAR(255),
     in_arch      VARCHAR(255),
-    in_variant   VARCHAR(100),
-
-    OUT out_status enum('Inserted', 'NoChange')
+    in_variant   VARCHAR(100)
 )
 BEGIN
 
-    IF EXISTS(SELECT `branch_id` FROM TagDigest WHERE `branch_id` = in_branch_id AND `digest` = in_digest) THEN
-
-        -- Digests are immutable and cannot be changed. Only new digest can be added.
-        SET out_status = 'NoChange';
-
-    ELSE
-
-        INSERT INTO TagDigest (`branch_id`, `size`, `digest`, `arch`, `variant`)
-        VALUES
-        (
-            in_branch_id,
-            in_size,
-            in_digest,
-            in_arch,
-            in_variant
-        );
-
-        SET out_status = 'Inserted';
-
-    END IF;
+    INSERT INTO TagDigest (`branch_id`, `size`, `digest`, `arch`, `variant`)
+    VALUES
+    (
+        in_branch_id,
+        in_size,
+        in_digest,
+        in_arch,
+        in_variant
+    );
 
 END;
 //
@@ -349,6 +361,54 @@ BEGIN
         SET out_status = 'Inserted';
 
         SELECT * FROM RepositoryKey_View WHERE RepositoryId = LAST_INSERT_ID();
+
+    END IF;
+
+END //
+
+CREATE OR REPLACE PROCEDURE `Image_Store`
+(
+    in_id           INT,
+    in_pulls        BIGINT,
+    in_stars        INT,
+    in_description  TEXT,
+    in_modified     TIMESTAMP,
+    in_deprecated   TINYINT,
+    in_hidden       TINYINT,
+    in_stable       TINYINT,
+    in_synchronised TINYINT,
+    in_version_mask VARCHAR(255),
+
+    OUT out_status enum('Updated', 'NoChange')
+)
+BEGIN
+
+    IF NOT EXISTS(SELECT `id` FROM Image WHERE `id` = in_id) THEN
+        SET out_status = 'NoChange';
+    ELSE
+
+        UPDATE
+            Image
+        SET
+            `pulls`        = in_pulls,
+            `stars`        = in_stars,
+            `description`  = in_description,
+            `modified`     = in_modified,
+            `deprecated`   = in_deprecated,
+            `hidden`       = in_hidden,
+            `stable`       = in_stable,
+            `sync_enabled` = in_synchronised,
+            `version_mask` = in_version_mask
+        WHERE
+            `id` = in_id;
+
+        IF ROW_COUNT() <> 1 THEN
+            SET out_status = 'NoChange';
+        ELSE
+            SET out_status = 'Updated';
+        END IF;
+
+        SELECT * FROM ImageKey_View WHERE `ImageId` = in_id;
 
     END IF;
 

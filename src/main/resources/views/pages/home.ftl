@@ -30,46 +30,9 @@
     <section class="section is-paddingless-top">
         <div class="container">
 
-<#--            <div class="columns">-->
-<#--                <div class="column is-12 has-text-right">-->
-<#--                    <#if availableRepositories?has_content && availableRepositories?size &gt; 0>-->
-<#--                        <@input.dropdown id="RepositorySelection" size="normal" icon="cubes">-->
-<#--                            <#list availableRepositories as repository>-->
-<#--                                <option value="${repository.key}"<#if repository.name==selectedRepository.name> selected</#if>>${repository.name}</option>-->
-<#--                            </#list>-->
-<#--                        </@input.dropdown>-->
-<#--                    <#else>-->
-<#--                        There are currently no available repositories.-->
-<#--                    </#if>-->
-<#--                </div>-->
-<#--            </div>-->
-
             <#if selectedRepository?has_content>
 
                 <div class="columns is-multiline">
-
-                    <div class="column is-12 has-margin-top">
-                        <nav class="level">
-                            <div class="level-item has-text-centered">
-                                <div>
-                                    <p class="heading">Images</p>
-                                    <p class="title">${selectedRepository.images?size}</p>
-                                </div>
-                            </div>
-                            <div class="level-item has-text-centered">
-                                <div>
-                                    <p class="heading">Aggregated Pulls</p>
-                                    <p class="title">${selectedRepository.totalPulls}</p>
-                                </div>
-                            </div>
-                            <div class="level-item has-text-centered">
-                                <div>
-                                    <p class="heading">Aggregated Stars</p>
-                                    <p class="title">${selectedRepository.totalStars}</p>
-                                </div>
-                            </div>
-                        </nav>
-                    </div>
 
                     <div class="column is-12 has-margin-top">
                         <h2 class="title is-3 repository-title">
@@ -107,9 +70,9 @@
                                     <th>Name</th>
                                     <th></th>
                                     <th>Latest Version</th>
-                                    <th>Build Time</th>
                                     <th class="sorter-pullCount">Pulls</th>
                                     <th>Stars</th>
+                                    <th>Build Time</th>
                                 </tr>
                                 </thead>
                                 <tbody>

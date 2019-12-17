@@ -15,11 +15,11 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package io.linuxserver.fleet.v2.client.docker.converter;
+package io.linuxserver.fleet.v2.thread;
 
-public interface DockerResponseConverter<DOCKER_MODEL, INTERNAL_MODEL> {
+import io.linuxserver.fleet.core.FleetAppController;
 
-    INTERNAL_MODEL convert(final DOCKER_MODEL dockerModel);
+public interface AsyncTaskDelegate {
 
-    Class<DOCKER_MODEL> getConverterClass();
+    FleetAppController getController();
 }

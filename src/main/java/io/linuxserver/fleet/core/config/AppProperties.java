@@ -17,8 +17,6 @@
 
 package io.linuxserver.fleet.core.config;
 
-import io.linuxserver.fleet.dockerhub.DockerHubCredentials;
-
 import java.util.Properties;
 
 public class AppProperties {
@@ -87,14 +85,6 @@ public class AppProperties {
         }
 
         return "true".equalsIgnoreCase(safe);
-    }
-
-    public DockerHubCredentials getDockerHubCredentials() {
-
-        String username = getStringProperty("fleet.dockerhub.username");
-        String password = getStringProperty("fleet.dockerhub.password");
-
-        return new DockerHubCredentials(username, password);
     }
 
     public int getQueueThreadCount() {

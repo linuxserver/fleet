@@ -136,7 +136,7 @@ var formValidationManager = (function($) {
 
 }(jQuery));
 
-var bulmaManager = (function($) {
+var appManager = (function($) {
 
     var initMenu = function() {
 
@@ -147,9 +147,51 @@ var bulmaManager = (function($) {
         });
     };
 
+    var initRepositorySwitcher = function() {
+
+        $('#RepositorySelection').on('change', function() {
+
+            var selectedRepoKey = $(this).find('option:selected').val();
+            window.location.href = '/?key=' + selectedRepoKey;
+        });
+    };
+
     var init = function() {
 
+        initRepositorySwitcher();
         initMenu();
+    };
+
+    return {
+        init: init
+    }
+
+}(jQuery));
+
+var imageSearchManager = (function($) {
+
+    var performSearch = function() {
+
+        var $searchBox      = $(this);
+        var currentSearch   = $.trim($searchBox.val()).toLowerCase();
+        var rows            = $('#ImageTable').find('tbody tr');
+
+        rows.each(function(i, row) {
+
+            var $row = $(row);
+            var imageName = $row.data('image-name').toLowerCase();
+
+            if (imageName.startsWith(currentSearch) || currentSearch.length === 0) {
+                $row.show();
+            } else {
+                $row.hide();
+            }
+        });
+
+    };
+
+    var init = function() {
+        $('#SearchImages').on('keyup', performSearch);
     };
 
     return {

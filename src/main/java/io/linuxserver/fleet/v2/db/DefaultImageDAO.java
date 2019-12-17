@@ -28,6 +28,7 @@ import io.linuxserver.fleet.v2.types.internal.ImageOutlineRequest;
 import io.linuxserver.fleet.v2.types.internal.TagBranchOutlineRequest;
 import io.linuxserver.fleet.v2.types.meta.ItemSyncSpec;
 
+import java.net.StandardSocketOptions;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -40,8 +41,9 @@ public class DefaultImageDAO extends AbstractDAO implements ImageDAO {
     private static final String GetRepository     = "{CALL Repository_Get(?)}";
     private static final String GetImageKeys      = "{CALL Repository_GetImageKeys(?)}";
 
-    private static final String StoreImage             = "{CALL Image_Store(?,?,?,?,?,?,?,?,?,?)}";
+    private static final String StoreImage             = "{CALL Image_Store(?,?,?,?,?,?,?,?,?,?,?)}";
     private static final String CreateTagBranchOutline = "{CALL Image_CreateTagBranchOutline(?,?)}";
+    private static final String StoreTagBranch         = "{CALL Image_StoreTagBranch(?,?,?,?)}";
     private static final String StoreTagDigest         = "{CALL Image_StoreTagDigest(?,?,?,?,?)}";
     private static final String GetTagBranches         = "{CALL Image_GetTagBranches(?)}";
     private static final String GetTagDigests          = "{CALL Image_GetTagDigests(?)}";
@@ -86,10 +88,19 @@ public class DefaultImageDAO extends AbstractDAO implements ImageDAO {
                 call.setBoolean(i++, image.isHidden());
                 call.setBoolean(i++, image.isStable());
                 call.setBoolean(i++, image.isSyncEnabled());
-                Utils.setNullableString(call, i, image.getVersionMask());
+                Utils.setNullableString(call, i++, image.getVersionMask());
+
+                call.registerOutParameter(i, Types.VARCHAR);
 
                 final ResultSet results = call.executeQuery();
-                if (results.next()) {
+
+                final DbUpdateStatus status = DbUpdateStatus.valueOf(call.getString(i));
+                if (status.isNoChange()) {
+                    getLogger().warn("removeImage attempted to remove an image which did not exist in the database: {}", image);
+                } else if (results.next()) {
+
+                    storeTagBranches(connection, image);
+
                     return new InsertUpdateResult<>(makeImage(makeImageKey(results), connection));
                 }
 
@@ -163,14 +174,37 @@ public class DefaultImageDAO extends AbstractDAO implements ImageDAO {
         }
     }
 
-    private void storeTagDigests(final Connection connection, final TagBranchKey branchKey, final List<TagDigest> digests) throws SQLException {
+    private void storeTagBranches(final Connection connection, final Image image) throws SQLException {
+
+        try (final CallableStatement call = connection.prepareCall(StoreTagBranch)) {
+
+            for (TagBranch tagBranch : image.getTagBranches()) {
+
+                int i = 1;
+                call.setInt(i++,     tagBranch.getKey().getImageKey().getId());
+                call.setInt(i++,     tagBranch.getKey().getId());
+                call.setString(i++,  tagBranch.getLatestTag().getVersion());
+                call.setTimestamp(i, Timestamp.valueOf(tagBranch.getLatestTag().getBuildDate()));
+
+                call.addBatch();
+            }
+
+            call.executeBatch();
+        }
+
+        for (TagBranch tagBranch : image.getTagBranches()) {
+            storeTagDigests(connection, tagBranch);
+        }
+    }
+
+    private void storeTagDigests(final Connection connection, final TagBranch tagBranch) throws SQLException {
 
         try (final CallableStatement call = connection.prepareCall(StoreTagDigest)) {
 
-            for (TagDigest digest : digests) {
+            for (TagDigest digest : tagBranch.getLatestTag().getDigests()) {
 
                 int i = 1;
-                call.setInt(i++,    branchKey.getId());
+                call.setInt(i++,    tagBranch.getKey().getId());
                 call.setLong(i++,   digest.getSize());
                 call.setString(i++, digest.getDigest());
                 call.setString(i++, digest.getArchitecture());
@@ -185,7 +219,6 @@ public class DefaultImageDAO extends AbstractDAO implements ImageDAO {
 
     @Override
     public void removeImage(final Image image) {
-
 
         try (final Connection connection = getConnection()) {
 
@@ -411,28 +444,32 @@ public class DefaultImageDAO extends AbstractDAO implements ImageDAO {
 
     private TagBranch makeTagBranch(final ResultSet results, final Connection connection, final ImageKey imageKey) throws SQLException {
 
-        return new TagBranch(makeTagBranchKey(results, imageKey),
+        final TagBranchKey tagBranchKey = makeTagBranchKey(results, imageKey);
+
+        return new TagBranch(tagBranchKey,
                              results.getString("BranchName"),
                              results.getBoolean("BranchProtected"),
-                             makeTag(results, connection));
+                             makeTag(results, connection, tagBranchKey));
     }
 
     private TagBranchKey makeTagBranchKey(ResultSet results, ImageKey imageKey) throws SQLException {
         return new TagBranchKey(results.getInt("BranchId"), imageKey);
     }
 
-    private Tag makeTag(final ResultSet results, final Connection connection) throws SQLException {
+    private Tag makeTag(final ResultSet results, final Connection connection, final TagBranchKey tagBranchKey) throws SQLException {
 
         return new Tag(results.getString("TagVersion"),
                        results.getTimestamp("TagBuildDate").toLocalDateTime(),
-                       makeTagDigests(connection));
+                       makeTagDigests(connection, tagBranchKey));
     }
 
-    private Set<TagDigest> makeTagDigests(final Connection connection) throws SQLException {
+    private Set<TagDigest> makeTagDigests(final Connection connection, final TagBranchKey tagBranchKey) throws SQLException {
 
         final Set<TagDigest> digests = new HashSet<>();
 
         try (final CallableStatement call = connection.prepareCall(GetTagDigests)) {
+
+            call.setInt(1, tagBranchKey.getId());
 
             final ResultSet results = call.executeQuery();
             while (results.next()) {

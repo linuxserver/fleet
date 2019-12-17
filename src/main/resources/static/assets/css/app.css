@@ -1,5 +1,5 @@
 body {
-    font-size: 0.8rem;
+    font-size: 0.85rem;
 }
 
 .card  {
@@ -18,9 +18,12 @@ i.fas, i.far, i.fab {
     margin-right: .5rem;
 }
 
+.navbar-title {
+    font-size: 1.8rem;
+}
+
 .navbar-title, .repository-title {
     font-family: 'Nunito', sans-serif !important;
-    font-size: 1.8rem;
     font-weight: 600;
     letter-spacing: .01rem;
 }

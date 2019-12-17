@@ -130,8 +130,6 @@ class PropertiesLoader extends BaseRuntimeLoader {
         LOGGER.info("fleet.database.url       : " + properties.getDatabaseUrl());
         LOGGER.info("fleet.database.username  : " + properties.getDatabaseUsername());
         LOGGER.info("fleet.database.password  : " + (showPasswords() ? properties.getDatabasePassword() : "***"));
-        LOGGER.info("fleet.dockerhub.username : " + properties.getDockerHubCredentials().getUsername());
-        LOGGER.info("fleet.dockerhub.password : " + (showPasswords() ? properties.getDockerHubCredentials().getPassword() : "***"));
     }
 
     /**

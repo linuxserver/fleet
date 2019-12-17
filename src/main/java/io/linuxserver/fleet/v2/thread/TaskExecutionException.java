@@ -15,11 +15,11 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package io.linuxserver.fleet.v2.client.docker.converter;
+package io.linuxserver.fleet.v2.thread;
 
-public interface DockerResponseConverter<DOCKER_MODEL, INTERNAL_MODEL> {
+public class TaskExecutionException extends RuntimeException {
 
-    INTERNAL_MODEL convert(final DOCKER_MODEL dockerModel);
-
-    Class<DOCKER_MODEL> getConverterClass();
+    public TaskExecutionException(final Exception cause) {
+        super(cause);
+    }
 }
