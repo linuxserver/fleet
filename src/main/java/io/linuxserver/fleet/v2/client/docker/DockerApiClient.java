@@ -24,6 +24,8 @@ import java.util.List;
 
 public interface DockerApiClient {
 
+    boolean isRepositoryValid(final String repositoryName);
+
     DockerImage fetchImage(final String imageName);
 
     List<DockerImage> fetchAllImages(final String repositoryName);

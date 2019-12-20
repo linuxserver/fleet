@@ -20,16 +20,19 @@ package io.linuxserver.fleet.v2.web;
 import io.javalin.Javalin;
 import io.linuxserver.fleet.core.FleetAppController;
 import io.linuxserver.fleet.core.config.WebConfiguration;
-import io.linuxserver.fleet.v2.web.routes.DefaultAccessManager;
-import io.linuxserver.fleet.v2.web.routes.HomeController;
-import io.linuxserver.fleet.v2.web.routes.ImageController;
-import io.linuxserver.fleet.v2.web.routes.LoginController;
+import io.linuxserver.fleet.v2.web.routes.*;
+
+import static io.javalin.apibuilder.ApiBuilder.*;
+import static io.javalin.core.security.SecurityUtil.roles;
 
 public class WebRouteController {
 
-    private final Javalin webInstance;
+    private final Javalin               webInstance;
+    private final InternalApiController apiController;
 
     public WebRouteController(final FleetAppController app) {
+
+        apiController = new InternalApiController(app);
 
         final WebConfiguration webConfiguration = app.getWebConfiguration();
 
@@ -45,9 +48,20 @@ public class WebRouteController {
 
         webInstance.routes(() -> {
 
-            webInstance.get(Locations.Login, new LoginController());
-            webInstance.get(Locations.Home,  new HomeController(app.getRepositoryManager()));
-            webInstance.get(Locations.Image, new ImageController(app.getRepositoryManager()));
+            get(Locations.Login, new LoginController(),                           roles(FleetRole.Anyone));
+            get(Locations.Home,  new HomeController(app.getRepositoryManager()),  roles(FleetRole.Anyone));
+            get(Locations.Image, new ImageController(app.getRepositoryManager()), roles(FleetRole.Anyone));
+
+            get(Locations.Admin.Repositories, new AdminRepositoryController(app.getRepositoryManager()), roles(FleetRole.Anyone));
+            get(Locations.Admin.Images,       new AdminImageController(app.getRepositoryManager()),      roles(FleetRole.Anyone));
+
+            path(Locations.Internal.Api, () -> {
+
+                path(Locations.Internal.Repository, () -> {
+                    put(apiController::updateRepository,  roles(FleetRole.AdminOnly));
+                    post(apiController::addNewRepository, roles(FleetRole.AdminOnly));
+                });
+            });
         });
     }
 

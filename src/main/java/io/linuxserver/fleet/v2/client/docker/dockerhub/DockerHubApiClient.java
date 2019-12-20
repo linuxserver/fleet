@@ -83,6 +83,16 @@ public class DockerHubApiClient implements DockerApiClient {
     }
 
     @Override
+    public boolean isRepositoryValid(String repositoryName) {
+
+        try {
+            return !fetchAllImages(repositoryName).isEmpty();
+        } catch (HttpException e) {
+            throw new DockerHubException("Unable to verify repository " + repositoryName, e);
+        }
+    }
+
+    @Override
     public DockerImage fetchImage(String imageName) {
 
         try {

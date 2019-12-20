@@ -21,8 +21,6 @@ import io.linuxserver.fleet.v2.thread.AsyncTask;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
@@ -55,15 +53,5 @@ public class TaskQueue<TASK extends AsyncTask<?, ?>> {
 
     public final boolean reQueueFailedTask(final TASK failedTask) {
         return failedTaskQueue.add(failedTask);
-    }
-
-    public final List<TASK> getFailedTasks() {
-
-        final List<TASK> failedTasks = new ArrayList<>();
-        TASK peeked;
-        while ((peeked = failedTaskQueue.peek()) != null) {
-            failedTasks.add(peeked);
-        }
-        return failedTasks;
     }
 }

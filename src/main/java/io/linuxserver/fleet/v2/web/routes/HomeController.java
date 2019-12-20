@@ -49,7 +49,7 @@ public class HomeController extends AbstractPageHandler {
             setSingleRepository(modelSpec, repository);
         }
 
-        modelSpec.addModelAttribute("availableRepositories", repositoryManager.getAllSynchronisedRepositories());
+        modelSpec.addModelAttribute("availableRepositories", repositoryManager.getAllShownRepositories());
 
         return modelSpec;
     }

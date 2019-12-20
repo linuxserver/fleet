@@ -175,3 +175,27 @@ table tr th.tablesorter-header {
     outline: none;
     cursor: pointer;
 }
+
+.has-switchable .switchable.plaintext {
+    border-bottom: dotted 2px;
+}
+
+.has-switchable .switchable.field {
+    display: none;
+}
+
+.has-switchable.is-active .switchable.plaintext {
+    display: none;
+}
+
+.has-switchable.is-active .switchable.field {
+    display: flex;
+}
+
+.is-pointer {
+    cursor: pointer;
+}
+
+.is-borderless {
+    border: 0 !important;
+}

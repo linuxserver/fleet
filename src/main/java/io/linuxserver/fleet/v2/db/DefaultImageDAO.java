@@ -28,7 +28,6 @@ import io.linuxserver.fleet.v2.types.internal.ImageOutlineRequest;
 import io.linuxserver.fleet.v2.types.internal.TagBranchOutlineRequest;
 import io.linuxserver.fleet.v2.types.meta.ItemSyncSpec;
 
-import java.net.StandardSocketOptions;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.HashSet;

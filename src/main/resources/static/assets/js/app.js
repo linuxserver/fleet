@@ -156,9 +156,35 @@ var appManager = (function($) {
         });
     };
 
+    var initSwitchables = function() {
+
+        var $body = $('body');
+
+        $body.on('click', '.has-switchable .switchable.plaintext', function() {
+            $(this).parents('.has-switchable').addClass('is-active');
+        });
+
+        $body.on('click', '.has-switchable .switchable.field .cancel-switchable', function() {
+
+            var $parent = $(this).parents('.has-switchable');
+            var $editableField = $parent.find('.switchable.field').find('.input');
+            $editableField.val($editableField.data('original-value'));
+            $parent.removeClass('is-active');
+        });
+    };
+
+    var initDropdowns = function() {
+
+        $('.dropdown-trigger').on('click', function() {
+            $(this).parents('.dropdown').toggleClass('is-active');
+        });
+    };
+
     var init = function() {
 
         initRepositorySwitcher();
+        initSwitchables();
+        initDropdowns();
         initMenu();
     };
 

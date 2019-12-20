@@ -36,9 +36,8 @@ public class DockerImageUpdateRequest extends AbstractAppTask<DockerApiDelegate,
         try {
             return new DockerImageUpdateResponse(delegate.getController(), imageKey, delegate.getCurrentImageView(imageKey));
         } catch (DockerImageNotFoundException e) {
-            getLogger().warn("Request responded with an empty response so assuming image has been removed upstream. Error message: {}", e.getMessage());
+            getLogger().warn("Request responded with an empty response so assuming image {} has been removed upstream. Error message: {}", imageKey, e.getMessage());
             return new DockerImageMissingUpdateResponse(delegate.getController(), imageKey);
         }
-
     }
 }

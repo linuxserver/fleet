@@ -15,15 +15,16 @@
  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 -->
 
+<#import "../prebuilt/base.ftl"                  as base />
+<#import "../prebuilt/fleet-title.ftl"           as title />
+<#import "../prebuilt/image-list-table-item.ftl" as imageListTableItem />
+<#import "../prebuilt/image-list-item.ftl"       as imageListBoxItem />
+
 <#import "../ui/form/input.ftl"            as input />
 <#import "../ui/components/message.ftl"    as message />
 <#import "../ui/elements/box.ftl"          as box />
-<#import "../prebuilt/base.ftl"            as base />
 <#import "../ui/elements/table.ftl"        as table />
 <#import "../ui/elements/button.ftl"       as button />
-
-<#import "../prebuilt/image-list-table-item.ftl" as imageListTableItem />
-<#import "../prebuilt/image-list-item.ftl"       as imageListBoxItem />
 
 <@base.base title="Images" context="home" showTitle=false>
 
@@ -35,9 +36,7 @@
                 <div class="columns is-multiline">
 
                     <div class="column is-12 has-margin-top">
-                        <h2 class="title is-3 repository-title">
-                            <i class="fas fa-cubes"></i> ${selectedRepository.name}<span class="has-text-primary">.</span>
-                        </h2>
+                        <@title.title icon="cubes" boldValue=selectedRepository.name />
                     </div>
 
                     <div class="column is-12 has-margin-top">

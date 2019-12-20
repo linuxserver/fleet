@@ -228,7 +228,7 @@ Creates a placeholder field with the ability to "switch" it into an input which 
             </div>
             <div class="control is-${size}">
                 <div class="buttons has-addons">
-                    <button title="Cancel edit"    class="button is-cancel-switchable is-normal-colour is-${size}"><i class="fas fa-times has-text-danger is-marginless"></i></button>
+                    <button title="Cancel edit"    class="button cancel-switchable is-normal-colour is-${size}"><i class="fas fa-times has-text-danger is-marginless"></i></button>
                     <button title="Accept changes" id="Accept_${id}" class="button is-accept-switchable<#if acceptClass?has_content> ${acceptClass}</#if> is-normal-colour is-${size}"><i class="fas fa-check has-text-success is-marginless"></i></button>
                 </div>
             </div>
@@ -239,7 +239,11 @@ Creates a placeholder field with the ability to "switch" it into an input which 
         </div>
 
         <span class="switchable plaintext is-pointer is-${size}" title="Click to edit">
-            ${value}
+            <#if value?has_content>
+                ${value}
+            <#else>
+                <i class="fas fa-pencil-alt is-marginless has-text-grey is-borderless"></i>
+            </#if>
         </span>
 
     </div>

@@ -24,8 +24,6 @@ import io.linuxserver.fleet.v2.client.docker.queue.DockerApiDelegate;
 import io.linuxserver.fleet.v2.client.docker.queue.DockerApiTaskConsumer;
 import io.linuxserver.fleet.v2.client.docker.queue.DockerImageUpdateRequest;
 import io.linuxserver.fleet.v2.client.docker.queue.TaskQueue;
-import io.linuxserver.fleet.v2.key.ImageKey;
-import io.linuxserver.fleet.v2.key.RepositoryKey;
 import io.linuxserver.fleet.v2.web.WebRouteController;
 
 /**

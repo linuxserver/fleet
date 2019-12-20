@@ -19,8 +19,6 @@ package io.linuxserver.fleet.v2.web;
 
 public interface Locations {
 
-
-
     interface Static {
 
         String Static  = "/static";
@@ -36,11 +34,22 @@ public interface Locations {
     String Login = "/login";
     String Image = "/image";
 
-    // Api endpoints
-    String ApiImages = "/api/v1/images";
+    interface Api {
+        String Images = "/api/v1/images";
+    }
 
-    // Pages/endpoints which do not require authentication
-    String[] UnAuthenticated = {
-        Home, Image, ApiImages, Login, Static.Assets
-    };
+    interface Internal {
+        String Api        = "/internalApi";
+        String Repository = "repository";
+        String Image      = "image";
+        String Schedule   = "schedule";
+    }
+
+    interface Admin {
+
+        String Repositories = "/admin/repositories";
+        String Images       = "/admin/images";
+        String Schedules    = "/admin/schedules";
+        String Users        = "/admin/users";
+    }
 }

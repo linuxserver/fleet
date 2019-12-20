@@ -118,8 +118,8 @@ public class RepositoryManager {
         return new ArrayList<>(repositoryCache.getAllItems());
     }
 
-    public final List<Repository> getAllSynchronisedRepositories() {
-        return getAllRepositories().stream().filter(Repository::isSyncEnabled).collect(Collectors.toList());
+    public final List<Repository> getAllShownRepositories() {
+        return getAllRepositories().stream().filter(r -> !r.isHidden()).collect(Collectors.toList());
     }
 
     public Image applyImageUpdate(final ImageKey imageKey, final DockerImage latestImage) {

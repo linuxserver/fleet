@@ -27,13 +27,13 @@
 
     <title><#if showTitle>${title} | </#if>fleet</title>
 
-    <link rel="shortcut icon" type="image/png" href="assets/images/favicon-32x32.png"/>
+    <link rel="shortcut icon" type="image/png" href="/assets/images/favicon-32x32.png"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
 
     <link href="https://fonts.googleapis.com/css?family=Pacifico|Nunito" rel="stylesheet">
-    <link rel="stylesheet" type="text/css" href="assets/css/bulma-0.7.5.min.css" />
-    <link rel="stylesheet" type="text/css" href="assets/css/app.css" />
-    <link rel="stylesheet" type="text/css" href="assets/css/fontawesome-all.css" />
+    <link rel="stylesheet" type="text/css" href="/assets/css/bulma-0.7.5.min.css" />
+    <link rel="stylesheet" type="text/css" href="/assets/css/app.css" />
+    <link rel="stylesheet" type="text/css" href="/assets/css/fontawesome-all.css" />
 
 </head>
 
@@ -55,10 +55,19 @@
             </div>
         </#if>
 
+        <@navbar.dropdown icon="shield-alt" displayText="Admin" isRight=true>
+            <@navbar.item displayText="Repositories"    icon="cubes"    link="/admin/repositories" isActive=(context=='admin_repositories') />
+            <@navbar.item displayText="Schedules"       icon="sync-alt" link="/admin/schedules"    isActive=(context=='admin_schedules') />
+            <@navbar.item displayText="Users"           icon="users"    link="/admin/users"        isActive=(context=='admin_users') />
+            <@navbar.item displayText="System Settings" icon="cog"      link="/admin/system"       isActive=(context=='admin_system') />
+        </@navbar.dropdown>
+
         <#if __AuthenticatedUser?has_content>
-            <@navbar.dropdown displayText=__AuthenticatedUser.name>
+
+            <@navbar.dropdown displayText=__AuthenticatedUser.name isRight=true>
                 <@navbar.item displayText="Log Out" icon="sign-out-alt" />
             </@navbar.dropdown>
+
         <#else>
             <@navbar.buttons size="small">
                 <@button.link id="LogIn" link="/login" size="small">
@@ -71,36 +80,39 @@
 
     <#nested>
 
-    <script type="text/javascript" src="assets/js/jquery-3.3.1.min.js"></script>
-    <script type="text/javascript" src="assets/js/jquery.tablesorter.js"></script>
-    <script type="text/javascript" src="assets/js/app.js"></script>
+    <script type="text/javascript" src="/assets/js/jquery-3.3.1.min.js"></script>
+    <script type="text/javascript" src="/assets/js/jquery.tablesorter.js"></script>
+    <script type="text/javascript" src="/assets/js/app.js"></script>
     <script type="text/javascript">
 
         (function() {
           'use strict';
           window.addEventListener('load', function() {
 
-            formValidationManager.init();
-            appManager.init();
+              <#if context=='users'>
+              formValidationManager.init();
+              </#if>
 
-            <#if context=='home'>
-            imageSearchManager.init();
-            </#if>
+              appManager.init();
 
-            jQuery.tablesorter.addParser({
-                id: "pullCount",
-                is: function(s) {
-                    return /^[0-9]?[0-9,.]*$/.test(s);
-                },
-                format: function(s) {
-                    return jQuery.tablesorter.formatFloat( s.replace(/,/g,'') );
-                },
-                type: "numeric"
-            });
+              <#if context=='home'>
+              imageSearchManager.init();
+              </#if>
 
-            $(function() {
-                $("table.table--sortable").tablesorter();
-            });
+              jQuery.tablesorter.addParser({
+                  id: "pullCount",
+                  is: function(s) {
+                      return /^[0-9]?[0-9,.]*$/.test(s);
+                  },
+                  format: function(s) {
+                      return jQuery.tablesorter.formatFloat( s.replace(/,/g,'') );
+                  },
+                  type: "numeric"
+              });
+
+              $(function() {
+                  $("table.table--sortable").tablesorter();
+              });
 
           }, false);
         })();

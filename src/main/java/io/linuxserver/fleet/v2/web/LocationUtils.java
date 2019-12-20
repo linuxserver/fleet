@@ -22,6 +22,6 @@ import java.util.stream.Stream;
 public class LocationUtils {
 
     public static boolean isUnAuthenticatedLocation(final String location) {
-        return Stream.of(Locations.UnAuthenticated).anyMatch(loc -> loc.startsWith(location));
+        return location.startsWith(Locations.Static.Assets);
     }
 }
