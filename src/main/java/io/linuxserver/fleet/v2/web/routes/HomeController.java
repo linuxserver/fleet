@@ -19,16 +19,16 @@ package io.linuxserver.fleet.v2.web.routes;
 
 import io.javalin.http.Context;
 import io.linuxserver.fleet.v2.key.RepositoryKey;
-import io.linuxserver.fleet.v2.service.RepositoryManager;
+import io.linuxserver.fleet.v2.service.RepositoryService;
 import io.linuxserver.fleet.v2.types.Repository;
 import io.linuxserver.fleet.v2.web.PageModelSpec;
 
 public class HomeController extends AbstractPageHandler {
 
-    private final RepositoryManager repositoryManager;
+    private final RepositoryService repositoryService;
 
-    public HomeController(final RepositoryManager repositoryManager) {
-        this.repositoryManager = repositoryManager;
+    public HomeController(final RepositoryService repositoryService) {
+        this.repositoryService = repositoryService;
     }
 
     @Override
@@ -39,17 +39,17 @@ public class HomeController extends AbstractPageHandler {
         final String repositoryLookupParam = ctx.queryParam("key");
         if (null == repositoryLookupParam) {
 
-            final Repository repository = repositoryManager.getFirstRepository();
+            final Repository repository = repositoryService.getFirstRepository();
             setSingleRepository(modelSpec, repository);
 
         } else {
 
             final RepositoryKey repositoryLookupKey = RepositoryKey.parse(repositoryLookupParam);
-            final Repository repository = repositoryManager.getRepository(repositoryLookupKey);
+            final Repository repository = repositoryService.getRepository(repositoryLookupKey);
             setSingleRepository(modelSpec, repository);
         }
 
-        modelSpec.addModelAttribute("availableRepositories", repositoryManager.getAllShownRepositories());
+        modelSpec.addModelAttribute("availableRepositories", repositoryService.getAllShownRepositories());
 
         return modelSpec;
     }

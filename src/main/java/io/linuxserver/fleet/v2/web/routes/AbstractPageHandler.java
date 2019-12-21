@@ -22,15 +22,27 @@ import io.javalin.http.Handler;
 import io.linuxserver.fleet.v2.web.PageModelAttributes;
 import io.linuxserver.fleet.v2.web.PageModelSpec;
 import io.linuxserver.fleet.v2.web.SessionAttributes;
+import io.linuxserver.fleet.v2.web.freemarker.CustomFreemarkerTemplate;
+import io.linuxserver.fleet.v2.web.freemarker.Java8DateTimeMethod;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import static io.javalin.plugin.rendering.template.TemplateUtil.model;
 
 public abstract class AbstractPageHandler implements Handler {
 
     private final Logger LOGGER = LoggerFactory.getLogger(getClass());
+
+    private static final List<CustomFreemarkerTemplate> CUSTOM_TEMPLATES;
+    static {
+
+        CUSTOM_TEMPLATES = new ArrayList<>();
+        CUSTOM_TEMPLATES.add(new Java8DateTimeMethod());
+    }
 
     AbstractPageHandler() {
         LOGGER.info("Registering web route.");
@@ -52,6 +64,7 @@ public abstract class AbstractPageHandler implements Handler {
                 return;
             }
 
+            injectCustomMethods(spec);
             injectTopLevelModelAttributes(ctx, spec);
             checkViewForRedirect(ctx, spec);
 
@@ -65,6 +78,13 @@ public abstract class AbstractPageHandler implements Handler {
     protected abstract PageModelSpec handlePageLoad(Context ctx);
 
     protected abstract PageModelSpec handleFormSubmission(Context ctx);
+
+    protected void injectCustomMethods(final PageModelSpec spec) {
+
+        for (CustomFreemarkerTemplate template : CUSTOM_TEMPLATES) {
+            spec.addModelAttribute(template.getName(), template);
+        }
+    }
 
     private void injectTopLevelModelAttributes(final Context ctx, final PageModelSpec spec) {
         spec.addModelAttribute(PageModelAttributes.AuthenticatedUser, ctx.sessionAttribute(SessionAttributes.AuthenticatedUser));

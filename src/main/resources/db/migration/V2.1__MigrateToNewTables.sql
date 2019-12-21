@@ -17,3 +17,8 @@ INSERT INTO
 SELECT
     `id`, 'latest', `latest_version`, 1, `latest_version_buildtime`
 FROM Images;
+
+INSERT INTO
+    Schedule (`name`, `interval`, `java_class`)
+VALUES
+    ('SyncAllCachedImages', '1:hours', 'io.linuxserver.fleet.v2.thread.schedule.sync.AllImagesSyncSchedule');

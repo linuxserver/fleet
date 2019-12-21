@@ -24,6 +24,12 @@ import io.linuxserver.fleet.v2.client.docker.queue.DockerApiDelegate;
 import io.linuxserver.fleet.v2.client.docker.queue.DockerApiTaskConsumer;
 import io.linuxserver.fleet.v2.client.docker.queue.DockerImageUpdateRequest;
 import io.linuxserver.fleet.v2.client.docker.queue.TaskQueue;
+import io.linuxserver.fleet.v2.db.DefaultImageDAO;
+import io.linuxserver.fleet.v2.db.DefaultScheduleDAO;
+import io.linuxserver.fleet.v2.key.ImageKey;
+import io.linuxserver.fleet.v2.service.RepositoryService;
+import io.linuxserver.fleet.v2.service.ScheduleService;
+import io.linuxserver.fleet.v2.types.Image;
 import io.linuxserver.fleet.v2.web.WebRouteController;
 
 /**
@@ -38,11 +44,16 @@ public class FleetAppController extends AbstractAppController {
     private final TaskQueue<DockerImageUpdateRequest> syncQueue;
     private final DockerApiTaskConsumer               syncConsumer;
 
+    private final RepositoryService repositoryService;
+    private final ScheduleService   scheduleService;
+
     public FleetAppController() {
 
         syncQueue         = new TaskQueue<>();
         dockerApiDelegate = new DockerApiDelegate(this);
         syncConsumer      = new DockerApiTaskConsumer(this);
+        repositoryService = new RepositoryService(new DefaultImageDAO(getDatabaseProvider()));
+        scheduleService   = new ScheduleService(this, new DefaultScheduleDAO(getDatabaseProvider()));
     }
 
     private static FleetAppController instance;
@@ -69,12 +80,7 @@ public class FleetAppController extends AbstractAppController {
         configureWeb();
 
         syncConsumer.start();
-
-//        getRepositoryManager().getAllRepositories().forEach(r -> {
-//            r.getImages().forEach(i -> {
-//                submitSyncRequest(new DockerImageUpdateRequest(i.getKey()));
-//            });
-//        });
+        scheduleService.initialiseSchedules();
     }
 
     public final WebConfiguration getWebConfiguration() {
@@ -93,8 +99,8 @@ public class FleetAppController extends AbstractAppController {
         return new DockerHubApiClient();
     }
 
-    public final boolean submitSyncRequest(final DockerImageUpdateRequest request) {
-        return syncQueue.submitTask(request);
+    public final boolean submitSyncRequestForImage(final ImageKey imageKey) {
+        return syncQueue.submitTask(new DockerImageUpdateRequest(imageKey));
     }
 
     public final TaskQueue<DockerImageUpdateRequest> getSyncQueue() {
@@ -103,5 +109,17 @@ public class FleetAppController extends AbstractAppController {
 
     public final DockerApiDelegate getConfiguredDockerDelegate() {
         return dockerApiDelegate;
+    }
+
+    public final RepositoryService getRepositoryService() {
+        return repositoryService;
+    }
+
+    public final Image storeUpdatedImage(final Image updatedImage) {
+        return repositoryService.storeImage(updatedImage);
+    }
+
+    public ScheduleService getScheduleService() {
+        return scheduleService;
     }
 }

@@ -35,14 +35,14 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
-public class RepositoryManager {
+public class RepositoryService {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(RepositoryManager.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(RepositoryService.class);
 
     private final ImageDAO        imageDAO;
     private final RepositoryCache repositoryCache;
 
-    public RepositoryManager(final ImageDAO imageDAO) {
+    public RepositoryService(final ImageDAO imageDAO) {
 
         this.imageDAO        = imageDAO;
         this.repositoryCache = new RepositoryCache();
@@ -51,6 +51,8 @@ public class RepositoryManager {
     }
 
     public final void reloadCache() {
+
+        repositoryCache.clear();
         repositoryCache.addAllItems(imageDAO.fetchAllRepositories());
     }
 

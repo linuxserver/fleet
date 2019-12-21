@@ -17,7 +17,7 @@
 
 package io.linuxserver.fleet.v2.db;
 
-import io.linuxserver.fleet.db.DefaultDatabaseConnection;
+import io.linuxserver.fleet.core.db.DatabaseProvider;
 import io.linuxserver.fleet.v2.LoggerOwner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,14 +29,14 @@ public class AbstractDAO implements LoggerOwner {
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
-    private final DefaultDatabaseConnection databaseConnection;
+    private final DatabaseProvider databaseProvider;
 
-    public AbstractDAO(DefaultDatabaseConnection databaseConnection) {
-        this.databaseConnection = databaseConnection;
+    public AbstractDAO(final DatabaseProvider databaseProvider) {
+        this.databaseProvider = databaseProvider;
     }
 
     protected final Connection getConnection() throws SQLException {
-        return databaseConnection.getConnection();
+        return databaseProvider.getDatabaseConnection().getConnection();
     }
 
     @Override

@@ -49,11 +49,12 @@ public class WebRouteController {
         webInstance.routes(() -> {
 
             get(Locations.Login, new LoginController(),                           roles(FleetRole.Anyone));
-            get(Locations.Home,  new HomeController(app.getRepositoryManager()),  roles(FleetRole.Anyone));
-            get(Locations.Image, new ImageController(app.getRepositoryManager()), roles(FleetRole.Anyone));
+            get(Locations.Home,  new HomeController( app.getRepositoryService()), roles(FleetRole.Anyone));
+            get(Locations.Image, new ImageController(app.getRepositoryService()), roles(FleetRole.Anyone));
 
-            get(Locations.Admin.Repositories, new AdminRepositoryController(app.getRepositoryManager()), roles(FleetRole.Anyone));
-            get(Locations.Admin.Images,       new AdminImageController(app.getRepositoryManager()),      roles(FleetRole.Anyone));
+            get(Locations.Admin.Repositories, new AdminRepositoryController(app.getRepositoryService()), roles(FleetRole.Anyone));
+            get(Locations.Admin.Images,       new AdminImageController(     app.getRepositoryService()), roles(FleetRole.Anyone));
+            get(Locations.Admin.Schedules,    new AdminScheduleController(  app.getScheduleService()),   roles(FleetRole.Anyone));
 
             path(Locations.Internal.Api, () -> {
 

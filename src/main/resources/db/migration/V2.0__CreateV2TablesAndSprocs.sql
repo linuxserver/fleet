@@ -54,6 +54,14 @@ CREATE TABLE TagDigest (
 ) ENGINE=InnoDB;
 //
 
+CREATE TABLE Schedule (
+    `id`         INT          NOT NULL auto_increment PRIMARY KEY,
+    `name`       VARCHAR(100) NOT NULL,
+    `java_class` VARCHAR(255) NOT NULL,
+    `interval`   VARCHAR(50)  NOT NULL DEFAULT '1:hours'
+) ENGINE=InnoDB;
+//
+
 CREATE OR REPLACE VIEW `Image_View` AS (
 
    SELECT
@@ -454,5 +462,18 @@ BEGIN
 
     END IF;
 
+END;
+//
+
+CREATE OR REPLACE PROCEDURE `Schedule_GetSpecs` ()
+BEGIN
+
+    SELECT
+        `id`         AS `ScheduleId`,
+        `name`       AS `ScheduleName`,
+        `interval`   AS `ScheduleInterval`,
+        `java_class` AS `ScheduleClass`
+    FROM
+         Schedule;
 END;
 //

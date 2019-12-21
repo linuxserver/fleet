@@ -38,6 +38,12 @@ public abstract class AbstractItemCache<KEY extends Key, ITEM extends HasKey<KEY
         items     = new HashMap<>();
     }
 
+    public final void clear() {
+
+        LOGGER.info("Emptying cache");
+        items.clear();
+    }
+
     public final void registerCacheListener(final ItemCacheListener<ITEM> listener) {
 
         LOGGER.info("Registering new cache listener {}", listener);

@@ -17,6 +17,7 @@
 
 package io.linuxserver.fleet.v2.db;
 
+import io.linuxserver.fleet.core.db.DatabaseProvider;
 import io.linuxserver.fleet.db.DefaultDatabaseConnection;
 import io.linuxserver.fleet.db.query.InsertUpdateResult;
 import io.linuxserver.fleet.db.query.InsertUpdateStatus;
@@ -50,7 +51,7 @@ public class DefaultImageDAO extends AbstractDAO implements ImageDAO {
     private static final String GetImage               = "{CALL Image_Get(?)}";
     private static final String DeleteImage            = "{CALL Image_Delete(?)}";
 
-    public DefaultImageDAO(final DefaultDatabaseConnection databaseConnection) {
+    public DefaultImageDAO(final DatabaseProvider databaseConnection) {
         super(databaseConnection);
     }
 

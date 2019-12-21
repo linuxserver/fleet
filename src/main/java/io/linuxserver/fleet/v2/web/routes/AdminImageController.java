@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 LinuxServer.io
+ * Copyright (c)  2019 LinuxServer.io
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,26 +18,27 @@
 package io.linuxserver.fleet.v2.web.routes;
 
 import io.javalin.http.Context;
-import io.linuxserver.fleet.v2.key.ImageLookupKey;
+import io.linuxserver.fleet.v2.key.RepositoryKey;
 import io.linuxserver.fleet.v2.service.RepositoryService;
 import io.linuxserver.fleet.v2.web.PageModelSpec;
 
-public class ImageController extends AbstractPageHandler {
+public class AdminImageController extends AbstractPageHandler {
 
-    private final RepositoryService repositoryService;
+    private RepositoryService repositoryService;
 
-    public ImageController(final RepositoryService repositoryService) {
+    public AdminImageController(final RepositoryService repositoryService) {
+        super();
         this.repositoryService = repositoryService;
     }
 
     @Override
     protected PageModelSpec handlePageLoad(final Context ctx) {
 
-        final String imageLookupParam = ctx.queryParam("name");
-        if (null != imageLookupParam) {
+        final String repositoryKeyParam = ctx.queryParam("repositoryKey");
+        if (null != repositoryKeyParam) {
 
-            final PageModelSpec modelSpec = new PageModelSpec("views/pages/image.ftl");
-            modelSpec.addModelAttribute("image", repositoryService.lookupImage(new ImageLookupKey(imageLookupParam)));
+            final PageModelSpec modelSpec = new PageModelSpec("views/pages/admin/images.ftl");
+            modelSpec.addModelAttribute("repository", repositoryService.getRepository(RepositoryKey.parse(repositoryKeyParam)));
             return modelSpec;
 
         } else {
@@ -47,6 +48,6 @@ public class ImageController extends AbstractPageHandler {
 
     @Override
     protected PageModelSpec handleFormSubmission(final Context ctx) {
-        return new PageModelSpec("views/pages/unsupported.ftl");
+        return null;
     }
 }
