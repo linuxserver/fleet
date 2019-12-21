@@ -46,6 +46,12 @@ public class WebRouteController {
 
         Javalin.log.info(printBanner());
 
+        webInstance.exception(ApiException.class, (e, ctx) -> {
+
+            ctx.status(400);
+            ctx.result(e.getMessage());
+        });
+
         webInstance.routes(() -> {
 
             get(Locations.Login, new LoginController(),                           roles(FleetRole.Anyone));
@@ -60,7 +66,7 @@ public class WebRouteController {
 
                 path(Locations.Internal.Repository, () -> {
                     put(apiController::updateRepository,  roles(FleetRole.AdminOnly));
-                    post(apiController::addNewRepository, roles(FleetRole.AdminOnly));
+                    post(apiController::addNewRepository, roles(FleetRole.Anyone));
                 });
             });
         });

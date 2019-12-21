@@ -38,13 +38,17 @@ public class DockerApiDelegate implements AsyncTaskDelegate {
         this.apiClient  = controller.getDockerClient();
     }
 
+    public final boolean isRepositoryValid(final String repositoryName) {
+        return apiClient.isRepositoryValid(repositoryName);
+    }
+
     public final List<DockerImage> getImagesForRepository(final RepositoryKey repositoryKey) {
         return apiClient.fetchAllImages(repositoryKey.getName());
     }
 
     public final DockerImage getCurrentImageView(final ImageKey imageKey) {
 
-        final DockerImage     dockerImage  = apiClient.fetchImage(imageKey.getAsRepositoryAndImageName());
+        final DockerImage dockerImage = apiClient.fetchImage(imageKey.getAsRepositoryAndImageName());
         if (null == dockerImage) {
             throw new DockerImageNotFoundException("Image " + imageKey.getAsRepositoryAndImageName() + " was not found upstream.");
         }

@@ -18,7 +18,6 @@
 package io.linuxserver.fleet.v2.db;
 
 import io.linuxserver.fleet.core.db.DatabaseProvider;
-import io.linuxserver.fleet.db.DefaultDatabaseConnection;
 import io.linuxserver.fleet.db.query.InsertUpdateResult;
 import io.linuxserver.fleet.db.query.InsertUpdateStatus;
 import io.linuxserver.fleet.v2.key.ImageKey;
@@ -26,10 +25,12 @@ import io.linuxserver.fleet.v2.key.RepositoryKey;
 import io.linuxserver.fleet.v2.key.TagBranchKey;
 import io.linuxserver.fleet.v2.types.*;
 import io.linuxserver.fleet.v2.types.internal.ImageOutlineRequest;
+import io.linuxserver.fleet.v2.types.internal.RepositoryOutlineRequest;
 import io.linuxserver.fleet.v2.types.internal.TagBranchOutlineRequest;
 import io.linuxserver.fleet.v2.types.meta.ItemSyncSpec;
 
 import java.sql.*;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -37,9 +38,10 @@ import java.util.Set;
 
 public class DefaultImageDAO extends AbstractDAO implements ImageDAO {
 
-    public static final String  GetRepositoryKeys = "{CALL Repository_GetRepositoryKeys()}";
-    private static final String GetRepository     = "{CALL Repository_Get(?)}";
-    private static final String GetImageKeys      = "{CALL Repository_GetImageKeys(?)}";
+    private static final String GetRepositoryKeys        = "{CALL Repository_GetRepositoryKeys()}";
+    private static final String GetRepository            = "{CALL Repository_Get(?)}";
+    private static final String GetImageKeys             = "{CALL Repository_GetImageKeys(?)}";
+    private static final String CreateRepositoryOutline  = "{CALL Repository_CreateOutline(?,?,?,?,?,?,?,?)}";
 
     private static final String StoreImage             = "{CALL Image_Store(?,?,?,?,?,?,?,?,?,?,?)}";
     private static final String CreateTagBranchOutline = "{CALL Image_CreateTagBranchOutline(?,?)}";
@@ -183,6 +185,111 @@ public class DefaultImageDAO extends AbstractDAO implements ImageDAO {
         }
     }
 
+    @Override
+    public void removeImage(final Image image) {
+
+        try (final Connection connection = getConnection()) {
+
+            try (final CallableStatement call = connection.prepareCall(DeleteImage)) {
+
+                call.setInt(1, image.getKey().getId());
+                call.registerOutParameter(2, Types.VARCHAR);
+                call.executeUpdate();
+
+                final DbUpdateStatus status = DbUpdateStatus.valueOf(call.getString(2));
+                if (status.isNoChange()) {
+                    getLogger().warn("removeImage attempted to remove an image which did not exist in the database: {}", image);
+                }
+            }
+
+        } catch (SQLException e) {
+
+            getLogger().error("Error caught when executing SQL: removeImage", e);
+            throw new RuntimeException("removeImage unable to delete image", e);
+        }
+    }
+
+    @Override
+    public Repository fetchRepository(final RepositoryKey repositoryKey) {
+
+        try (final Connection connection = getConnection()) {
+            return makeRepository(repositoryKey, connection);
+        } catch (SQLException e) {
+
+            getLogger().error("Error caught when executing SQL: fetchRepository", e);
+            throw new RuntimeException("fetchRepository", e);
+        }
+    }
+
+    @Override
+    public InsertUpdateResult<Repository> createRepositoryOutline(final RepositoryOutlineRequest request) {
+
+        try (final Connection connection = getConnection()) {
+
+            try (final CallableStatement call = connection.prepareCall(CreateRepositoryOutline)) {
+
+                int i = 1;
+                call.setString(   i++,   request.getRepositoryName());
+                call.setTimestamp(i++, Timestamp.valueOf(LocalDateTime.now()));
+                call.setBoolean(  i++, ItemSyncSpec.Default.isDeprecated());
+                call.setBoolean(  i++, ItemSyncSpec.Default.isHidden());
+                call.setBoolean(  i++, ItemSyncSpec.Default.isStable());
+                call.setBoolean(  i++, ItemSyncSpec.Default.isSynchronised());
+                call.setString(   i++, ItemSyncSpec.Default.getVersionMask());
+
+                final int statusIndex = i;
+                call.registerOutParameter(statusIndex, Types.VARCHAR);
+
+                final ResultSet results = call.executeQuery();
+
+                final DbUpdateStatus status = DbUpdateStatus.valueOf(call.getString(statusIndex));
+                if (status.isExists()) {
+                    return new InsertUpdateResult<>(InsertUpdateStatus.FAILED, "Repository already exists");
+                }
+
+                if (results.next()) {
+                    return new InsertUpdateResult<>(makeRepository(makeRepositoryKey(results), connection));
+                }
+
+                return new InsertUpdateResult<>(InsertUpdateStatus.FAILED, "createRepositoryOutline did not return anything.");
+
+            }
+
+        } catch (SQLException e) {
+
+            getLogger().error("Error caught when executing SQL: createRepositoryOutline", e);
+            return new InsertUpdateResult<>(InsertUpdateStatus.FAILED, e.getMessage());
+        }
+    }
+
+    @Override
+    public List<Repository> fetchAllRepositories() {
+
+        try (final Connection connection = getConnection()) {
+
+            try (final CallableStatement call = connection.prepareCall(GetRepositoryKeys)) {
+
+                final ResultSet results = call.executeQuery();
+
+                final List<RepositoryKey> repositoryKeys = new ArrayList<>();
+                while (results.next()) {
+                    repositoryKeys.add(makeRepositoryKey(results));
+                }
+                return makeRepositories(repositoryKeys, connection);
+            }
+
+        } catch (SQLException e) {
+
+            getLogger().error("Error caught when executing SQL: fetchAllRepositories", e);
+            throw new RuntimeException("fetchAllRepositories", e);
+        }
+    }
+
+    @Override
+    public InsertUpdateResult<Repository> storeRepository(Repository repository) {
+        return null;
+    }
+
     private void storeTagBranches(final Connection connection, final Image image) throws SQLException {
 
         try (final CallableStatement call = connection.prepareCall(StoreTagBranch)) {
@@ -224,70 +331,6 @@ public class DefaultImageDAO extends AbstractDAO implements ImageDAO {
 
             call.executeBatch();
         }
-    }
-
-    @Override
-    public void removeImage(final Image image) {
-
-        try (final Connection connection = getConnection()) {
-
-            try (final CallableStatement call = connection.prepareCall(DeleteImage)) {
-
-                call.setInt(1, image.getKey().getId());
-                call.registerOutParameter(2, Types.VARCHAR);
-                call.executeUpdate();
-
-                final DbUpdateStatus status = DbUpdateStatus.valueOf(call.getString(2));
-                if (status.isNoChange()) {
-                    getLogger().warn("removeImage attempted to remove an image which did not exist in the database: {}", image);
-                }
-            }
-
-        } catch (SQLException e) {
-
-            getLogger().error("Error caught when executing SQL: removeImage", e);
-            throw new RuntimeException("removeImage unable to delete image", e);
-        }
-    }
-
-    @Override
-    public Repository fetchRepository(final RepositoryKey repositoryKey) {
-
-        try (final Connection connection = getConnection()) {
-            return makeRepository(repositoryKey, connection);
-        } catch (SQLException e) {
-
-            getLogger().error("Error caught when executing SQL: fetchRepository", e);
-            throw new RuntimeException("fetchRepository", e);
-        }
-    }
-
-    @Override
-    public List<Repository> fetchAllRepositories() {
-
-        try (final Connection connection = getConnection()) {
-
-            try (final CallableStatement call = connection.prepareCall(GetRepositoryKeys)) {
-
-                final ResultSet results = call.executeQuery();
-
-                final List<RepositoryKey> repositoryKeys = new ArrayList<>();
-                while (results.next()) {
-                    repositoryKeys.add(makeRepositoryKey(results));
-                }
-                return makeRepositories(repositoryKeys, connection);
-            }
-
-        } catch (SQLException e) {
-
-            getLogger().error("Error caught when executing SQL: fetchAllRepositories", e);
-            throw new RuntimeException("fetchAllRepositories", e);
-        }
-    }
-
-    @Override
-    public InsertUpdateResult<Repository> storeRepository(Repository repository) {
-        return null;
     }
 
     private List<Repository> makeRepositories(final List<RepositoryKey> repositoryKeys, final Connection connection) throws SQLException {

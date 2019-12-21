@@ -1,4 +1,4 @@
-/*
+/*io.linuxserver.fleet.v2.db
  * Copyright (c)  2019 LinuxServer.io
  *
  * This program is free software: you can redistribute it and/or modify
@@ -15,21 +15,17 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package io.linuxserver.fleet.v2.thread.schedule.cache;
+package io.linuxserver.fleet.v2.types.internal;
 
-import io.linuxserver.fleet.core.FleetAppController;
-import io.linuxserver.fleet.v2.thread.schedule.AbstractAppSchedule;
-import io.linuxserver.fleet.v2.thread.schedule.ScheduleSpec;
+public class RepositoryOutlineRequest {
 
-public final class RefreshCacheSchedule extends AbstractAppSchedule {
+    private final String repositoryName;
 
-    public RefreshCacheSchedule(final ScheduleSpec spec,
-                                final FleetAppController controller) {
-        super(spec, controller);
+    public RepositoryOutlineRequest(final String repositoryName) {
+        this.repositoryName = repositoryName;
     }
 
-    @Override
-    public void executeSchedule() {
-        getController().getRepositoryService().reloadCache();
+    public final String getRepositoryName() {
+        return repositoryName;
     }
 }

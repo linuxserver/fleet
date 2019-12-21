@@ -15,21 +15,11 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package io.linuxserver.fleet.v2.thread.schedule.cache;
+package io.linuxserver.fleet.v2.web;
 
-import io.linuxserver.fleet.core.FleetAppController;
-import io.linuxserver.fleet.v2.thread.schedule.AbstractAppSchedule;
-import io.linuxserver.fleet.v2.thread.schedule.ScheduleSpec;
+public class ApiException extends RuntimeException {
 
-public final class RefreshCacheSchedule extends AbstractAppSchedule {
-
-    public RefreshCacheSchedule(final ScheduleSpec spec,
-                                final FleetAppController controller) {
-        super(spec, controller);
-    }
-
-    @Override
-    public void executeSchedule() {
-        getController().getRepositoryService().reloadCache();
+    public ApiException(final String message, final Throwable cause) {
+        super(message, cause);
     }
 }

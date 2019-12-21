@@ -78,11 +78,18 @@
 
     </@navbar.navbar>
 
+    <div id="NotificationWrapper">
+        <div id="Notifications"></div>
+    </div>
+
     <#nested>
 
     <script type="text/javascript" src="/assets/js/jquery-3.3.1.min.js"></script>
     <script type="text/javascript" src="/assets/js/jquery.tablesorter.js"></script>
     <script type="text/javascript" src="/assets/js/app.js"></script>
+    <#if context?starts_with("admin")>
+        <script type="text/javascript" src="/assets/js/admin.js"></script>
+    </#if>
     <script type="text/javascript">
 
         (function() {
@@ -94,6 +101,10 @@
               </#if>
 
               appManager.init();
+
+              <#if context?starts_with("admin")>
+                  adminManager.init();
+              </#if>
 
               <#if context=='home'>
               imageSearchManager.init();

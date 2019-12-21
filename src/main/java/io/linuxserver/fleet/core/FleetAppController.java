@@ -21,15 +21,15 @@ import io.linuxserver.fleet.core.config.WebConfiguration;
 import io.linuxserver.fleet.v2.client.docker.DockerApiClient;
 import io.linuxserver.fleet.v2.client.docker.dockerhub.DockerHubApiClient;
 import io.linuxserver.fleet.v2.client.docker.queue.DockerApiDelegate;
-import io.linuxserver.fleet.v2.client.docker.queue.DockerApiTaskConsumer;
-import io.linuxserver.fleet.v2.client.docker.queue.DockerImageUpdateRequest;
-import io.linuxserver.fleet.v2.client.docker.queue.TaskQueue;
 import io.linuxserver.fleet.v2.db.DefaultImageDAO;
 import io.linuxserver.fleet.v2.db.DefaultScheduleDAO;
 import io.linuxserver.fleet.v2.key.ImageKey;
 import io.linuxserver.fleet.v2.service.RepositoryService;
 import io.linuxserver.fleet.v2.service.ScheduleService;
+import io.linuxserver.fleet.v2.service.SynchronisationService;
 import io.linuxserver.fleet.v2.types.Image;
+import io.linuxserver.fleet.v2.types.Repository;
+import io.linuxserver.fleet.v2.types.internal.RepositoryOutlineRequest;
 import io.linuxserver.fleet.v2.web.WebRouteController;
 
 /**
@@ -40,20 +40,17 @@ import io.linuxserver.fleet.v2.web.WebRouteController;
  */
 public class FleetAppController extends AbstractAppController {
 
-    public  final DockerApiDelegate                   dockerApiDelegate;
-    private final TaskQueue<DockerImageUpdateRequest> syncQueue;
-    private final DockerApiTaskConsumer               syncConsumer;
-
-    private final RepositoryService repositoryService;
-    private final ScheduleService   scheduleService;
+    public  final DockerApiDelegate      dockerApiDelegate;
+    private final RepositoryService      repositoryService;
+    private final ScheduleService        scheduleService;
+    private final SynchronisationService syncService;
 
     public FleetAppController() {
 
-        syncQueue         = new TaskQueue<>();
-        dockerApiDelegate = new DockerApiDelegate(this);
-        syncConsumer      = new DockerApiTaskConsumer(this);
         repositoryService = new RepositoryService(new DefaultImageDAO(getDatabaseProvider()));
         scheduleService   = new ScheduleService(this, new DefaultScheduleDAO(getDatabaseProvider()));
+        dockerApiDelegate = new DockerApiDelegate(this);
+        syncService       = new SynchronisationService(this);
     }
 
     private static FleetAppController instance;
@@ -79,7 +76,6 @@ public class FleetAppController extends AbstractAppController {
 
         configureWeb();
 
-        syncConsumer.start();
         scheduleService.initialiseSchedules();
     }
 
@@ -99,12 +95,12 @@ public class FleetAppController extends AbstractAppController {
         return new DockerHubApiClient();
     }
 
-    public final boolean submitSyncRequestForImage(final ImageKey imageKey) {
-        return syncQueue.submitTask(new DockerImageUpdateRequest(imageKey));
+    public final boolean synchroniseImage(final ImageKey imageKey) {
+        return syncService.synchroniseImage(imageKey);
     }
 
-    public final TaskQueue<DockerImageUpdateRequest> getSyncQueue() {
-        return syncQueue;
+    public final void synchroniseRepository(final Repository repository) {
+        syncService.synchroniseCachedRepository(repository);
     }
 
     public final DockerApiDelegate getConfiguredDockerDelegate() {
@@ -121,5 +117,24 @@ public class FleetAppController extends AbstractAppController {
 
     public ScheduleService getScheduleService() {
         return scheduleService;
+    }
+
+    public final Repository verifyRepositoryAndCreateOutline(final RepositoryOutlineRequest request) {
+
+        if (getConfiguredDockerDelegate().isRepositoryValid(request.getRepositoryName())) {
+
+            final Repository repositoryOutline = getRepositoryService()
+                    .createRepositoryOutline(new RepositoryOutlineRequest(request.getRepositoryName()));
+
+            getSynchronisationService().synchroniseUpstreamRepository(repositoryOutline);
+            return repositoryOutline;
+
+        }
+
+        throw new IllegalArgumentException("Repository " + request.getRepositoryName() + " does not exist upstream");
+    }
+
+    public final SynchronisationService getSynchronisationService() {
+        return syncService;
     }
 }

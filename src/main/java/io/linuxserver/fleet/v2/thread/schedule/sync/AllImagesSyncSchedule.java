@@ -20,7 +20,6 @@ package io.linuxserver.fleet.v2.thread.schedule.sync;
 import io.linuxserver.fleet.core.FleetAppController;
 import io.linuxserver.fleet.v2.thread.schedule.AbstractAppSchedule;
 import io.linuxserver.fleet.v2.thread.schedule.ScheduleSpec;
-import io.linuxserver.fleet.v2.types.Image;
 import io.linuxserver.fleet.v2.types.Repository;
 
 import java.util.List;
@@ -37,26 +36,7 @@ public final class AllImagesSyncSchedule extends AbstractAppSchedule {
 
         final List<Repository> allRepositories = getController().getRepositoryService().getAllRepositories();
         for (Repository repository : allRepositories) {
-
-            if (repository.isSyncEnabled()) {
-
-                for (Image image : repository.getImages()) {
-
-                    if (image.isSyncEnabled()) {
-
-                        boolean submitted = getController().submitSyncRequestForImage(image.getKey());
-                        if (!submitted) {
-                            getLogger().warn("Unable to place sync request for image {} on queue", image.getKey());
-                        }
-
-                    } else {
-                        getLogger().info("Ignoring sync request for {} as it has synchronisation disabled.", image);
-                    }
-                }
-
-            } else {
-                getLogger().info("Will not synchronise images in {} as it has synchronisation disabled", repository);
-            }
+            getController().getSynchronisationService().synchroniseCachedRepository(repository);
         }
     }
 }

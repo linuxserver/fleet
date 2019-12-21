@@ -199,3 +199,15 @@ table tr th.tablesorter-header {
 .is-borderless {
     border: 0 !important;
 }
+
+#NotificationWrapper {
+    position: relative;
+    margin: 10px 10px 0 10px;
+    z-index: 1000;
+}
+
+#Notifications {
+    position: absolute;
+    right: 0;
+    max-width: 100%;
+}

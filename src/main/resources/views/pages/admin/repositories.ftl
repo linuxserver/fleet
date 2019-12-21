@@ -66,7 +66,7 @@
                             </#list>
                             <tr>
                                 <td colspan="3" class="is-hovered">
-                                    <@input.text id="NewRepositoryName" icon="cubes" placeholder="New Repository Name" />
+                                    <@input.text id="NewRepositoryName" icon="cubes" placeholder="New Repository..." />
                                 </td>
                                 <td class="has-text-right is-hovered is-vcentered">
                                     <@button.button id="SubmitNewRepository" size="small" colour="success">

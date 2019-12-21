@@ -18,58 +18,25 @@
 package io.linuxserver.fleet.v2.thread.schedule.sync;
 
 import io.linuxserver.fleet.core.FleetAppController;
-import io.linuxserver.fleet.v2.client.docker.queue.DockerApiDelegate;
-import io.linuxserver.fleet.v2.key.ImageLookupKey;
-import io.linuxserver.fleet.v2.service.RepositoryService;
 import io.linuxserver.fleet.v2.thread.schedule.AbstractAppSchedule;
 import io.linuxserver.fleet.v2.thread.schedule.ScheduleSpec;
-import io.linuxserver.fleet.v2.types.Image;
 import io.linuxserver.fleet.v2.types.Repository;
-import io.linuxserver.fleet.v2.types.docker.DockerImage;
-import io.linuxserver.fleet.v2.types.internal.ImageOutlineRequest;
 
 import java.util.List;
 
-public class GetMissingImagesSchedule extends AbstractAppSchedule {
-
-    private final DockerApiDelegate dockerApiDelegate;
-    private final RepositoryService repositoryService;
+public final class GetMissingImagesSchedule extends AbstractAppSchedule {
 
     public GetMissingImagesSchedule(final ScheduleSpec spec,
                                     final FleetAppController controller) {
         super(spec, controller);
-        dockerApiDelegate = controller.getConfiguredDockerDelegate();
-        repositoryService = controller.getRepositoryService();
     }
 
     @Override
     public void executeSchedule() {
 
-        final List<Repository> cachedRepositories = repositoryService.getAllRepositories();
+        final List<Repository> cachedRepositories = getController().getRepositoryService().getAllRepositories();
         for (Repository repository : cachedRepositories) {
-
-            if (repository.isSyncEnabled()) {
-
-                final List<DockerImage> apiImages = dockerApiDelegate.getImagesForRepository(repository.getKey());
-                for (DockerImage apiImage : apiImages) {
-
-                    final Image cachedImage = repositoryService.lookupImage(new ImageLookupKey(apiImage.getRepository() + "/" + apiImage.getName()));
-                    if (null == cachedImage) {
-
-                        getLogger().info("Found image from API which is not currently cached. Will add to system: {}", apiImage);
-                        final ImageOutlineRequest outlineRequest = new ImageOutlineRequest(repository.getKey(),
-                                                                                           apiImage.getName(),
-                                                                                           apiImage.getDescription(),
-                                                                                           apiImage.getBuildDate());
-
-                        final Image imageOutline = repositoryService.createImageOutline(outlineRequest);
-                        getController().submitSyncRequestForImage(imageOutline.getKey());
-                    }
-                }
-
-            } else {
-                getLogger().info("Will not check upstream repository {} as synchronisation is disabled", repository);
-            }
+            getController().getSynchronisationService().synchroniseUpstreamRepository(repository);
         }
     }
 }

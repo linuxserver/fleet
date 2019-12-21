@@ -15,21 +15,16 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package io.linuxserver.fleet.v2.thread.schedule.cache;
+package io.linuxserver.fleet.v2.web.request;
 
-import io.linuxserver.fleet.core.FleetAppController;
-import io.linuxserver.fleet.v2.thread.schedule.AbstractAppSchedule;
-import io.linuxserver.fleet.v2.thread.schedule.ScheduleSpec;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
-public final class RefreshCacheSchedule extends AbstractAppSchedule {
+public class NewRepositoryRequest {
 
-    public RefreshCacheSchedule(final ScheduleSpec spec,
-                                final FleetAppController controller) {
-        super(spec, controller);
-    }
+    @JsonProperty
+    private String repositoryName;
 
-    @Override
-    public void executeSchedule() {
-        getController().getRepositoryService().reloadCache();
+    public final String getRepositoryName() {
+        return repositoryName;
     }
 }

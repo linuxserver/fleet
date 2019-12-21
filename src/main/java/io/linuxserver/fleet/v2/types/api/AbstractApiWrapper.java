@@ -15,21 +15,17 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package io.linuxserver.fleet.v2.thread.schedule.cache;
+package io.linuxserver.fleet.v2.types.api;
 
-import io.linuxserver.fleet.core.FleetAppController;
-import io.linuxserver.fleet.v2.thread.schedule.AbstractAppSchedule;
-import io.linuxserver.fleet.v2.thread.schedule.ScheduleSpec;
+public class AbstractApiWrapper<T> {
 
-public final class RefreshCacheSchedule extends AbstractAppSchedule {
+    private final T originalObject;
 
-    public RefreshCacheSchedule(final ScheduleSpec spec,
-                                final FleetAppController controller) {
-        super(spec, controller);
+    public AbstractApiWrapper(final T originalObject) {
+        this.originalObject = originalObject;
     }
 
-    @Override
-    public void executeSchedule() {
-        getController().getRepositoryService().reloadCache();
+    protected final T getOriginalObject() {
+        return originalObject;
     }
 }

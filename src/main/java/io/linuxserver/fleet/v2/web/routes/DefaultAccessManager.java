@@ -38,7 +38,7 @@ public class DefaultAccessManager implements AccessManager {
             handler.handle(ctx);
         } else {
 
-            User user = ctx.sessionAttribute(SessionAttributes.AuthenticatedUser);
+            final User user = ctx.sessionAttribute(SessionAttributes.AuthenticatedUser);
             if (null == user) {
                 ctx.redirect(Locations.Login);
             } else {

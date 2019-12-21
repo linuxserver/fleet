@@ -15,37 +15,46 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-var ajaxManager = (function($) {
+var notificationManager = (function($) {
 
-    var handleError = function(jqXHR, textStatus, handleError) {
+    var makeNotification = function(message, level='info', delay) {
 
-        if (jqXHR.status === 403) {
+        var notification = $(
+            '<div class="notification is-' + level + '">' +
+                '<button class="delete"></button>' +
+                message +
+            '</div>'
+        );
 
-            var notification = $(
-                '<div class="fleet-alert fleet-alert--warning">' +
-                     '<i class="fas fa-exclamation-triangle text-warning"></i> Permission denied. Has your session expired?' +
-                 '</div>'
-            );
-
-        } else {
-
-            var message = JSON.parse(jqXHR.responseText).data;
-
-            var notification = $(
-                '<div class="fleet-alert fleet-alert--warning">' +
-                     '<i class="fas fa-exclamation-triangle text-warning"></i> ' + message +
-                 '</div>'
-            );
-        }
-
-        $('.notifications').append(notification);
-        notification.delay(3000).fadeOut(2000, function() {
+        $('#Notifications').append(notification);
+        notification.delay((typeof delay === 'undefined' ? 3000 : delay)).fadeOut(2000, function() {
             $(this).remove();
         });
     };
 
-    var call = function(param, onDone) {
-        return $.ajax(param).done(onDone).fail(handleError);
+    return {
+        makeNotification: makeNotification
+    }
+
+}(jQuery));
+
+var ajaxManager = (function($) {
+
+    var handleError = function(jqXHR, onError) {
+
+        if (jqXHR.status === 403) {
+            notificationManager.makeNotification('Permission denied', 'danger');
+        } else {
+            notificationManager.makeNotification(jqXHR.responseText, 'danger');
+        }
+
+        if (onError) {
+            onError();
+        }
+    };
+
+    var call = function(param, onDone, onError) {
+        return $.ajax(param).done(onDone).fail(function(jqXHR) { handleError(jqXHR, onError); });
     };
 
     return {
@@ -180,11 +189,19 @@ var appManager = (function($) {
         });
     };
 
+    var initNotifications = function() {
+
+        $('#Notifications').on('click', '.delete', function() {
+            $(this).parents('.notification').remove();
+        });
+    };
+
     var init = function() {
 
         initRepositorySwitcher();
         initSwitchables();
         initDropdowns();
+        initNotifications();
         initMenu();
     };
 

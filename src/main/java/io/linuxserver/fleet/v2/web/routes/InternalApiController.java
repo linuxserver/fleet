@@ -20,6 +20,11 @@ package io.linuxserver.fleet.v2.web.routes;
 import io.javalin.http.Context;
 import io.linuxserver.fleet.core.FleetAppController;
 import io.linuxserver.fleet.v2.service.AbstractAppService;
+import io.linuxserver.fleet.v2.types.Repository;
+import io.linuxserver.fleet.v2.types.api.ApiRepositoryWrapper;
+import io.linuxserver.fleet.v2.types.internal.RepositoryOutlineRequest;
+import io.linuxserver.fleet.v2.web.ApiException;
+import io.linuxserver.fleet.v2.web.request.NewRepositoryRequest;
 
 public class InternalApiController extends AbstractAppService {
 
@@ -31,7 +36,20 @@ public class InternalApiController extends AbstractAppService {
 
     }
 
-    public void addNewRepository(final Context context) {
+    public void addNewRepository(final Context ctx) {
 
+        try {
+
+            final NewRepositoryRequest request = ctx.bodyValidator(NewRepositoryRequest.class)
+                    .check(req -> req.getRepositoryName() != null).get();
+
+            final Repository newlyCreatedRepository = getController()
+                    .verifyRepositoryAndCreateOutline(new RepositoryOutlineRequest(request.getRepositoryName()));
+
+            ctx.json(new ApiRepositoryWrapper(newlyCreatedRepository));
+
+        } catch (IllegalArgumentException e) {
+            throw new ApiException(e.getMessage(), e);
+        }
     }
 }

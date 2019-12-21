@@ -17,13 +17,17 @@
 
 package io.linuxserver.fleet.v2.client.docker.queue;
 
-import io.linuxserver.fleet.core.FleetAppController;
+import io.linuxserver.fleet.v2.service.SynchronisationService;
 import io.linuxserver.fleet.v2.thread.AbstractTaskQueueConsumer;
 
 public final class DockerApiTaskConsumer extends AbstractTaskQueueConsumer<DockerApiDelegate, DockerImageUpdateResponse, DockerImageUpdateRequest> {
 
-    public DockerApiTaskConsumer(final FleetAppController controller) {
-        super(controller, controller.getConfiguredDockerDelegate(), controller.getSyncQueue(), "DockerSyncConsumer");
+    public DockerApiTaskConsumer(final SynchronisationService syncService) {
+
+        super(syncService.getController(),
+              syncService.getConfiguredDockerDelegate(),
+              syncService.getSyncQueue(),
+              "DockerSyncConsumer");
     }
 
     @Override
