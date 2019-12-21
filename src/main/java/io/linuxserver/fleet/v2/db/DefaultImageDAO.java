@@ -47,7 +47,7 @@ public class DefaultImageDAO extends AbstractDAO implements ImageDAO {
     private static final String StoreTagDigest         = "{CALL Image_StoreTagDigest(?,?,?,?,?)}";
     private static final String GetTagBranches         = "{CALL Image_GetTagBranches(?)}";
     private static final String GetTagDigests          = "{CALL Image_GetTagDigests(?)}";
-    private static final String CreateImageOutline     = "{CALL Image_CreateOutline(?,?,?,?)}";
+    private static final String CreateImageOutline     = "{CALL Image_CreateOutline(?,?,?,?,?,?,?,?,?,?)}";
     private static final String GetImage               = "{CALL Image_Get(?)}";
     private static final String DeleteImage            = "{CALL Image_Delete(?)}";
 
@@ -130,9 +130,18 @@ public class DefaultImageDAO extends AbstractDAO implements ImageDAO {
                 call.setBoolean(i++, ItemSyncSpec.Default.isHidden());
                 call.setBoolean(i++, ItemSyncSpec.Default.isStable());
                 call.setBoolean(i++, ItemSyncSpec.Default.isSynchronised());
-                call.setString(i, ItemSyncSpec.Default.getVersionMask());
+                call.setString(i++, ItemSyncSpec.Default.getVersionMask());
+
+                final int statusIndex = i;
+                call.registerOutParameter(statusIndex, Types.VARCHAR);
 
                 final ResultSet results = call.executeQuery();
+
+                final DbUpdateStatus status = DbUpdateStatus.valueOf(call.getString(statusIndex));
+                if (status.isExists()) {
+                    return new InsertUpdateResult<>(InsertUpdateStatus.FAILED, "Image already exists");
+                }
+
                 if (results.next()) {
                     return new InsertUpdateResult<>(makeImage(makeImageKey(results), connection));
                 }

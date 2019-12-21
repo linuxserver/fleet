@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 LinuxServer.io
+ * Copyright (c)  2019 LinuxServer.io
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -15,26 +15,21 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package io.linuxserver.fleet.v2.types.internal;
+package io.linuxserver.fleet.v2.thread.schedule.cache;
 
-import io.linuxserver.fleet.v2.key.ImageKey;
+import io.linuxserver.fleet.core.FleetAppController;
+import io.linuxserver.fleet.v2.thread.schedule.AbstractAppSchedule;
+import io.linuxserver.fleet.v2.thread.schedule.ScheduleSpec;
 
-public class TagBranchOutlineRequest {
+public class RefreshCacheSchedule extends AbstractAppSchedule {
 
-    private final ImageKey imageKey;
-    private final String   branchName;
-
-    public TagBranchOutlineRequest(final ImageKey imageKey, final String branchName) {
-
-        this.imageKey      = imageKey;
-        this.branchName    = branchName;
+    public RefreshCacheSchedule(final ScheduleSpec spec,
+                                final FleetAppController controller) {
+        super(spec, controller);
     }
 
-    public final ImageKey getImageKey() {
-        return imageKey;
-    }
-
-    public final String getBranchName() {
-        return branchName;
+    @Override
+    public void executeSchedule() {
+        getController().getRepositoryService().reloadCache();
     }
 }

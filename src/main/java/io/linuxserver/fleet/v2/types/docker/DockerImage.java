@@ -79,4 +79,9 @@ public class DockerImage {
     public final LocalDateTime getBuildDate() {
         return buildDate;
     }
+
+    @Override
+    public final String toString() {
+        return getRepository() + "/" + getName();
+    }
 }

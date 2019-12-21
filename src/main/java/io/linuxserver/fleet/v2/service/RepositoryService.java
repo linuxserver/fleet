@@ -27,6 +27,7 @@ import io.linuxserver.fleet.v2.key.RepositoryKey;
 import io.linuxserver.fleet.v2.types.*;
 import io.linuxserver.fleet.v2.types.docker.DockerImage;
 import io.linuxserver.fleet.v2.types.docker.DockerTag;
+import io.linuxserver.fleet.v2.types.internal.ImageOutlineRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -71,6 +72,24 @@ public class RepositoryService {
         return storedRepository;
     }
 
+    public final Image createImageOutline(final ImageOutlineRequest request) {
+
+        final InsertUpdateResult<Image> result = imageDAO.createImageOutline(request);
+        if (result.isError()) {
+
+            LOGGER.error("Unable to create image outline {}, reason: {}", request, result.getStatusMessage());
+            throw new RuntimeException("Unable to create outline");
+
+        } else {
+
+            final Image imageOutline = result.getResult();
+            LOGGER.info("Successfully created outline for image {}", imageOutline);
+            updateCache(imageOutline);
+
+            return imageOutline;
+        }
+    }
+
     public final void removeImage(final ImageKey imageKey) {
 
         final Image cachedImage = repositoryCache.findImage(imageKey);
@@ -88,14 +107,8 @@ public class RepositoryService {
             throw new RuntimeException("Failed to store image: " + result.getStatusMessage());
         }
 
-        final Image      storedImage           = result.getResult();
-        final Repository imageParentRepository = repositoryCache.findItem(storedImage.getRepositoryKey());
-
-        if (null != imageParentRepository) {
-            imageParentRepository.addImage(storedImage);
-        } else {
-            LOGGER.warn("Could not find repository for image {}", storedImage);
-        }
+        final Image storedImage = result.getResult();
+        updateCache(storedImage);
 
         return storedImage;
     }
@@ -122,6 +135,10 @@ public class RepositoryService {
 
     public final List<Repository> getAllShownRepositories() {
         return getAllRepositories().stream().filter(r -> !r.isHidden()).collect(Collectors.toList());
+    }
+
+    public final List<Repository> getAllSynchronisedRepositories() {
+        return getAllRepositories().stream().filter(Repository::isSyncEnabled).collect(Collectors.toList());
     }
 
     public Image applyImageUpdate(final ImageKey imageKey, final DockerImage latestImage) {
@@ -158,6 +175,17 @@ public class RepositoryService {
             }
 
             return storeImage(cloned);
+        }
+    }
+
+    private void updateCache(final Image storedImage) {
+
+        final Repository imageParentRepository = repositoryCache.findItem(storedImage.getRepositoryKey());
+
+        if (null != imageParentRepository) {
+            imageParentRepository.addImage(storedImage);
+        } else {
+            LOGGER.warn("Could not find repository for image {}", storedImage);
         }
     }
 }

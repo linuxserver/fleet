@@ -18,39 +18,29 @@
 package io.linuxserver.fleet.core;
 
 import io.linuxserver.fleet.core.config.AppProperties;
+import io.linuxserver.fleet.core.db.DatabaseProvider;
+import io.linuxserver.fleet.core.db.DefaultDatabaseProvider;
 import io.linuxserver.fleet.db.DefaultDatabaseConnection;
-import io.linuxserver.fleet.db.migration.DatabaseVersion;
-import io.linuxserver.fleet.v2.db.DefaultImageDAO;
-import io.linuxserver.fleet.v2.service.RepositoryManager;
-import io.linuxserver.fleet.v2.types.Image;
 
 public abstract class AbstractAppController {
 
-    private final AppProperties             appProperties;
-    private final DatabaseVersion           databaseVersion;
-
-    private final RepositoryManager repositoryManager;
+    private final AppProperties    appProperties;
+    private final DatabaseProvider databaseProvider;
 
     public AbstractAppController() {
 
         this.appProperties      = new PropertiesLoader().getProperties();
 
-        final DefaultDatabaseConnection databaseConnection = new DefaultDatabaseConnection(appProperties.getDatabaseProperties());
+        this.databaseProvider   = new DefaultDatabaseProvider(new DefaultDatabaseConnection(appProperties.getDatabaseProperties()));
 
-        this.databaseVersion    = new DatabaseVersion(databaseConnection);
-        this.repositoryManager  = new RepositoryManager(new DefaultImageDAO(databaseConnection));
+    }
+
+    public final DatabaseProvider getDatabaseProvider() {
+        return databaseProvider;
     }
 
     public final AppProperties getAppProperties() {
         return appProperties;
-    }
-
-    public final RepositoryManager getRepositoryManager() {
-        return repositoryManager;
-    }
-
-    public final Image storeUpdatedImage(final Image updatedImage) {
-        return repositoryManager.storeImage(updatedImage);
     }
 
     protected void run() {

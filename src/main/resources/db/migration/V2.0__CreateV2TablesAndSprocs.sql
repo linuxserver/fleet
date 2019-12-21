@@ -50,7 +50,7 @@ CREATE TABLE TagDigest (
     `digest`    VARCHAR(255) NOT NULL,
     `variant`   VARCHAR(50) DEFAULT CURRENT_TIMESTAMP(),
     UNIQUE KEY (`branch_id`, `digest`),
-    FOREIGN KEY (`branch_id`) REFERENCES TagBranch(`id`)
+    FOREIGN KEY (`branch_id`) REFERENCES TagBranch(`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB;
 //
 
@@ -438,6 +438,8 @@ CREATE OR REPLACE PROCEDURE `Image_CreateOutline`
 )
 BEGIN
 
+    DECLARE var_imageId INT;
+
     IF EXISTS(SELECT `id` FROM Image WHERE `repository` = in_repository AND `name` = in_name) THEN
         SET out_status = 'Exists';
     ELSE
@@ -456,9 +458,19 @@ BEGIN
             in_version_mask
         );
 
+        SET var_imageId = LAST_INSERT_ID();
+
+        INSERT INTO TagBranch (`image_id`, `name`, `protected`)
+        VALUES
+        (
+            var_imageId,
+            'latest',
+            1
+        );
+
         SET out_status = 'Inserted';
 
-        SELECT * FROM ImageKey_View image_key WHERE image_key.`ImageId` = LAST_INSERT_ID();
+        SELECT * FROM ImageKey_View image_key WHERE image_key.`ImageId` = var_imageId;
 
     END IF;
 

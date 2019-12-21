@@ -19,7 +19,6 @@ package io.linuxserver.fleet.v2.cache;
 
 import io.linuxserver.fleet.v2.key.HasKey;
 import io.linuxserver.fleet.v2.key.Key;
-import io.linuxserver.fleet.v2.types.Repository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -89,7 +88,7 @@ public abstract class AbstractItemCache<KEY extends Key, ITEM extends HasKey<KEY
     }
 
     @Override
-    public final void addAllItems(Collection<ITEM> fetchAllRepositories) {
-        fetchAllRepositories.forEach(this::addItem);
+    public final void addAllItems(Collection<ITEM> allItems) {
+        allItems.forEach(this::addItem);
     }
 }
