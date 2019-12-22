@@ -40,6 +40,12 @@ public class TaskQueue<TASK extends AsyncTask<?, ?>> {
     public final boolean submitTask(final TASK task) {
 
         LOGGER.info("Task submitted: {}", task);
+        if (activeTaskQueue.contains(task)) {
+
+            LOGGER.warn("Task {} is already queued so will not duplicate the request.", task);
+            return false;
+        }
+
         return activeTaskQueue.add(task);
     }
 

@@ -68,6 +68,10 @@ public class WebRouteController {
                     put(apiController::updateRepository,  roles(FleetRole.AdminOnly));
                     post(apiController::addNewRepository, roles(FleetRole.Anyone));
                 });
+
+                path(Locations.Internal.Schedule, () -> {
+                   put(apiController::runSchedule, roles(FleetRole.Anyone));
+                });
             });
         });
     }

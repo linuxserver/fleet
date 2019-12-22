@@ -39,7 +39,7 @@
                             <tr>
                                 <th>Name</th>
                                 <th>Last Run</th>
-                                <th>Next Run</th>
+                                <th>Next Run (Est.)</th>
                                 <th>Interval</th>
                                 <th></th>
                             </tr>
@@ -53,7 +53,7 @@
                                     <td class="is-vcentered">${schedule.interval.timeDuration} ${schedule.interval.timeUnitAsTimeUnit?lower_case}</td>
                                     <td>
                                         <@button.buttons isGrouped=true isRightAligned=true>
-                                            <@button.button extraClasses="force-schedule-run" colour="normal-colour" size="small" title="Run this schedule now">
+                                            <@button.button extraClasses="force-schedule-run" colour="normal-colour" size="small" title="Run this schedule now" extraAttributes='data-schedule-key="${schedule.key}"'>
                                                 <i class="fas fa-play is-marginless"></i>
                                             </@button.button>
                                         </@button.buttons>

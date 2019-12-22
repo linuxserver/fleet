@@ -28,6 +28,11 @@ public abstract class AbstractAppTask<DELEGATE extends AsyncTaskDelegate, RESPON
     public final String name;
 
     public AbstractAppTask(final String name) {
+
+        if (null == name) {
+            throw new IllegalArgumentException("name must not be null");
+        }
+
         this.name = name;
     }
 
@@ -51,6 +56,21 @@ public abstract class AbstractAppTask<DELEGATE extends AsyncTaskDelegate, RESPON
 
     @Override
     public String toString() {
-        return name;
+        return "AsyncTask[" + name + "]";
+    }
+
+    @Override
+    public int hashCode() {
+        return name.hashCode();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+
+        if (!(o instanceof AbstractAppTask)) {
+            return false;
+        }
+
+        return ((AbstractAppTask<?, ?>) o).name.equals(name);
     }
 }

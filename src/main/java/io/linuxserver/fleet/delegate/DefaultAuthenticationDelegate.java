@@ -25,7 +25,7 @@ public class DefaultAuthenticationDelegate implements AuthenticationDelegate {
 
     private final UserAuthenticator authenticator;
 
-    public DefaultAuthenticationDelegate(UserAuthenticator authenticator) {
+    public DefaultAuthenticationDelegate(final UserAuthenticator authenticator) {
         this.authenticator = authenticator;
     }
 

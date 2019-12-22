@@ -17,6 +17,34 @@
 
 var adminManager = (function($) {
 
+    var toggleButtonLoadingState = function(button) {
+        button.prop('disabled', !button.prop('disabled')).toggleClass('is-loading');
+    };
+
+    var runSchedule = function(trigger) {
+
+        var scheduleKey = trigger.data('schedule-key');
+
+        var request = {
+
+            url: '/internalApi/schedule',
+            method: 'put',
+            data: {
+                'scheduleKey': scheduleKey
+            }
+        };
+
+        toggleButtonLoadingState(trigger);
+        ajaxManager.call(request, function() {
+
+            notificationManager.makeNotification('Schedule run submitted successfully. The "Last Run" value will be updated once the task has completed.', 'success');
+            toggleButtonLoadingState(trigger);
+
+        }, function() {
+            toggleButtonLoadingState(trigger);
+        });
+    };
+
     var addRepository = function(repositoryName) {
 
         var trimmedName = $.trim(repositoryName);
@@ -37,7 +65,7 @@ var adminManager = (function($) {
 
             ajaxManager.call(request, function() { window.location.reload(); }, function() {
 
-                $('#SubmitNewRepository').prop('disabled', false).removeClass('is-loading');
+                toggleButtonLoadingState($('#SubmitNewRepository'));
                 $('#NewRepositoryName').val('');
             });
         }
@@ -50,9 +78,13 @@ var adminManager = (function($) {
             var $button        = $(this);
             var repositoryName = $('#NewRepositoryName').val();
 
-            $button.prop('disabled', true).addClass('is-loading');
+            toggleButtonLoadingState($button);
             addRepository(repositoryName);
-        })
+        });
+
+        $('.force-schedule-run').on('click', function() {
+            runSchedule($(this));
+        });
     };
 
     return {
