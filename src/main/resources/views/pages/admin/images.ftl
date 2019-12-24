@@ -54,10 +54,10 @@
                                         ${image.name}
                                     </td>
                                     <td class="editable-image-version-mask is-vcentered" style="width: 300px; min-width: 300px;">
-                                        <@input.switchable id="VersionMask_${repository.key.id}" icon="mask" value=repository.versonMask size="small" acceptClass="version-mask-switch" />
+                                        <@input.switchable id="VersionMask_${repository.key.id}" icon="mask" value=repository.versionMask size="small" acceptClass="version-mask-switch" />
                                     </td>
                                     <td class="editable-image-sync-enabled is-vcentered has-text-centered" style="width: 100px; max-width: 100px;">
-                                        <@input.toggle id="Enabled_${image.key.id}" size="small" isToggled=image.syncEnabled />
+                                        <@input.toggle id="Enabled_${image.key.id}" size="small" isToggled=(repository.syncEnabled && image.syncEnabled) isDisabled=(!repository.syncEnabled) title="${(!repository.syncEnabled)?string('Repository sync has been disabled.', '')}" />
                                     </td>
                                     <td class="editable-image-stable is-vcentered has-text-centered" style="width: 100px; max-width: 100px;">
                                         <@input.toggle id="Stable_${image.key.id}" size="small" isToggled=image.stable />

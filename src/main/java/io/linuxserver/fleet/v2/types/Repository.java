@@ -38,7 +38,7 @@ public class Repository extends AbstractSyncItem<RepositoryKey, Repository> {
     public Repository cloneWithSyncSpec(final ItemSyncSpec syncSpec) {
 
         final Repository cloned = new Repository(getKey(), syncSpec);
-        images.getAllItems().forEach(cloned::addImage);
+        images.getAllItems().forEach(i -> addImage(i.cloneWithSyncSpec(i.getSpec())));
 
         return cloned;
     }

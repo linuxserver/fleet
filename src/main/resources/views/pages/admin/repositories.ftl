@@ -48,7 +48,7 @@
                             <#list repositories as repository>
                                 <tr class="repository-row" data-repository-key="${repository.key}">
                                     <td class="editable-repository-enabled is-vcentered has-text-centered">
-                                        <@input.toggle id="Enabled_${repository.key.id}" size="large" isToggled=repository.syncEnabled />
+                                        <@input.toggle id="Enabled_${repository.key.id}" size="large" isToggled=repository.syncEnabled inputClasses="update-repository-trigger" />
                                     </td>
                                     <td class="is-vcentered">
                                         <p>
@@ -57,10 +57,18 @@
                                         <a href="/admin/images?repositoryKey=${repository.key}">${repository.images?size} images</a>
                                     </td>
                                     <td class="editable-repository-version-mask is-vcentered">
-                                        <@input.switchable id="VersionMask_${repository.key.id}" icon="mask" value=repository.versonMask size="small" acceptClass="version-mask-switch" />
+                                        <@input.switchable id="VersionMask_${repository.key.id}" icon="mask" value=repository.versionMask size="small" acceptClass="update-repository-trigger" />
                                     </td>
                                     <td class="is-vcentered has-text-right">
-                                        <@button.button size="small" colour="danger" extraAttributes='data-repository-key="${repository.key}"'>Delete</@button.button>
+                                        <@button.buttons isGrouped=true isRightAligned=true>
+                                            <@button.button size="small" colour="normal-colour" extraClasses="sync-repository" extraAttributes='data-repository-key="${repository.key}"' title="Re-sync repository">
+                                                <i class="fas fa-sync is-marginless"></i>
+                                            </@button.button>
+                                            <@button.button size="small" colour="danger" extraAttributes='data-repository-key="${repository.key}"' title="Delete repository">
+                                                <i class="fas fa-trash is-marginless"></i>
+                                            </@button.button>
+
+                                        </@button.buttons>
                                     </td>
                                 </tr>
                             </#list>

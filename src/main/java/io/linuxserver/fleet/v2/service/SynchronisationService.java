@@ -24,6 +24,7 @@ import io.linuxserver.fleet.v2.client.docker.queue.DockerImageUpdateRequest;
 import io.linuxserver.fleet.v2.client.docker.queue.TaskQueue;
 import io.linuxserver.fleet.v2.key.ImageKey;
 import io.linuxserver.fleet.v2.key.ImageLookupKey;
+import io.linuxserver.fleet.v2.thread.ThreadStatus;
 import io.linuxserver.fleet.v2.types.Image;
 import io.linuxserver.fleet.v2.types.Repository;
 import io.linuxserver.fleet.v2.types.docker.DockerImage;
@@ -34,12 +35,14 @@ import java.util.List;
 public class SynchronisationService extends AbstractAppService {
 
     private final TaskQueue<DockerImageUpdateRequest> syncQueue;
+    private final DockerApiTaskConsumer               taskConsumer;
 
     public SynchronisationService(FleetAppController controller) {
         super(controller);
 
         syncQueue = new TaskQueue<>();
-        new DockerApiTaskConsumer(this).start();
+        taskConsumer = new DockerApiTaskConsumer(this);
+        taskConsumer.start();
     }
 
     public final void synchroniseUpstreamRepository(final Repository repository) {
@@ -98,5 +101,9 @@ public class SynchronisationService extends AbstractAppService {
 
     public final DockerApiDelegate getConfiguredDockerDelegate() {
         return getController().getConfiguredDockerDelegate();
+    }
+
+    public final boolean isConsumerRunning() {
+        return taskConsumer.isThreadRunning();
     }
 }

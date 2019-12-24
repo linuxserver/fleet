@@ -32,8 +32,6 @@ public final class DockerApiTaskConsumer extends AbstractTaskQueueConsumer<Docke
 
     @Override
     protected void handleTaskResponse(final DockerImageUpdateResponse response) {
-
-        getLogger().info("Handling DockerApi response {}", response);
         response.handleDockerApiResponse();
     }
 }

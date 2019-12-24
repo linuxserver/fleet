@@ -65,6 +65,11 @@ public abstract class AbstractSyncItem<KEY extends Key, ITEM extends AbstractSyn
     }
 
     public final String getMaskedVersion(final Tag tag) {
+
+        if (null == tag) {
+            return null;
+        }
+
         return extractMaskedVersion(tag.getVersion());
     }
 

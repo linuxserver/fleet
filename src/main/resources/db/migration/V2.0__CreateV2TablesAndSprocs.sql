@@ -333,8 +333,35 @@ BEGIN
         SET out_status = 'NoChange';
     END IF;
 
-END;
-//
+END //
+
+CREATE OR REPLACE PROCEDURE `Repository_Store`
+(
+    in_id           INT,
+    in_synchronised TINYINT,
+    in_version_mask VARCHAR(255),
+
+    OUT out_status enum('NoChange', 'Updated')
+)
+BEGIN
+
+    IF NOT(EXISTS(SELECT `id` FROM Repository WHERE `id` = in_id)) THEN
+       SET out_status = 'NoChange';
+    ELSE
+
+        UPDATE
+            Repository
+        SET
+            `sync_enabled` = in_synchronised,
+            `version_mask` = in_version_mask
+        WHERE
+            `id` = in_id;
+
+        SET out_status = 'Updated';
+
+    END IF;
+
+END //
 
 CREATE OR REPLACE PROCEDURE `Repository_CreateOutline`
 (

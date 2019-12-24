@@ -27,7 +27,7 @@ var adminManager = (function($) {
 
         var request = {
 
-            url: '/internalApi/schedule',
+            url: '/internalapi/schedule',
             method: 'put',
             data: {
                 'scheduleKey': scheduleKey
@@ -37,7 +37,31 @@ var adminManager = (function($) {
         toggleButtonLoadingState(trigger);
         ajaxManager.call(request, function() {
 
-            notificationManager.makeNotification('Schedule run submitted successfully. The "Last Run" value will be updated once the task has completed.', 'success');
+            notificationManager.makeNotification('Schedule run submitted successfully.', 'success');
+            toggleButtonLoadingState(trigger);
+
+        }, function() {
+            toggleButtonLoadingState(trigger);
+        });
+    };
+
+    var syncRepository = function(trigger) {
+
+        var repositoryKey = trigger.data('repository-key');
+
+        var request = {
+
+            url: '/internalapi/repository/sync',
+            method: 'put',
+            data: {
+                'repositoryKey': repositoryKey
+            }
+        };
+
+        toggleButtonLoadingState(trigger);
+        ajaxManager.call(request, function() {
+
+            notificationManager.makeNotification('Sync request submitted.', 'success');
             toggleButtonLoadingState(trigger);
 
         }, function() {
@@ -52,7 +76,7 @@ var adminManager = (function($) {
 
             var request = {
 
-                url: '/internalApi/repository',
+                url: '/internalapi/repository',
                 method: 'post',
                 contentType: 'application/json',
                 dataType: 'json',
@@ -71,6 +95,34 @@ var adminManager = (function($) {
         }
     };
 
+    var updateRepositorySpec = function($row) {
+
+        var repositoryKey = $row.data('repository-key');
+        var syncEnabled   = $row.find('.editable-repository-enabled').find('input[type="checkbox"]').is(':checked');
+        var versionMask   = cleanEmpty($row.find('.editable-repository-version-mask').find('.switchable.field input[type="text"]').val());
+
+        var request = {
+
+            url: '/internalapi/repository',
+            method: 'put',
+            contentType: 'application/json',
+            dataType: 'json',
+            data: JSON.stringify({
+                'repositoryKey': repositoryKey,
+                'syncEnabled': syncEnabled,
+                'versionMask': versionMask
+            })
+        };
+
+        ajaxManager.call(request, function() {
+            notificationManager.makeNotification('Repository updated', 'success');
+        });
+    };
+
+    var cleanEmpty = function(val) {
+        return (typeof val === 'undefined' || $.trim(val).length === 0) ? null : val;
+    };
+
     var init = function() {
 
         $('#SubmitNewRepository').on('click', function() {
@@ -84,6 +136,14 @@ var adminManager = (function($) {
 
         $('.force-schedule-run').on('click', function() {
             runSchedule($(this));
+        });
+
+        $('.sync-repository').on('click', function() {
+           syncRepository($(this));
+        });
+
+        $('.update-repository-trigger').on('click', function() {
+            updateRepositorySpec($(this).parents('.repository-row'));
         });
     };
 

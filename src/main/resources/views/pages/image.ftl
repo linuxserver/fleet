@@ -72,7 +72,7 @@
                         <@table.table isFullWidth=true isNarrow=true isStriped=true>
                             <tbody>
                                 <#list image.tagBranches as tagBranch>
-                                    <@table.halfDisplayRow title=tagBranch.branchName value='<i class="fas fa-tag"></i> ${(tagBranch.latestTag).version!""}' />
+                                    <@table.halfDisplayRow title=tagBranch.branchName value='<i class="fas fa-tag"></i> ${image.getMaskedVersion(tagBranch.latestTag)}' />
                                 </#list>
                             </tbody>
                         </@table.table>

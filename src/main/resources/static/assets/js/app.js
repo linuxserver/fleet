@@ -180,6 +180,10 @@ var appManager = (function($) {
             $editableField.val($editableField.data('original-value'));
             $parent.removeClass('is-active');
         });
+
+        $body.on('click', '.has-switchable .switchable.field .is-accept-switchable', function() {
+            $(this).parents('.has-switchable').removeClass('is-active');
+        });
     };
 
     var initDropdowns = function() {

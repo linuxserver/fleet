@@ -40,6 +40,10 @@ public class ItemSyncSpec {
         setVersionMask(versionMask);
     }
 
+    public final ItemSyncSpec copyOf() {
+        return new ItemSyncSpec(isDeprecated(), isHidden(), isStable(), isSynchronised(), getVersionMask());
+    }
+
     public final void setDeprecated(boolean deprecated) {
         this.deprecated = deprecated;
     }

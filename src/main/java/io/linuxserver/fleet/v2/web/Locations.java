@@ -39,10 +39,11 @@ public interface Locations {
     }
 
     interface Internal {
-        String Api        = "/internalApi";
+        String Api        = "/internalapi";
         String Repository = "repository";
         String Image      = "image";
         String Schedule   = "schedule";
+        String Sync       = "sync";
     }
 
     interface Admin {

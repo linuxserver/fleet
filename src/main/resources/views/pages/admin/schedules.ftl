@@ -66,6 +66,29 @@
 
             </div>
 
+            <div class="columns is-multiline has-margin-top">
+
+                <div class="column is-12">
+                    <h3 class="title is-5">
+                        Queued Items
+                    </h3>
+                    <h4 class="subtitle is-6">
+                        The synchronisation queue contains individual sync requests for images.
+                    </h4>
+                    There ${(queueSize==1)?string('is', 'are')} currently #{queueSize} ${(queueSize==1)?string('item', 'items')} queued.
+                </div>
+
+                <div class="column is-12">
+                    <h3 class="title is-5">
+                        Request Consumer
+                    </h3>
+                    <h4 class="subtitle is-6">
+                        Asynchronous thread which subscribes to the request queue.
+                    </h4>
+                    The request consumer is currently ${consumerRunning?string('<span class="has-text-success has-fontweight-bold">running</span>', '<span class="has-text-danger has-fontweight-bold">not running</span>')}.
+                </div>
+            </div>
+
         </@container.container>
     </@section.section>
 

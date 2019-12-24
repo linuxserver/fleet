@@ -19,6 +19,7 @@ package io.linuxserver.fleet.v2.web.routes;
 
 import io.javalin.http.Context;
 import io.linuxserver.fleet.core.FleetAppController;
+import io.linuxserver.fleet.v2.key.RepositoryKey;
 import io.linuxserver.fleet.v2.key.ScheduleKey;
 import io.linuxserver.fleet.v2.service.AbstractAppService;
 import io.linuxserver.fleet.v2.thread.schedule.AppSchedule;
@@ -26,8 +27,10 @@ import io.linuxserver.fleet.v2.types.Repository;
 import io.linuxserver.fleet.v2.types.api.ApiRepositoryWrapper;
 import io.linuxserver.fleet.v2.types.api.ApiScheduleWrapper;
 import io.linuxserver.fleet.v2.types.internal.RepositoryOutlineRequest;
+import io.linuxserver.fleet.v2.types.meta.ItemSyncSpec;
 import io.linuxserver.fleet.v2.web.ApiException;
 import io.linuxserver.fleet.v2.web.request.NewRepositoryRequest;
+import io.linuxserver.fleet.v2.web.request.UpdateRepositoryRequest;
 
 public class InternalApiController extends AbstractAppService {
 
@@ -37,9 +40,26 @@ public class InternalApiController extends AbstractAppService {
 
     public final void updateRepository(final Context ctx) {
 
+        try {
+
+            final UpdateRepositoryRequest request = ctx.bodyValidator(UpdateRepositoryRequest.class)
+                    .check(req -> req.getRepositoryKey() != null).get();
+
+            final ItemSyncSpec spec = ItemSyncSpec.Default.copyOf();
+            spec.setSynchronised(request.isSyncEnabled());
+            spec.setVersionMask(request.getVersionMask());
+
+            final Repository updated = getController().getRepositoryService()
+                    .updateRepositorySpec(RepositoryKey.parse(request.getRepositoryKey()), spec);
+
+            ctx.json(new ApiRepositoryWrapper(updated));
+
+        } catch (IllegalArgumentException e) {
+            throw new ApiException(e.getMessage(), e);
+        }
     }
 
-    public void addNewRepository(final Context ctx) {
+    public final void addNewRepository(final Context ctx) {
 
         try {
 
@@ -56,7 +76,7 @@ public class InternalApiController extends AbstractAppService {
         }
     }
 
-    public void runSchedule(final Context ctx) {
+    public final void runSchedule(final Context ctx) {
 
         try {
 
@@ -64,6 +84,22 @@ public class InternalApiController extends AbstractAppService {
             final AppSchedule schedule = getController().getScheduleService().forceRun(new ScheduleKey(scheduleKey));
 
             ctx.json(new ApiScheduleWrapper(schedule));
+
+        } catch (IllegalArgumentException e) {
+            throw new ApiException(e.getMessage(), e);
+        }
+    }
+
+    public final void syncRepository(Context ctx) {
+
+        try {
+
+            final String     repositoryKeyParam = ctx.formParam("repositoryKey", String.class).get();
+            final Repository repository = getController().getRepositoryService().getRepository(RepositoryKey.parse(repositoryKeyParam));
+
+            getController().synchroniseRepository(repository);
+
+            ctx.json(new ApiRepositoryWrapper(repository));
 
         } catch (IllegalArgumentException e) {
             throw new ApiException(e.getMessage(), e);

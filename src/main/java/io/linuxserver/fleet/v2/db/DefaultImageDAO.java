@@ -42,6 +42,7 @@ public class DefaultImageDAO extends AbstractDAO implements ImageDAO {
     private static final String GetRepository            = "{CALL Repository_Get(?)}";
     private static final String GetImageKeys             = "{CALL Repository_GetImageKeys(?)}";
     private static final String CreateRepositoryOutline  = "{CALL Repository_CreateOutline(?,?,?,?,?,?,?,?)}";
+    private static final String StoreRepository          = "{CALL Repository_Store(?,?,?,?)}";
 
     private static final String StoreImage             = "{CALL Image_Store(?,?,?,?,?,?,?,?,?,?,?)}";
     private static final String CreateTagBranchOutline = "{CALL Image_CreateTagBranchOutline(?,?)}";
@@ -287,7 +288,34 @@ public class DefaultImageDAO extends AbstractDAO implements ImageDAO {
 
     @Override
     public InsertUpdateResult<Repository> storeRepository(Repository repository) {
-        return null;
+
+        try (final Connection connection = getConnection()) {
+
+            try (final CallableStatement call = connection.prepareCall(StoreRepository)) {
+
+                int i = 1;
+                call.setInt(i++,     repository.getKey().getId());
+                call.setBoolean(i++, repository.getSpec().isSynchronised());
+                call.setString(i++,  repository.getSpec().getVersionMask());
+
+                final int statusIndex = i;
+                call.registerOutParameter(statusIndex, Types.VARCHAR);
+
+                call.executeUpdate();
+
+                final DbUpdateStatus status = DbUpdateStatus.valueOf(call.getString(statusIndex));
+                if (status.isUpdated()) {
+                    return new InsertUpdateResult<>(makeRepository(repository.getKey(), connection));
+                }
+
+                return new InsertUpdateResult<>(InsertUpdateStatus.FAILED, "Repository was not updated.");
+            }
+
+        } catch (SQLException e) {
+
+            getLogger().error("Error caught when executing SQL: storeRepository", e);
+            return new InsertUpdateResult<>(InsertUpdateStatus.FAILED, e.getMessage());
+        }
     }
 
     private void storeTagBranches(final Connection connection, final Image image) throws SQLException {

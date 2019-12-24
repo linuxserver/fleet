@@ -50,7 +50,7 @@ public class DockerImageUpdateResponse implements AsyncDockerApiResponse {
     }
 
     @Override
-    public final String toString() {
-        return imageKey.toString();
+    public String toString() {
+        return "DockerImageUpdateResponse[" + imageKey.toString() + "]";
     }
 }

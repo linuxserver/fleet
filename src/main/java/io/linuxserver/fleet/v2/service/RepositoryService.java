@@ -29,6 +29,7 @@ import io.linuxserver.fleet.v2.types.docker.DockerImage;
 import io.linuxserver.fleet.v2.types.docker.DockerTag;
 import io.linuxserver.fleet.v2.types.internal.ImageOutlineRequest;
 import io.linuxserver.fleet.v2.types.internal.RepositoryOutlineRequest;
+import io.linuxserver.fleet.v2.types.meta.ItemSyncSpec;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -58,12 +59,19 @@ public class RepositoryService {
         repositoryCache.addAllItems(imageDAO.fetchAllRepositories());
     }
 
-    public final Repository storeRepository(final Repository repository) {
+    public final Repository updateRepositorySpec(final RepositoryKey repositoryKey, final ItemSyncSpec updatedSpec) {
 
-        final InsertUpdateResult<Repository> result = imageDAO.storeRepository(repository);
+        final Repository cachedRepository = getRepository(repositoryKey);
+        if (null == cachedRepository) {
+            throw new IllegalArgumentException("Repository key " + repositoryKey + " did not match known repository");
+        }
+
+        final Repository updatedRepository = cachedRepository.cloneWithSyncSpec(updatedSpec);
+
+        final InsertUpdateResult<Repository> result = imageDAO.storeRepository(updatedRepository);
         if (result.isError()) {
 
-            LOGGER.error("Unable to store repository {}. Update returned error: {}", repository, result.getStatusMessage());
+            LOGGER.error("Unable to store repository {}. Update returned error: {}", repositoryKey, result.getStatusMessage());
             throw new RuntimeException("Failed to store repository: " + result.getStatusMessage());
         }
 
@@ -142,7 +150,7 @@ public class RepositoryService {
     }
 
     public final Repository getFirstRepository() {
-        return repositoryCache.getAllItems().stream().findFirst().orElse(null);
+        return getAllShownRepositories().stream().findFirst().orElse(null);
     }
 
     public final List<Repository> getAllRepositories() {

@@ -60,13 +60,18 @@ public class WebRouteController {
 
             get(Locations.Admin.Repositories, new AdminRepositoryController(app.getRepositoryService()), roles(FleetRole.Anyone));
             get(Locations.Admin.Images,       new AdminImageController(     app.getRepositoryService()), roles(FleetRole.Anyone));
-            get(Locations.Admin.Schedules,    new AdminScheduleController(  app.getScheduleService()),   roles(FleetRole.Anyone));
+            get(Locations.Admin.Schedules,    new AdminScheduleController(  app.getScheduleService(), app.getSynchronisationService()), roles(FleetRole.Anyone));
 
             path(Locations.Internal.Api, () -> {
 
                 path(Locations.Internal.Repository, () -> {
-                    put(apiController::updateRepository,  roles(FleetRole.AdminOnly));
+
+                    put(apiController::updateRepository,  roles(FleetRole.Anyone));
                     post(apiController::addNewRepository, roles(FleetRole.Anyone));
+
+                    path(Locations.Internal.Sync, () -> {
+                       put(apiController::syncRepository, roles(FleetRole.Anyone));
+                    });
                 });
 
                 path(Locations.Internal.Schedule, () -> {
