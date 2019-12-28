@@ -24,6 +24,7 @@ import org.slf4j.LoggerFactory;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.util.Objects;
 import java.util.Properties;
 
 /**
@@ -51,6 +52,7 @@ class PropertiesLoader extends BaseRuntimeLoader {
 
             Properties properties = new Properties();
             properties.load(new FileInputStream(FleetRuntime.CONFIG_BASE + "/fleet.properties"));
+            properties.load(Objects.requireNonNull(getClass().getClassLoader().getResourceAsStream("version.properties")));
 
             this.properties = new AppProperties(properties);
 
@@ -126,10 +128,10 @@ class PropertiesLoader extends BaseRuntimeLoader {
     private void printProperties() {
 
         LOGGER.info("fleet.app.port           : " + properties.getAppPort());
-        LOGGER.info("fleet.refresh.interval   : " + properties.getRefreshIntervalInMinutes());
-        LOGGER.info("fleet.database.url       : " + properties.getDatabaseUrl());
-        LOGGER.info("fleet.database.username  : " + properties.getDatabaseUsername());
-        LOGGER.info("fleet.database.password  : " + (showPasswords() ? properties.getDatabasePassword() : "***"));
+        LOGGER.info("fleet.database.url       : " + properties.getDatabaseProperties().getDatabaseUrl());
+        LOGGER.info("fleet.database.username  : " + properties.getDatabaseProperties().getDatabaseUsername());
+        LOGGER.info("fleet.database.password  : " + (showPasswords() ? properties.getDatabaseProperties().getDatabasePassword() : "***"));
+        LOGGER.info("app.version              : " + getProperties().getVersionProperties());
     }
 
     /**

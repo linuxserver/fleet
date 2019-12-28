@@ -22,10 +22,12 @@ import java.util.concurrent.TimeUnit;
 
 public class TimeWithUnit {
 
-    private final int        timeDuration;
-    private final ChronoUnit timeUnit;
+    public static final TimeWithUnit Zero = new TimeWithUnit(0, TimeUnit.SECONDS);
 
-    public TimeWithUnit(final int timeDuration, final ChronoUnit timeUnit) {
+    private final long     timeDuration;
+    private final TimeUnit timeUnit;
+
+    public TimeWithUnit(final long timeDuration, final TimeUnit timeUnit) {
 
         this.timeDuration = timeDuration;
         this.timeUnit     = timeUnit;
@@ -36,26 +38,40 @@ public class TimeWithUnit {
         if (value.matches("\\d+:(seconds|minutes|hours|days)")) {
 
             final String[] values = value.split(":");
-            return new TimeWithUnit(Integer.parseInt(values[0]), ChronoUnit.valueOf(values[1].toUpperCase()));
+            return new TimeWithUnit(Integer.parseInt(values[0]), TimeUnit.valueOf(values[1].toUpperCase()));
         }
 
         throw new IllegalArgumentException("Invalid TimeWithUnit value " + value);
     }
 
-    public final int getTimeDuration() {
+    public final TimeWithUnit convertToLowestUnit(final TimeWithUnit otherUnit) {
+
+        if (getTimeUnit().compareTo(otherUnit.getTimeUnit()) < 0) {
+            return this;
+        }
+
+        return new TimeWithUnit(otherUnit.getTimeUnit().convert(getTimeDuration(), getTimeUnit()),
+                                otherUnit.getTimeUnit());
+    }
+
+    public final long getTimeDuration() {
         return timeDuration;
     }
 
-    public final ChronoUnit getTimeUnit() {
+    public final ChronoUnit getChronoUnit() {
+        return timeUnit.toChronoUnit();
+    }
+
+    public final TimeUnit getTimeUnit() {
         return timeUnit;
     }
 
-    public final TimeUnit getTimeUnitAsTimeUnit() {
-        return TimeUnit.valueOf(getTimeUnit().name());
+    public final boolean isGreaterThanZero() {
+        return getTimeDuration() > 0;
     }
 
     @Override
     public final String toString() {
-        return getTimeDuration() + ":" + getTimeUnitAsTimeUnit().name().toLowerCase();
+        return getTimeDuration() + ":" + getTimeUnit().name().toLowerCase();
     }
 }

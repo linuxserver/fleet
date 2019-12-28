@@ -39,7 +39,7 @@ public interface ImageDAO {
 
     InsertUpdateResult<TagBranch> createTagBranchOutline(final TagBranchOutlineRequest request);
 
-    void removeImage(final Image image);
+    InsertUpdateResult<Void> removeImage(final Image image);
 
     Repository fetchRepository(final RepositoryKey repositoryKey);
 
@@ -48,4 +48,6 @@ public interface ImageDAO {
     List<Repository> fetchAllRepositories();
 
     InsertUpdateResult<Repository> storeRepository(Repository repository);
+
+    InsertUpdateResult<Void> removeRepository(final Repository repository);
 }

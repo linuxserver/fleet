@@ -19,17 +19,21 @@ package io.linuxserver.fleet.v2.web.routes;
 
 import io.javalin.http.Context;
 import io.linuxserver.fleet.core.FleetAppController;
+import io.linuxserver.fleet.v2.key.ImageKey;
 import io.linuxserver.fleet.v2.key.RepositoryKey;
 import io.linuxserver.fleet.v2.key.ScheduleKey;
 import io.linuxserver.fleet.v2.service.AbstractAppService;
 import io.linuxserver.fleet.v2.thread.schedule.AppSchedule;
+import io.linuxserver.fleet.v2.types.Image;
 import io.linuxserver.fleet.v2.types.Repository;
+import io.linuxserver.fleet.v2.types.api.ApiImageWrapper;
 import io.linuxserver.fleet.v2.types.api.ApiRepositoryWrapper;
 import io.linuxserver.fleet.v2.types.api.ApiScheduleWrapper;
 import io.linuxserver.fleet.v2.types.internal.RepositoryOutlineRequest;
 import io.linuxserver.fleet.v2.types.meta.ItemSyncSpec;
 import io.linuxserver.fleet.v2.web.ApiException;
 import io.linuxserver.fleet.v2.web.request.NewRepositoryRequest;
+import io.linuxserver.fleet.v2.web.request.UpdateImageSpecRequest;
 import io.linuxserver.fleet.v2.web.request.UpdateRepositoryRequest;
 
 public class InternalApiController extends AbstractAppService {
@@ -38,7 +42,31 @@ public class InternalApiController extends AbstractAppService {
         super(controller);
     }
 
-    public final void updateRepository(final Context ctx) {
+    public final void updateImageSpec(final Context ctx) {
+
+        try {
+
+            final UpdateImageSpecRequest request = ctx.bodyValidator(UpdateImageSpecRequest.class)
+                    .check(req -> req.getImageKey() != null).get();
+
+            final ItemSyncSpec spec = ItemSyncSpec.Default.copyOf();
+            spec.setSynchronised(request.isSyncEnabled());
+            spec.setStable(request.isStable());
+            spec.setHidden(request.isHidden());
+            spec.setDeprecated(request.isDeprecated());
+            spec.setVersionMask(request.getVersionMask());
+
+            final Image updated = getController().getRepositoryService()
+                    .updateImageSpec(ImageKey.parse(request.getImageKey()), spec);
+
+            ctx.json(new ApiImageWrapper(updated));
+
+        } catch (IllegalArgumentException e) {
+            throw new ApiException(e.getMessage(), e);
+        }
+    }
+
+    public final void updateRepositorySpec(final Context ctx) {
 
         try {
 
@@ -90,7 +118,7 @@ public class InternalApiController extends AbstractAppService {
         }
     }
 
-    public final void syncRepository(Context ctx) {
+    public final void syncRepository(final Context ctx) {
 
         try {
 
@@ -100,6 +128,20 @@ public class InternalApiController extends AbstractAppService {
             getController().synchroniseRepository(repository);
 
             ctx.json(new ApiRepositoryWrapper(repository));
+
+        } catch (IllegalArgumentException e) {
+            throw new ApiException(e.getMessage(), e);
+        }
+    }
+
+    public void deleteRepository(final Context ctx) {
+
+        try {
+
+            final String     repositoryKeyParam = ctx.queryParam("repositoryKey", String.class).get();
+            getController().getRepositoryService().removeRepository(RepositoryKey.parse(repositoryKeyParam));
+
+            ctx.result("OK");
 
         } catch (IllegalArgumentException e) {
             throw new ApiException(e.getMessage(), e);

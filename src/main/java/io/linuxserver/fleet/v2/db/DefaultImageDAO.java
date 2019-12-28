@@ -40,6 +40,7 @@ public class DefaultImageDAO extends AbstractDAO implements ImageDAO {
 
     private static final String GetRepositoryKeys        = "{CALL Repository_GetRepositoryKeys()}";
     private static final String GetRepository            = "{CALL Repository_Get(?)}";
+    private static final String DeleteRepository         = "{CALL Repository_Delete(?,?)}";
     private static final String GetImageKeys             = "{CALL Repository_GetImageKeys(?)}";
     private static final String CreateRepositoryOutline  = "{CALL Repository_CreateOutline(?,?,?,?,?,?,?,?)}";
     private static final String StoreRepository          = "{CALL Repository_Store(?,?,?,?)}";
@@ -187,7 +188,7 @@ public class DefaultImageDAO extends AbstractDAO implements ImageDAO {
     }
 
     @Override
-    public void removeImage(final Image image) {
+    public InsertUpdateResult<Void> removeImage(final Image image) {
 
         try (final Connection connection = getConnection()) {
 
@@ -199,14 +200,18 @@ public class DefaultImageDAO extends AbstractDAO implements ImageDAO {
 
                 final DbUpdateStatus status = DbUpdateStatus.valueOf(call.getString(2));
                 if (status.isNoChange()) {
+
                     getLogger().warn("removeImage attempted to remove an image which did not exist in the database: {}", image);
+                    return new InsertUpdateResult<>(InsertUpdateStatus.FAILED, "Unable to remove image " + image);
                 }
+
+                return new InsertUpdateResult<>(null);
             }
 
         } catch (SQLException e) {
 
             getLogger().error("Error caught when executing SQL: removeImage", e);
-            throw new RuntimeException("removeImage unable to delete image", e);
+            return new InsertUpdateResult<>(InsertUpdateStatus.FAILED, e.getMessage());
         }
     }
 
@@ -314,6 +319,35 @@ public class DefaultImageDAO extends AbstractDAO implements ImageDAO {
         } catch (SQLException e) {
 
             getLogger().error("Error caught when executing SQL: storeRepository", e);
+            return new InsertUpdateResult<>(InsertUpdateStatus.FAILED, e.getMessage());
+        }
+    }
+
+    @Override
+    public InsertUpdateResult<Void> removeRepository(final Repository repository) {
+
+        try (final Connection connection = getConnection()) {
+
+            try (final CallableStatement call = connection.prepareCall(DeleteRepository)) {
+
+                call.setInt(1, repository.getKey().getId());
+                call.registerOutParameter(2, Types.VARCHAR);
+
+                call.executeUpdate();
+
+                final DbUpdateStatus status = DbUpdateStatus.valueOf(call.getString(2));
+                if (status.isNoChange()) {
+
+                    getLogger().warn("Attempted to delete repository {} but resulted in no change", repository);
+                    return new InsertUpdateResult<>(InsertUpdateStatus.FAILED, "Unable to remove repository " + repository.getName());
+                }
+
+                return new InsertUpdateResult<>(null);
+            }
+
+        } catch (SQLException e) {
+
+            getLogger().error("Error caught when executing SQL: removeRepository.", e);
             return new InsertUpdateResult<>(InsertUpdateStatus.FAILED, e.getMessage());
         }
     }

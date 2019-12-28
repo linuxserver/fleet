@@ -33,10 +33,4 @@ public interface FleetRuntime {
      * Tells Fleet to completely wipe the database and recreate it.
      */
     boolean NUKE_DATABASE           = System.getProperty("fleet.nuke.database") != null;
-
-    /**
-     * Tells Fleet not to run a synchronisation when the app starts up. The first run
-     * will be at the next interval
-     */
-    boolean SKIP_SYNC_ON_STARTUP    = System.getProperty("fleet.skip.sync.on.startup") != null;
 }

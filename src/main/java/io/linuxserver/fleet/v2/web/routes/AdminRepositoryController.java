@@ -18,6 +18,7 @@
 package io.linuxserver.fleet.v2.web.routes;
 
 import io.javalin.http.Context;
+import io.linuxserver.fleet.core.FleetAppController;
 import io.linuxserver.fleet.v2.service.RepositoryService;
 import io.linuxserver.fleet.v2.web.PageModelSpec;
 
@@ -25,8 +26,9 @@ public class AdminRepositoryController extends AbstractPageHandler {
 
     private final RepositoryService repositoryService;
 
-    public AdminRepositoryController(final RepositoryService repositoryService) {
-        this.repositoryService = repositoryService;
+    public AdminRepositoryController(final FleetAppController controller) {
+        super(controller);
+        repositoryService = controller.getRepositoryService();
     }
 
     @Override

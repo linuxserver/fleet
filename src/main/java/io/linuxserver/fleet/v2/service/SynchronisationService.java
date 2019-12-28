@@ -106,4 +106,8 @@ public class SynchronisationService extends AbstractAppService {
     public final boolean isConsumerRunning() {
         return taskConsumer.isThreadRunning();
     }
+
+    public final boolean isSyncQueueEmpty() {
+        return getSyncQueue().isEmpty();
+    }
 }

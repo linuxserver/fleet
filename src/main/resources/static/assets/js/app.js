@@ -42,6 +42,8 @@ var ajaxManager = (function($) {
 
     var handleError = function(jqXHR, onError) {
 
+        $('.modal').removeClass('is-active');
+
         if (jqXHR.status === 403) {
             notificationManager.makeNotification('Permission denied', 'danger');
         } else {
@@ -200,6 +202,17 @@ var appManager = (function($) {
         });
     };
 
+    var initModals = function() {
+
+        $('.is-modal-trigger').on('click', function() {
+            $($(this).data('modal')).addClass('is-active');
+        });
+
+        $('.is-modal-cancel').on('click', function() {
+            $(this).parents('.modal').removeClass('is-active');
+        });
+    };
+
     var init = function() {
 
         initRepositorySwitcher();
@@ -207,6 +220,7 @@ var appManager = (function($) {
         initDropdowns();
         initNotifications();
         initMenu();
+        initModals();
     };
 
     return {

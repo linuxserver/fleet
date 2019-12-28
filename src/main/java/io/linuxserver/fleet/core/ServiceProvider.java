@@ -15,27 +15,20 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package io.linuxserver.fleet.v2.thread.schedule;
+package io.linuxserver.fleet.core;
 
-import io.linuxserver.fleet.v2.key.HasKey;
-import io.linuxserver.fleet.v2.key.ScheduleKey;
+import io.linuxserver.fleet.v2.service.RepositoryService;
+import io.linuxserver.fleet.v2.service.ScheduleService;
+import io.linuxserver.fleet.v2.service.SynchronisationService;
+import io.linuxserver.fleet.v2.service.UserService;
 
-import java.time.Duration;
-import java.time.LocalDateTime;
+public interface ServiceProvider {
 
-public interface AppSchedule extends HasKey<ScheduleKey>, Runnable {
+    SynchronisationService getSynchronisationService();
 
-    String getName();
+    RepositoryService getRepositoryService();
 
-    LocalDateTime getLastRunTime();
+    ScheduleService getScheduleService();
 
-    LocalDateTime getNextRunTime();
-
-    Duration getLastRunDuration();
-
-    TimeWithUnit getDelay();
-
-    TimeWithUnit getInterval();
-
-    void executeSchedule();
+    UserService getUserService();
 }

@@ -38,6 +38,8 @@ public interface ItemCache<KEY extends Key, ITEM extends HasKey<KEY>> {
 
     void addAllItems(Collection<ITEM> items);
 
+    int size();
+
     interface ItemCacheListener<ITEM> {
 
         void onItemCached(final ITEM item);

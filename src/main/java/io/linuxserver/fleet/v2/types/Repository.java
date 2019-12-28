@@ -94,4 +94,9 @@ public class Repository extends AbstractSyncItem<RepositoryKey, Repository> {
     public final void removeImage(final Image image) {
         images.removeItem(image.getKey());
     }
+
+    @Override
+    public final String toString() {
+        return getName() + "[nImages=" + images.size() + "]";
+    }
 }

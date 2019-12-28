@@ -29,12 +29,9 @@ public class TaskQueue<TASK extends AsyncTask<?, ?>> {
     private static final Logger LOGGER = LoggerFactory.getLogger(TaskQueue.class);
 
     private final BlockingQueue<TASK> activeTaskQueue;
-    private final BlockingQueue<TASK> failedTaskQueue;
 
     public TaskQueue() {
-
         activeTaskQueue = new LinkedBlockingQueue<>();
-        failedTaskQueue = new LinkedBlockingQueue<>();
     }
 
     public final boolean submitTask(final TASK task) {
@@ -57,7 +54,7 @@ public class TaskQueue<TASK extends AsyncTask<?, ?>> {
         return activeTaskQueue.take();
     }
 
-    public final boolean reQueueFailedTask(final TASK failedTask) {
-        return failedTaskQueue.add(failedTask);
+    public final boolean isEmpty() {
+        return activeTaskQueue.isEmpty();
     }
 }

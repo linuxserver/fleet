@@ -18,9 +18,16 @@
 package io.linuxserver.fleet.v2.web.routes;
 
 import io.javalin.http.Context;
+import io.linuxserver.fleet.auth.AuthenticationResult;
+import io.linuxserver.fleet.core.FleetAppController;
 import io.linuxserver.fleet.v2.web.PageModelSpec;
+import io.linuxserver.fleet.v2.web.SessionAttributes;
 
 public class LoginController extends AbstractPageHandler {
+
+    public LoginController(final FleetAppController controller) {
+        super(controller);
+    }
 
     @Override
     protected PageModelSpec handlePageLoad(final Context ctx) {
@@ -48,6 +55,11 @@ public class LoginController extends AbstractPageHandler {
 
         final String username = ctx.formParam("username");
         final String password = ctx.formParam("password");
+
+        final AuthenticationResult result = getController().authenticateUser(username, password);
+        if (result.isAuthenticated()) {
+            ctx.sessionAttribute(SessionAttributes.AuthenticatedUser, result.getUser());
+        }
     }
 
     private void doLogOut(final Context ctx) {

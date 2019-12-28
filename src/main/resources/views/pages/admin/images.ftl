@@ -24,19 +24,21 @@
 <#import "../../ui/elements/button.ftl"     as button />
 <#import "../../ui/elements/table.ftl"      as table />
 
-<@base.base title="Images (${repository.name}) | Admin" context="admin_images">
+<@base.base title='Images (${(repository.name)!"Unknown Repository"}) | Admin' context="admin_images">
 
-    <@section.section id="ManageImages">
-        <@container.container>
+    <#if repository?has_content>
 
-            <div class="columns is-multiline">
-                <div class="column is-12">
-                    <@title.title boldValue="Images under ${repository.name}" subtitle="Manage all synchronised images" />
-                </div>
-                <div class="column is-12 has-margin-top">
+        <@section.section id="ManageImages">
+            <@container.container>
 
-                    <@table.table isFullWidth=true isHoverable=true isScrollable=true extraClasses="table--sortable">
-                        <thead>
+                <div class="columns is-multiline">
+                    <div class="column is-12">
+                        <@title.title boldValue="Images under ${repository.name}" subtitle="Manage all synchronised images" />
+                    </div>
+                    <div class="column is-12 has-margin-top">
+
+                        <@table.table isFullWidth=true isHoverable=true isScrollable=true extraClasses="table--sortable">
+                            <thead>
                             <tr>
                                 <th>Name</th>
                                 <th><abbr title="Apply a mask against all tags under this repository">Version Mask</abbr></th>
@@ -46,27 +48,27 @@
                                 <th class="has-text-centered"><abbr title="Is this image deprecated?">Dep.</abbr></th>
                                 <th></th>
                             </tr>
-                        </thead>
-                        <tbody>
+                            </thead>
+                            <tbody>
                             <#list repository.images as image>
                                 <tr class="image-row" data-repository-key="${repository.key}" data-image-key="${image.key}">
                                     <td class="is-vcentered">
                                         ${image.name}
                                     </td>
                                     <td class="editable-image-version-mask is-vcentered" style="width: 300px; min-width: 300px;">
-                                        <@input.switchable id="VersionMask_${repository.key.id}" icon="mask" value=repository.versionMask size="small" acceptClass="version-mask-switch" />
+                                        <@input.switchable id="VersionMask_${repository.key.id}" icon="mask" value=repository.versionMask size="small" acceptClass="update-image-trigger" />
                                     </td>
                                     <td class="editable-image-sync-enabled is-vcentered has-text-centered" style="width: 100px; max-width: 100px;">
-                                        <@input.toggle id="Enabled_${image.key.id}" size="small" isToggled=(repository.syncEnabled && image.syncEnabled) isDisabled=(!repository.syncEnabled) title="${(!repository.syncEnabled)?string('Repository sync has been disabled.', '')}" />
+                                        <@input.toggle id="Enabled_${image.key.id}" size="small" inputClasses="update-image-trigger" isToggled=(repository.syncEnabled && image.syncEnabled) isDisabled=(!repository.syncEnabled) title="${(!repository.syncEnabled)?string('Repository sync has been disabled.', '')}" />
                                     </td>
                                     <td class="editable-image-stable is-vcentered has-text-centered" style="width: 100px; max-width: 100px;">
-                                        <@input.toggle id="Stable_${image.key.id}" size="small" isToggled=image.stable />
+                                        <@input.toggle id="Stable_${image.key.id}" size="small" inputClasses="update-image-trigger" isToggled=image.stable />
                                     </td>
                                     <td class="editable-image-hidden is-vcentered has-text-centered" style="width: 100px; max-width: 100px;">
-                                        <@input.toggle id="Hidden_${image.key.id}" colour="warning" size="small" isToggled=image.hidden />
+                                        <@input.toggle id="Hidden_${image.key.id}" colour="warning" size="small" inputClasses="update-image-trigger" isToggled=image.hidden />
                                     </td>
                                     <td class="editable-image-deprecated is-vcentered has-text-centered" style="width: 100px; max-width: 100px;">
-                                        <@input.toggle id="Deprecated_${image.key.id}" colour="danger" size="small" isToggled=image.deprecated />
+                                        <@input.toggle id="Deprecated_${image.key.id}" colour="danger" size="small" inputClasses="update-image-trigger" isToggled=image.deprecated />
                                     </td>
                                     <td style="min-width: 100px; width: 100px;">
                                         <@button.buttons isGrouped=true isRightAligned=true>
@@ -80,13 +82,23 @@
                                     </td>
                                 </tr>
                             </#list>
-                        </tbody>
-                    </@table.table>
+                            </tbody>
+                        </@table.table>
 
+                    </div>
                 </div>
-            </div>
 
-        </@container.container>
-    </@section.section>
+            </@container.container>
+        </@section.section>
+
+    <#else>
+
+        <@section.section id="ManageImages">
+            <@container.container>
+                Unable to find repository.
+            </@container.container>
+        </@section.section>
+
+    </#if>
 
 </@base.base>

@@ -18,6 +18,7 @@
 package io.linuxserver.fleet.v2.web.routes;
 
 import io.javalin.http.Context;
+import io.linuxserver.fleet.core.FleetAppController;
 import io.linuxserver.fleet.v2.service.ScheduleService;
 import io.linuxserver.fleet.v2.service.SynchronisationService;
 import io.linuxserver.fleet.v2.web.PageModelSpec;
@@ -27,9 +28,11 @@ public class AdminScheduleController extends AbstractPageHandler {
     private final ScheduleService        scheduleService;
     private final SynchronisationService syncService;
 
-    public AdminScheduleController(final ScheduleService scheduleService, final SynchronisationService syncService) {
-        this.scheduleService = scheduleService;
-        this.syncService     = syncService;
+    public AdminScheduleController(final FleetAppController controller) {
+        super(controller);
+
+        scheduleService = controller.getScheduleService();
+        syncService     = controller.getSynchronisationService();
     }
 
     @Override

@@ -54,24 +54,29 @@ public class WebRouteController {
 
         webInstance.routes(() -> {
 
-            get(Locations.Login, new LoginController(),                           roles(FleetRole.Anyone));
-            get(Locations.Home,  new HomeController( app.getRepositoryService()), roles(FleetRole.Anyone));
-            get(Locations.Image, new ImageController(app.getRepositoryService()), roles(FleetRole.Anyone));
+            get(Locations.Login, new LoginController(app),                           roles(FleetRole.Anyone));
+            get(Locations.Home,  new HomeController( app), roles(FleetRole.Anyone));
+            get(Locations.Image, new ImageController(app), roles(FleetRole.Anyone));
 
-            get(Locations.Admin.Repositories, new AdminRepositoryController(app.getRepositoryService()), roles(FleetRole.Anyone));
-            get(Locations.Admin.Images,       new AdminImageController(     app.getRepositoryService()), roles(FleetRole.Anyone));
-            get(Locations.Admin.Schedules,    new AdminScheduleController(  app.getScheduleService(), app.getSynchronisationService()), roles(FleetRole.Anyone));
+            get(Locations.Admin.Repositories, new AdminRepositoryController(app), roles(FleetRole.Anyone));
+            get(Locations.Admin.Images,       new AdminImageController(     app), roles(FleetRole.Anyone));
+            get(Locations.Admin.Schedules,    new AdminScheduleController(  app), roles(FleetRole.Anyone));
 
             path(Locations.Internal.Api, () -> {
 
                 path(Locations.Internal.Repository, () -> {
 
-                    put(apiController::updateRepository,  roles(FleetRole.Anyone));
+                    put(apiController::updateRepositorySpec,  roles(FleetRole.Anyone));
                     post(apiController::addNewRepository, roles(FleetRole.Anyone));
+                    delete(apiController::deleteRepository, roles(FleetRole.Anyone));
 
                     path(Locations.Internal.Sync, () -> {
                        put(apiController::syncRepository, roles(FleetRole.Anyone));
                     });
+                });
+
+                path(Locations.Internal.Image, () -> {
+                    put(apiController::updateImageSpec, roles(FleetRole.Anyone));
                 });
 
                 path(Locations.Internal.Schedule, () -> {

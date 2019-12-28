@@ -32,4 +32,9 @@ public final class RefreshCacheSchedule extends AbstractAppSchedule {
     public void executeSchedule() {
         getController().getRepositoryService().reloadCache();
     }
+
+    @Override
+    protected boolean isAllowedToExecute() {
+        return getController().getSynchronisationService().isSyncQueueEmpty();
+    }
 }

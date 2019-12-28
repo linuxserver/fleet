@@ -24,6 +24,7 @@ import io.linuxserver.fleet.v2.key.AbstractHasKey;
 import io.linuxserver.fleet.v2.key.ScheduleKey;
 import io.linuxserver.fleet.v2.thread.schedule.AppSchedule;
 import io.linuxserver.fleet.v2.thread.schedule.ScheduleSpec;
+import io.linuxserver.fleet.v2.thread.schedule.TimeWithUnit;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -76,12 +77,16 @@ public class ScheduleService extends AbstractAppService {
             final ScheduleWrapper wrapper = scheduleCache.findItem(scheduleKey);
 
             LOGGER.info("Cancelling current run of schedule {}", wrapper.getName());
-            wrapper.getFuture().cancel(false);
+            final boolean stopped = wrapper.getFuture().cancel(false);
 
-            LOGGER.info("Triggering re-run of schedule {}", wrapper.getName());
-            loadOneSchedule(wrapper.getSchedule());
+            if (stopped) {
 
-            return wrapper.getSchedule();
+                LOGGER.info("Triggering re-run of schedule {}", wrapper.getName());
+                loadOneScheduleImmediately(wrapper.getSchedule());
+                return wrapper.getSchedule();
+            }
+
+            throw new RuntimeException("Schedule was already running and could not be stopped. Try again later.");
 
         } else {
 
@@ -109,12 +114,24 @@ public class ScheduleService extends AbstractAppService {
         }
     }
 
-    private void loadOneSchedule(AppSchedule schedule) {
+    private void loadOneSchedule(final AppSchedule schedule) {
+        loadInternal(schedule, schedule.getDelay());
+    }
 
+    private void loadOneScheduleImmediately(final AppSchedule schedule) {
+        loadInternal(schedule, TimeWithUnit.Zero);
+    }
+
+    private void loadInternal(final AppSchedule schedule, final TimeWithUnit delay) {
+
+        final TimeWithUnit scheduleIntervalUnit = schedule.getInterval().convertToLowestUnit(delay);
+        final TimeWithUnit scheduleDelayUnit    = delay.convertToLowestUnit(schedule.getInterval());
+
+        LOGGER.info("Scheduling with calculated interval/delay: {}/{}", scheduleIntervalUnit, scheduleDelayUnit);
         final ScheduledFuture<?> future = executorService.scheduleAtFixedRate(schedule,
-                                                                             0,
-                                                                              schedule.getInterval().getTimeDuration(),
-                                                                              schedule.getInterval().getTimeUnitAsTimeUnit());
+                                                                              scheduleDelayUnit.getTimeDuration(),
+                                                                              scheduleIntervalUnit.getTimeDuration(),
+                                                                              scheduleIntervalUnit.getTimeUnit());
 
         scheduleCache.addItem(new ScheduleWrapper(schedule, future));
     }

@@ -15,9 +15,11 @@
  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 -->
 
-<#import "../ui/components/navbar.ftl" as navbar />
-<#import "../ui/elements/button.ftl"   as button />
-<#import "../ui/form/input.ftl"        as input />
+<#import "../ui/components/navbar.ftl"  as navbar />
+<#import "../ui/layout/container.ftl"   as container />
+<#import "../ui/elements/button.ftl"    as button />
+<#import "../ui/form/input.ftl"         as input />
+<#import "../prebuilt/system-alert.ftl" as systemAlert />
 
 <#macro base title context showTitle=true backgroundColour="white">
 
@@ -81,6 +83,14 @@
     <div id="NotificationWrapper">
         <div id="Notifications"></div>
     </div>
+
+    <#if __SystemAlerts?has_content && __SystemAlerts?size &gt; 0>
+        <@container.container isFluid=true>
+            <#list __SystemAlerts as alert>
+                <@systemAlert.alert specificAlert=alert />
+            </#list>
+        </@container.container>
+    </#if>
 
     <#nested>
 

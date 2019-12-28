@@ -123,4 +123,21 @@ task configureLogConfiguration(type: Copy) {
     rename "log4j2.${logFile}.xml", 'log4j2.xml'
 }
 
-build.dependsOn configureLogConfiguration
+task buildVersionProperties() {
+
+    doFirst {
+
+        def versionProperties = new Properties()
+        def propFile          = new File("src/main/resources/version.properties")
+
+        versionProperties.load(propFile.newDataInputStream());
+        versionProperties.setProperty("app.version", project.version.toString())
+        versionProperties.setProperty("app.build.user", System.getProperty("user.name"))
+        versionProperties.setProperty("app.build.date", new Date().format("yyyy-MM-dd'T'HH:mm:ss"))
+        versionProperties.setProperty("app.build.os", System.getProperty("os.name"))
+
+        versionProperties.store(propFile.newWriter(), null)
+    }
+}
+
+build.dependsOn configureLogConfiguration, buildVersionProperties

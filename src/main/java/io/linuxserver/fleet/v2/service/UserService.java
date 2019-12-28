@@ -18,10 +18,20 @@
 package io.linuxserver.fleet.v2.service;
 
 import io.linuxserver.fleet.core.FleetAppController;
+import io.linuxserver.fleet.v2.db.UserDAO;
+import io.linuxserver.fleet.v2.types.User;
 
 public class UserService extends AbstractAppService {
 
-    public UserService(final FleetAppController controller) {
+    private final UserDAO userDAO;
+
+    public UserService(final FleetAppController controller,
+                       final UserDAO userDAO) {
         super(controller);
+        this.userDAO = userDAO;
+    }
+
+    public final User lookUpUser(final String username) {
+        return userDAO.lookUpUser(username);
     }
 }

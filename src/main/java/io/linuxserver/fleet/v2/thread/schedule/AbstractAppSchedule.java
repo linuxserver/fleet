@@ -35,12 +35,19 @@ public abstract class AbstractAppSchedule extends AbstractHasKey<ScheduleKey> im
     private final FleetAppController            controller;
     private final AtomicReference<ScheduleSpec> spec;
 
+    private final LocalDateTime                  intantiatedAt;
+    private final AtomicReference<LocalDateTime> lastRun;
+    private final AtomicReference<Duration>      lastRunDuration;
+
     public AbstractAppSchedule(final ScheduleSpec spec,
                                final FleetAppController controller) {
         super(spec.getKey());
 
-        this.controller = controller;
-        this.spec = new AtomicReference<>(spec);
+        this.intantiatedAt   = LocalDateTime.now();
+        this.controller      = controller;
+        this.spec            = new AtomicReference<>(spec);
+        this.lastRun         = new AtomicReference<>();
+        this.lastRunDuration = new AtomicReference<>(Duration.ZERO);
     }
 
     protected final FleetAppController getController() {
@@ -58,7 +65,7 @@ public abstract class AbstractAppSchedule extends AbstractHasKey<ScheduleKey> im
 
     @Override
     public final LocalDateTime getLastRunTime() {
-        return getSpec().getLastRun();
+        return lastRun.get();
     }
 
     @Override
@@ -67,17 +74,31 @@ public abstract class AbstractAppSchedule extends AbstractHasKey<ScheduleKey> im
         final ScheduleSpec scheduleSpec = getSpec();
         final TimeWithUnit interval     = scheduleSpec.getInterval();
 
-        return scheduleSpec.getLastRun().plus(interval.getTimeDuration(), interval.getTimeUnit());
+        if (null == getLastRunTime()) {
+
+            if (getSpec().getDelayOffset().isGreaterThanZero()) {
+                return intantiatedAt.plus(scheduleSpec.getDelayOffset().getTimeDuration(), scheduleSpec.getDelayOffset().getChronoUnit());
+            } else {
+                return intantiatedAt.plus(interval.getTimeDuration(), interval.getChronoUnit());
+            }
+        }
+
+        return getLastRunTime().plus(interval.getTimeDuration(), interval.getChronoUnit());
     }
 
     @Override
     public final Duration getLastRunDuration() {
-        return getSpec().getLastRunDuration();
+        return lastRunDuration.get();
     }
 
     @Override
     public final TimeWithUnit getInterval() {
         return getSpec().getInterval();
+    }
+
+    @Override
+    public TimeWithUnit getDelay() {
+        return getSpec().getDelayOffset();
     }
 
     @Override
@@ -93,20 +114,31 @@ public abstract class AbstractAppSchedule extends AbstractHasKey<ScheduleKey> im
 
         try {
 
-            logger.info("Starting run of schedule {}", scheduleName);
-            executeSchedule();
-            logger.info("Run of schedule {} finished.", scheduleName);
+            if (isAllowedToExecute()) {
+
+                logger.info("Starting run of schedule {}", scheduleName);
+                executeSchedule();
+                logger.info("Run of schedule {} finished.", scheduleName);
+
+            } else {
+                logger.info("Schedule is currently not allowed to run. Will log run but will skip until next time.");
+            }
 
         } catch (Exception e) {
             logger.error("Caught unhandled exception during running of schedule {}", scheduleName, e);
         }
 
         final LocalDateTime endTime = LocalDateTime.now();
-        spec.set(spec.get().cloneWithLastRun(startTime, endTime));
+        lastRun.set(endTime);
+        lastRunDuration.set(Duration.between(startTime, endTime));
     }
 
     @Override
     public String toString() {
-        return "Name=" + getName() + ", Interval=" + getInterval();
+        return "Name=" + getName() + ", Interval=" + getInterval() + ", InitialDelay=" + getDelay();
+    }
+
+    protected boolean isAllowedToExecute() {
+        return true;
     }
 }

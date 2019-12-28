@@ -45,6 +45,22 @@ var adminManager = (function($) {
         });
     };
 
+    var deleteRepository = function(trigger) {
+
+        var repositoryKey = trigger.data('repository-key');
+
+        var request = {
+
+            url: '/internalapi/repository?repositoryKey=' + repositoryKey,
+            method: 'delete'
+        };
+
+        toggleButtonLoadingState(trigger);
+        ajaxManager.call(request, function() { window.location.reload(); }, function() {
+            toggleButtonLoadingState(trigger);
+        });
+    };
+
     var syncRepository = function(trigger) {
 
         var repositoryKey = trigger.data('repository-key');
@@ -115,7 +131,37 @@ var adminManager = (function($) {
         };
 
         ajaxManager.call(request, function() {
-            notificationManager.makeNotification('Repository updated', 'success');
+            notificationManager.makeNotification('Image updated', 'success');
+        });
+    };
+
+    var updateImageSpec = function($row) {
+
+        var imageKey     = $row.data('image-key');
+        var syncEnabled  = $row.find('.editable-image-sync-enabled').find('input[type="checkbox"]').is(':checked');
+        var stable       = $row.find('.editable-image-stable').find('input[type="checkbox"]').is(':checked');
+        var hidden       = $row.find('.editable-image-hidden').find('input[type="checkbox"]').is(':checked');
+        var deprecated   = $row.find('.editable-image-deprecated').find('input[type="checkbox"]').is(':checked');
+        var versionMask  = cleanEmpty($row.find('.editable-image-version-mask').find('.switchable.field input[type="text"]').val());
+
+        var request = {
+
+            url: '/internalapi/image',
+            method: 'put',
+            contentType: 'application/json',
+            dataType: 'json',
+            data: JSON.stringify({
+                'imageKey': imageKey,
+                'syncEnabled': syncEnabled,
+                'versionMask': versionMask,
+                'stable': stable,
+                'hidden': hidden,
+                'deprecated': deprecated
+            })
+        };
+
+        ajaxManager.call(request, function(data) {
+            notificationManager.makeNotification('Updated ' + data.name, 'success');
         });
     };
 
@@ -144,6 +190,22 @@ var adminManager = (function($) {
 
         $('.update-repository-trigger').on('click', function() {
             updateRepositorySpec($(this).parents('.repository-row'));
+        });
+
+        $('#DeleteRepository').on('click', function() {
+            deleteRepository($(this));
+        });
+
+        $('.delete-repository').on('click', function() {
+
+            var $trigger = $(this);
+
+            $('#RepositoryPendingDeletion').text($trigger.data('repository-name'));
+            $('#DeleteRepository').data('repository-key', $trigger.data('repository-key'))
+        });
+
+        $('.update-image-trigger').on('click', function() {
+            updateImageSpec($(this).parents('.image-row'));
         });
     };
 

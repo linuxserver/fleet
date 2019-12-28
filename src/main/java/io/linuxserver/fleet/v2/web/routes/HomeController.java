@@ -18,6 +18,7 @@
 package io.linuxserver.fleet.v2.web.routes;
 
 import io.javalin.http.Context;
+import io.linuxserver.fleet.core.FleetAppController;
 import io.linuxserver.fleet.v2.key.RepositoryKey;
 import io.linuxserver.fleet.v2.service.RepositoryService;
 import io.linuxserver.fleet.v2.types.Repository;
@@ -27,8 +28,9 @@ public class HomeController extends AbstractPageHandler {
 
     private final RepositoryService repositoryService;
 
-    public HomeController(final RepositoryService repositoryService) {
-        this.repositoryService = repositoryService;
+    public HomeController(final FleetAppController controller) {
+        super(controller);
+        repositoryService = controller.getRepositoryService();
     }
 
     @Override

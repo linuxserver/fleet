@@ -18,6 +18,7 @@
 package io.linuxserver.fleet.v2.web.routes;
 
 import io.javalin.http.Context;
+import io.linuxserver.fleet.core.FleetAppController;
 import io.linuxserver.fleet.v2.key.ImageLookupKey;
 import io.linuxserver.fleet.v2.service.RepositoryService;
 import io.linuxserver.fleet.v2.web.PageModelSpec;
@@ -26,8 +27,9 @@ public class ImageController extends AbstractPageHandler {
 
     private final RepositoryService repositoryService;
 
-    public ImageController(final RepositoryService repositoryService) {
-        this.repositoryService = repositoryService;
+    public ImageController(final FleetAppController controller) {
+        super(controller);
+        repositoryService = controller.getRepositoryService();
     }
 
     @Override

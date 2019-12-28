@@ -17,25 +17,17 @@
 
 package io.linuxserver.fleet.v2.thread.schedule;
 
-import io.linuxserver.fleet.v2.key.HasKey;
-import io.linuxserver.fleet.v2.key.ScheduleKey;
+import io.linuxserver.fleet.core.FleetAppController;
 
-import java.time.Duration;
-import java.time.LocalDateTime;
+public class CheckAppVersionSchedule extends AbstractAppSchedule {
 
-public interface AppSchedule extends HasKey<ScheduleKey>, Runnable {
+    public CheckAppVersionSchedule(final ScheduleSpec spec,
+                                   final FleetAppController controller) {
+        super(spec, controller);
+    }
 
-    String getName();
+    @Override
+    public void executeSchedule() {
 
-    LocalDateTime getLastRunTime();
-
-    LocalDateTime getNextRunTime();
-
-    Duration getLastRunDuration();
-
-    TimeWithUnit getDelay();
-
-    TimeWithUnit getInterval();
-
-    void executeSchedule();
+    }
 }

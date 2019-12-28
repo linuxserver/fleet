@@ -18,6 +18,7 @@
 <#import "../../prebuilt/fleet-title.ftl" as title />
 
 <#import "../../ui/components/message.ftl" as message />
+<#import "../../ui/components/modal.ftl"   as modal />
 <#import "../../ui/layout/section.ftl"     as section />
 <#import "../../ui/layout/container.ftl"   as container />
 <#import "../../ui/form/input.ftl"         as input />
@@ -40,7 +41,7 @@
                             <tr>
                                 <th class="has-text-centered" style="width: 100px; max-width: 100px;"><abbr title="Is this repository synchronised?">Enabled</abbr></th>
                                 <th>Name</th>
-                                <th style="width: 300px; min-width: 300px;"><abbr title="Apply a mask against all tags under this repository">Version Mask</abbr></th>
+                                <th style="width: 400px; min-width: 400px;"><abbr title="Apply a mask against all tags under this repository">Version Mask</abbr></th>
                                 <th style="width: 100px; min-width: 100px;"></th>
                             </tr>
                         </thead>
@@ -64,7 +65,7 @@
                                             <@button.button size="small" colour="normal-colour" extraClasses="sync-repository" extraAttributes='data-repository-key="${repository.key}"' title="Re-sync repository">
                                                 <i class="fas fa-sync is-marginless"></i>
                                             </@button.button>
-                                            <@button.button size="small" colour="danger" extraAttributes='data-repository-key="${repository.key}"' title="Delete repository">
+                                            <@button.button size="small" colour="danger" extraClasses="delete-repository" modal="#ConfirmDelete" extraAttributes='data-repository-name="${repository.name}" data-repository-key="${repository.key}"' title="Delete repository">
                                                 <i class="fas fa-trash is-marginless"></i>
                                             </@button.button>
 
@@ -90,5 +91,28 @@
 
         </@container.container>
     </@section.section>
+
+    <@modal.modal id="ConfirmDelete" title="Are you sure?" isDismissable=true extraClasses="has-text-centered">
+
+        You are about to delete <strong><span id="RepositoryPendingDeletion"></span></strong> from the cache. If you wish to synchronise this repository at
+        a later date, you will need to re-add it.
+
+        <p class="has-margin-top">
+            <i class="fas fa-exclamation-triangle has-text-danger"></i> <strong>This action will permanently delete all historic pull data for all images under this repository.</strong>
+        </p>
+
+        <@button.buttons isRightAligned=true>
+
+            <@button.button colour="light" extraClasses="is-modal-cancel">
+                Cancel
+            </@button.button>
+
+            <@button.button id="DeleteRepository" colour="danger">
+                <i class="fas fa-trash"></i> Delete
+            </@button.button>
+
+        </@button.buttons>
+
+    </@modal.modal>
 
 </@base.base>

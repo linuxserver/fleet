@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 LinuxServer.io
+ * Copyright (c)  2019 LinuxServer.io
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -15,22 +15,18 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package io.linuxserver.fleet.delegate;
+package io.linuxserver.fleet.v2.key;
 
-import io.linuxserver.fleet.auth.AuthenticationResult;
-import io.linuxserver.fleet.auth.UserCredentials;
-import io.linuxserver.fleet.auth.authenticator.UserAuthenticator;
+import io.linuxserver.fleet.v2.types.AppAlert;
 
-public class DefaultAuthenticationDelegate implements AuthenticationDelegate {
+public class AlertKey extends AbstractLookupKey<AppAlert> {
 
-    private final UserAuthenticator authenticator;
-
-    public DefaultAuthenticationDelegate(final UserAuthenticator authenticator) {
-        this.authenticator = authenticator;
+    public AlertKey(String query) {
+        super(query);
     }
 
     @Override
-    public AuthenticationResult authenticate(String username, String password) {
-        return authenticator.authenticate(new UserCredentials(username, password));
+    public boolean isLookupKeyFor(final AppAlert appAlert) {
+        throw new RuntimeException("Operation not supported");
     }
 }

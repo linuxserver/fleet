@@ -23,7 +23,7 @@ public class AppProperties {
 
     private Properties properties;
 
-    public AppProperties(Properties properties) {
+    public AppProperties(final Properties properties) {
         this.properties = properties;
     }
 
@@ -35,24 +35,28 @@ public class AppProperties {
                                                 getDatabasePassword());
     }
 
-    public String getDatabaseDriverClassName() {
+    public final VersionProperties getVersionProperties() {
+
+        return new VersionProperties(getStringProperty("app.version"),
+                                     getStringProperty("app.build.user"),
+                                     getStringProperty("app.build.date"),
+                                     getStringProperty("app.build.os"));
+    }
+
+    private String getDatabaseDriverClassName() {
         return getStringProperty("fleet.database.driver");
     }
 
-    public String getDatabaseUrl() {
+    private String getDatabaseUrl() {
         return getStringProperty("fleet.database.url");
     }
 
-    public String getDatabaseUsername() {
+    private String getDatabaseUsername() {
         return getStringProperty("fleet.database.username");
     }
 
-    public String getDatabasePassword() {
+    private String getDatabasePassword() {
         return getStringProperty("fleet.database.password");
-    }
-
-    public String getAuthenticationType() {
-        return getStringProperty("fleet.admin.authentication.type");
     }
 
     public String getAppSecret() {
@@ -61,41 +65,8 @@ public class AppProperties {
         return null == secret ? "" : secret;
     }
 
-    public String getAppUsername() {
-        return getStringProperty("fleet.admin.username");
-    }
-
-    public String getAppPassword() {
-        return getStringProperty("fleet.admin.password");
-    }
-
     public int getAppPort() {
         return Integer.parseInt(getStringProperty("fleet.app.port"));
-    }
-
-    public int getRefreshIntervalInMinutes() {
-        return Integer.parseInt(getStringProperty("fleet.refresh.interval"));
-    }
-
-    public boolean isFullRmProtected() {
-
-        final String safe = getStringProperty("fleet.sync.fullrm.protected");
-        if (null == safe) {
-            return true;
-        }
-
-        return "true".equalsIgnoreCase(safe);
-    }
-
-    public int getQueueThreadCount() {
-        
-        final String numThreads = getStringProperty("fleet.queue.threads");
-        
-        if (null == numThreads) {
-            return 0;
-        }
-        
-        return Integer.parseInt(numThreads);
     }
 
     /**

@@ -21,18 +21,25 @@ import io.linuxserver.fleet.core.config.AppProperties;
 import io.linuxserver.fleet.core.db.DatabaseProvider;
 import io.linuxserver.fleet.core.db.DefaultDatabaseProvider;
 import io.linuxserver.fleet.db.DefaultDatabaseConnection;
+import io.linuxserver.fleet.v2.cache.BasicItemCache;
+import io.linuxserver.fleet.v2.key.AlertKey;
+import io.linuxserver.fleet.v2.types.AppAlert;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 
 public abstract class AbstractAppController {
 
-    private final AppProperties    appProperties;
-    private final DatabaseProvider databaseProvider;
+    private final AppProperties                      appProperties;
+    private final DatabaseProvider                   databaseProvider;
+    private final BasicItemCache<AlertKey, AppAlert> alertCache;
 
     public AbstractAppController() {
 
-        this.appProperties      = new PropertiesLoader().getProperties();
-
-        this.databaseProvider   = new DefaultDatabaseProvider(new DefaultDatabaseConnection(appProperties.getDatabaseProperties()));
-
+        this.appProperties    = new PropertiesLoader().getProperties();
+        this.databaseProvider = new DefaultDatabaseProvider(new DefaultDatabaseConnection(appProperties.getDatabaseProperties()));
+        this.alertCache       = new BasicItemCache<>();
     }
 
     public final DatabaseProvider getDatabaseProvider() {
@@ -41,6 +48,22 @@ public abstract class AbstractAppController {
 
     public final AppProperties getAppProperties() {
         return appProperties;
+    }
+
+    public final List<AppAlert> getAlerts() {
+        return new ArrayList<>(alertCache.getAllItems());
+    }
+
+    public final List<AppAlert> getSystemAlerts() {
+        return getAlerts().stream().filter(AppAlert::isSystemAlert).collect(Collectors.toList());
+    }
+
+    public final void addAlert(final AppAlert appAlert) {
+        alertCache.addItem(appAlert);
+    }
+
+    public final void clearAlert(final AlertKey alertKey) {
+        alertCache.removeItem(alertKey);
     }
 
     protected void run() {

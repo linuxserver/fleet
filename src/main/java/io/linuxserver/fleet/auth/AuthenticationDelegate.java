@@ -1,5 +1,5 @@
 /*
- * Copyright (c)  2019 LinuxServer.io
+ * Copyright (c) 2019 LinuxServer.io
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -15,27 +15,14 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package io.linuxserver.fleet.v2.thread.schedule;
+package io.linuxserver.fleet.auth;
 
-import io.linuxserver.fleet.v2.key.HasKey;
-import io.linuxserver.fleet.v2.key.ScheduleKey;
+import io.linuxserver.fleet.auth.AuthenticationResult;
+import io.linuxserver.fleet.auth.security.PasswordEncoder;
 
-import java.time.Duration;
-import java.time.LocalDateTime;
+public interface AuthenticationDelegate {
 
-public interface AppSchedule extends HasKey<ScheduleKey>, Runnable {
+    AuthenticationResult authenticate(String username, String password);
 
-    String getName();
-
-    LocalDateTime getLastRunTime();
-
-    LocalDateTime getNextRunTime();
-
-    Duration getLastRunDuration();
-
-    TimeWithUnit getDelay();
-
-    TimeWithUnit getInterval();
-
-    void executeSchedule();
+    PasswordEncoder getPasswordEncoder();
 }

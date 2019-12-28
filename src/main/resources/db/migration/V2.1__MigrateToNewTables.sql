@@ -19,8 +19,9 @@ SELECT
 FROM Images;
 
 INSERT INTO
-    Schedule (`name`, `interval`, `java_class`)
+    Schedule (`name`, `interval`, `delay`, `java_class`)
 VALUES
-    ('SyncAllCachedImages', '1:hours',    'io.linuxserver.fleet.v2.thread.schedule.sync.AllImagesSyncSchedule'),
-    ('GetMissingImages',    '30:minutes', 'io.linuxserver.fleet.v2.thread.schedule.sync.GetMissingImagesSchedule'),
-    ('RefreshCache',        '1:days',     'io.linuxserver.fleet.v2.thread.schedule.cache.RefreshCacheSchedule');
+    ('SyncAllCachedImages', '1:hours',    '0:minutes',  'io.linuxserver.fleet.v2.thread.schedule.sync.AllImagesSyncSchedule'),
+    ('GetMissingImages',    '30:minutes', '0:minutes',  'io.linuxserver.fleet.v2.thread.schedule.sync.GetMissingImagesSchedule'),
+    ('RefreshCache',        '1:days',     '10:minutes', 'io.linuxserver.fleet.v2.thread.schedule.cache.RefreshCacheSchedule'),
+    ('CheckAppVersion',     '1:days',     '0:minutes',  'io.linuxserver.fleet.v2.thread.schedule.CheckAppVersionSchedule');

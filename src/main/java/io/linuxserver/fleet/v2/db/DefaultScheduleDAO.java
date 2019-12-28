@@ -71,6 +71,7 @@ public class DefaultScheduleDAO extends AbstractDAO implements ScheduleDAO {
         return ScheduleSpec.makeInitial(new ScheduleKey(results.getInt("ScheduleId")),
                                         results.getString("ScheduleName"),
                                         TimeWithUnit.valueOf(results.getString("ScheduleInterval")),
+                                        TimeWithUnit.valueOf(results.getString("ScheduleDelayOffset")),
                                         (Class<? extends AppSchedule>) Class.forName(results.getString("ScheduleClass")));
     }
 }

@@ -58,7 +58,8 @@ CREATE TABLE Schedule (
     `id`         INT          NOT NULL auto_increment PRIMARY KEY,
     `name`       VARCHAR(100) NOT NULL,
     `java_class` VARCHAR(255) NOT NULL,
-    `interval`   VARCHAR(50)  NOT NULL DEFAULT '1:hours'
+    `interval`   VARCHAR(50)  NOT NULL DEFAULT '1:hours',
+    `delay`      VARCHAR(50)  NOT NULL DEFAULT '0:seconds'
 ) ENGINE=InnoDB;
 //
 
@@ -335,6 +336,25 @@ BEGIN
 
 END //
 
+CREATE OR REPLACE PROCEDURE `Repository_Delete`
+(
+    in_id   INT,
+
+    OUT out_status enum('Updated', 'NoChange')
+)
+BEGIN
+
+    IF EXISTS(SELECT `id` FROM Repository WHERE `id` = in_id) THEN
+
+        DELETE FROM Repository WHERE `id` = in_id;
+        SET out_status = 'Updated';
+
+    ELSE
+        SET out_status = 'NoChange';
+    END IF;
+
+END //
+
 CREATE OR REPLACE PROCEDURE `Repository_Store`
 (
     in_id           INT,
@@ -511,6 +531,7 @@ BEGIN
         `id`         AS `ScheduleId`,
         `name`       AS `ScheduleName`,
         `interval`   AS `ScheduleInterval`,
+        `delay`      AS `ScheduleDelayOffset`,
         `java_class` AS `ScheduleClass`
     FROM
          Schedule;

@@ -15,27 +15,26 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package io.linuxserver.fleet.auth.authenticator;
+package io.linuxserver.fleet.auth;
 
-import io.linuxserver.fleet.auth.AuthenticationResult;
-import io.linuxserver.fleet.auth.UserCredentials;
+import io.linuxserver.fleet.auth.authenticator.UserAuthenticator;
 import io.linuxserver.fleet.auth.security.PasswordEncoder;
 
-/**
- * <p>
- * Provides a mechanism for the application to authenticate a login request
- * from a user.
- * </p>
- */
-public interface UserAuthenticator {
+public class DefaultAuthenticationDelegate implements AuthenticationDelegate {
 
-    /**
-     * <p>
-     * Performs an authentication check against the provided credentials and the repository
-     * of currently stored users.
-     * </p>
-     */
-    AuthenticationResult authenticate(UserCredentials userCredentials);
+    private final UserAuthenticator authenticator;
 
-    PasswordEncoder getPasswordEncoder();
+    public DefaultAuthenticationDelegate(final UserAuthenticator authenticator) {
+        this.authenticator   = authenticator;
+    }
+
+    @Override
+    public AuthenticationResult authenticate(final String username, final String password) {
+        return authenticator.authenticate(new UserCredentials(username, password));
+    }
+
+    @Override
+    public PasswordEncoder getPasswordEncoder() {
+        return authenticator.getPasswordEncoder();
+    }
 }

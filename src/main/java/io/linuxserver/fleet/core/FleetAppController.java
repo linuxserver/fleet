@@ -17,16 +17,23 @@
 
 package io.linuxserver.fleet.core;
 
+import io.linuxserver.fleet.auth.AuthenticationDelegate;
+import io.linuxserver.fleet.auth.AuthenticationResult;
+import io.linuxserver.fleet.auth.DefaultAuthenticationDelegate;
+import io.linuxserver.fleet.auth.authenticator.DefaultUserAuthenticator;
+import io.linuxserver.fleet.auth.security.PBKDF2PasswordEncoder;
 import io.linuxserver.fleet.core.config.WebConfiguration;
 import io.linuxserver.fleet.v2.client.docker.DockerApiClient;
 import io.linuxserver.fleet.v2.client.docker.dockerhub.DockerHubApiClient;
 import io.linuxserver.fleet.v2.client.docker.queue.DockerApiDelegate;
 import io.linuxserver.fleet.v2.db.DefaultImageDAO;
 import io.linuxserver.fleet.v2.db.DefaultScheduleDAO;
+import io.linuxserver.fleet.v2.db.DefaultUserDAO;
 import io.linuxserver.fleet.v2.key.ImageKey;
 import io.linuxserver.fleet.v2.service.RepositoryService;
 import io.linuxserver.fleet.v2.service.ScheduleService;
 import io.linuxserver.fleet.v2.service.SynchronisationService;
+import io.linuxserver.fleet.v2.service.UserService;
 import io.linuxserver.fleet.v2.types.Image;
 import io.linuxserver.fleet.v2.types.Repository;
 import io.linuxserver.fleet.v2.types.internal.RepositoryOutlineRequest;
@@ -38,12 +45,14 @@ import io.linuxserver.fleet.v2.web.WebRouteController;
  * through this class.
  * </p>
  */
-public class FleetAppController extends AbstractAppController {
+public class FleetAppController extends AbstractAppController implements ServiceProvider {
 
     public  final DockerApiDelegate      dockerApiDelegate;
     private final RepositoryService      repositoryService;
     private final ScheduleService        scheduleService;
     private final SynchronisationService syncService;
+    private final UserService            userService;
+    private final AuthenticationDelegate authenticationDelegate;
 
     public FleetAppController() {
 
@@ -51,6 +60,10 @@ public class FleetAppController extends AbstractAppController {
         scheduleService   = new ScheduleService(this, new DefaultScheduleDAO(getDatabaseProvider()));
         dockerApiDelegate = new DockerApiDelegate(this);
         syncService       = new SynchronisationService(this);
+        userService       = new UserService(this, new DefaultUserDAO(getDatabaseProvider()));
+
+        authenticationDelegate = new DefaultAuthenticationDelegate(new DefaultUserAuthenticator(userService,
+                                                                                                new PBKDF2PasswordEncoder(getAppProperties().getAppSecret())));
     }
 
     private static FleetAppController instance;
@@ -115,6 +128,7 @@ public class FleetAppController extends AbstractAppController {
         return repositoryService.storeImage(updatedImage);
     }
 
+    @Override
     public ScheduleService getScheduleService() {
         return scheduleService;
     }
@@ -134,7 +148,17 @@ public class FleetAppController extends AbstractAppController {
         throw new IllegalArgumentException("Repository " + request.getRepositoryName() + " does not exist upstream");
     }
 
+    @Override
     public final SynchronisationService getSynchronisationService() {
         return syncService;
+    }
+
+    @Override
+    public final UserService getUserService() {
+        return userService;
+    }
+
+    public final AuthenticationResult authenticateUser(final String username, final String password) {
+        return authenticationDelegate.authenticate(username, password);
     }
 }

@@ -15,27 +15,14 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package io.linuxserver.fleet.v2.thread.schedule;
+package io.linuxserver.fleet.v2.db;
 
-import io.linuxserver.fleet.v2.key.HasKey;
-import io.linuxserver.fleet.v2.key.ScheduleKey;
+import io.linuxserver.fleet.v2.key.UserKey;
+import io.linuxserver.fleet.v2.types.User;
 
-import java.time.Duration;
-import java.time.LocalDateTime;
+public interface UserDAO {
 
-public interface AppSchedule extends HasKey<ScheduleKey>, Runnable {
+    User fetchUser(UserKey userKey);
 
-    String getName();
-
-    LocalDateTime getLastRunTime();
-
-    LocalDateTime getNextRunTime();
-
-    Duration getLastRunDuration();
-
-    TimeWithUnit getDelay();
-
-    TimeWithUnit getInterval();
-
-    void executeSchedule();
+    User lookUpUser(String username);
 }

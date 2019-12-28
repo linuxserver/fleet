@@ -20,67 +20,48 @@ package io.linuxserver.fleet.v2.thread.schedule;
 import io.linuxserver.fleet.v2.key.AbstractHasKey;
 import io.linuxserver.fleet.v2.key.ScheduleKey;
 
-import java.time.Duration;
-import java.time.LocalDateTime;
-
 public final class ScheduleSpec extends AbstractHasKey<ScheduleKey> {
 
     private final String                       scheduleName;
-    private final LocalDateTime                lastRun;
-    private final Duration                     lastRunDuration;
     private final TimeWithUnit                 interval;
+    private final TimeWithUnit                 delayOffset;
     private final Class<? extends AppSchedule> specForClass;
 
     private ScheduleSpec(final ScheduleKey key,
                          final String scheduleName,
-                         final LocalDateTime lastRun,
-                         final Duration lastRunDuration,
                          final TimeWithUnit interval,
+                         final TimeWithUnit delayOffset,
                          final Class<? extends AppSchedule> specForClass) {
         super(key);
 
         this.scheduleName    = scheduleName;
-        this.lastRun         = lastRun;
-        this.lastRunDuration = lastRunDuration;
         this.interval        = interval;
+        this.delayOffset     = delayOffset;
         this.specForClass    = specForClass;
     }
 
     public static ScheduleSpec makeInitial(final ScheduleKey key,
                                            final String scheduleName,
                                            final TimeWithUnit interval,
+                                           final TimeWithUnit delayOffset,
                                            final Class<? extends AppSchedule> specForClass) {
         return new ScheduleSpec(key,
                                 scheduleName,
-                                LocalDateTime.now(),
-                                Duration.ZERO,
                                 interval,
+                                delayOffset,
                                 specForClass);
-    }
-
-    public final ScheduleSpec cloneWithLastRun(final LocalDateTime lastRunStartTime, final LocalDateTime lastRunEndTime) {
-        return new ScheduleSpec(getKey(),
-                                getScheduleName(),
-                                lastRunStartTime,
-                                Duration.between(lastRunStartTime, lastRunEndTime),
-                                getInterval(),
-                                getScheduleClass());
     }
 
     public final String getScheduleName() {
         return scheduleName;
     }
 
-    public LocalDateTime getLastRun() {
-        return lastRun;
-    }
-
-    public Duration getLastRunDuration() {
-        return lastRunDuration;
-    }
-
-    public TimeWithUnit getInterval() {
+    public final TimeWithUnit getInterval() {
         return interval;
+    }
+
+    public final TimeWithUnit getDelayOffset() {
+        return delayOffset;
     }
 
     public final Class<? extends AppSchedule> getScheduleClass() {

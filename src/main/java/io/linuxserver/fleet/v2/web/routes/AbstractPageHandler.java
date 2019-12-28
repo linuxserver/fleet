@@ -19,6 +19,8 @@ package io.linuxserver.fleet.v2.web.routes;
 
 import io.javalin.http.Context;
 import io.javalin.http.Handler;
+import io.linuxserver.fleet.core.FleetAppController;
+import io.linuxserver.fleet.v2.service.AbstractAppService;
 import io.linuxserver.fleet.v2.web.PageModelAttributes;
 import io.linuxserver.fleet.v2.web.PageModelSpec;
 import io.linuxserver.fleet.v2.web.SessionAttributes;
@@ -33,7 +35,7 @@ import java.util.List;
 
 import static io.javalin.plugin.rendering.template.TemplateUtil.model;
 
-public abstract class AbstractPageHandler implements Handler {
+public abstract class AbstractPageHandler extends AbstractAppService implements Handler {
 
     private final Logger LOGGER = LoggerFactory.getLogger(getClass());
 
@@ -44,7 +46,8 @@ public abstract class AbstractPageHandler implements Handler {
         CUSTOM_TEMPLATES.add(new Java8DateTimeMethod());
     }
 
-    AbstractPageHandler() {
+    AbstractPageHandler(final FleetAppController controller) {
+        super(controller);
         LOGGER.info("Registering web route.");
     }
 
@@ -87,7 +90,9 @@ public abstract class AbstractPageHandler implements Handler {
     }
 
     private void injectTopLevelModelAttributes(final Context ctx, final PageModelSpec spec) {
+
         spec.addModelAttribute(PageModelAttributes.AuthenticatedUser, ctx.sessionAttribute(SessionAttributes.AuthenticatedUser));
+        spec.addModelAttribute(PageModelAttributes.SystemAlerts,      getController().getSystemAlerts());
     }
 
     private void checkViewForRedirect(final Context ctx, final PageModelSpec spec) {

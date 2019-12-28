@@ -59,7 +59,7 @@ public abstract class AbstractAppThread extends Thread {
         }
     }
 
-    protected final boolean isThreadRunning() {
+    public final boolean isThreadRunning() {
         return status == ThreadStatus.Running;
     }
 

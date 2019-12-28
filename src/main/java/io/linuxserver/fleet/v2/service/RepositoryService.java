@@ -59,6 +59,17 @@ public class RepositoryService {
         repositoryCache.addAllItems(imageDAO.fetchAllRepositories());
     }
 
+    public final Image updateImageSpec(final ImageKey imageKey, final ItemSyncSpec updatedSpec) {
+
+        final Image cachedImage = getImage(imageKey);
+        if (null == cachedImage) {
+            throw new IllegalArgumentException("Image key " + imageKey + " did not match known image");
+        }
+
+        final Image updated = cachedImage.cloneWithSyncSpec(updatedSpec);
+        return storeImage(updated);
+    }
+
     public final Repository updateRepositorySpec(final RepositoryKey repositoryKey, final ItemSyncSpec updatedSpec) {
 
         final Repository cachedRepository = getRepository(repositoryKey);
@@ -118,7 +129,30 @@ public class RepositoryService {
 
         final Image cachedImage = repositoryCache.findImage(imageKey);
         if (null != cachedImage) {
+
+            final InsertUpdateResult<Void> removalResult = imageDAO.removeImage(cachedImage);
+            if (removalResult.isError()) {
+                throw new RuntimeException("Unable to remove persisted image: " + removalResult.getStatusMessage());
+            }
+
             repositoryCache.findItem(cachedImage.getRepositoryKey()).removeImage(cachedImage);
+        }
+    }
+
+    public final void removeRepository(final RepositoryKey repositoryKey) {
+
+        if (repositoryCache.isItemCached(repositoryKey)) {
+
+            final Repository cached = repositoryCache.findItem(repositoryKey);
+            final InsertUpdateResult<Void> removalResult = imageDAO.removeRepository(cached);
+            if (removalResult.isError()) {
+                throw new RuntimeException("Unable to remove repository " + repositoryKey);
+            }
+
+            repositoryCache.removeItem(cached.getKey());
+
+        } else {
+            throw new IllegalArgumentException("Unable to find cached repository " + repositoryKey);
         }
     }
 

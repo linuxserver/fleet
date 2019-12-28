@@ -21,5 +21,7 @@ public interface PageModelAttributes {
 
     String AuthenticatedUser = "__AuthenticatedUser";
 
-    String ContextAdapter    = ".__ContextAdapter";
+    String ContextAdapter    = "__ContextAdapter";
+
+    String SystemAlerts      = "__SystemAlerts";
 }

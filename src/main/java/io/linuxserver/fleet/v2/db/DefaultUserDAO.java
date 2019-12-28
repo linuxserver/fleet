@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 LinuxServer.io
+ * Copyright (c)  2019 LinuxServer.io
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -15,11 +15,25 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package io.linuxserver.fleet.delegate;
+package io.linuxserver.fleet.v2.db;
 
-import io.linuxserver.fleet.auth.AuthenticationResult;
+import io.linuxserver.fleet.core.db.DatabaseProvider;
+import io.linuxserver.fleet.v2.key.UserKey;
+import io.linuxserver.fleet.v2.types.User;
 
-public interface AuthenticationDelegate {
+public class DefaultUserDAO extends AbstractDAO implements UserDAO {
 
-    AuthenticationResult authenticate(String username, String password);
+    public DefaultUserDAO(DatabaseProvider databaseProvider) {
+        super(databaseProvider);
+    }
+
+    @Override
+    public User fetchUser(final UserKey userKey) {
+        return null;
+    }
+
+    @Override
+    public User lookUpUser(final String username) {
+        return null;
+    }
 }

@@ -91,4 +91,9 @@ public abstract class AbstractItemCache<KEY extends Key, ITEM extends HasKey<KEY
     public final void addAllItems(Collection<ITEM> allItems) {
         allItems.forEach(this::addItem);
     }
+
+    @Override
+    public int size() {
+        return items.size();
+    }
 }

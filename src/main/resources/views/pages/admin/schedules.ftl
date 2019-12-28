@@ -48,9 +48,15 @@
                             <#list schedules as schedule>
                                 <tr data-schedule-key="${schedule.key}">
                                     <td class="is-vcentered">${schedule.name}</td>
-                                    <td class="is-vcentered">${formatDate(schedule.lastRunTime, 'dd MMM yyyy HH:mm:ss')}</td>
+                                    <td class="is-vcentered">
+                                        <#if schedule.lastRunTime?has_content>
+                                            ${formatDate(schedule.lastRunTime, 'dd MMM yyyy HH:mm:ss')}
+                                        <#else>
+                                            Never
+                                        </#if>
+                                    </td>
                                     <td class="is-vcentered">${formatDate(schedule.nextRunTime, 'dd MMM yyyy HH:mm:ss')}</td>
-                                    <td class="is-vcentered">${schedule.interval.timeDuration} ${schedule.interval.timeUnitAsTimeUnit?lower_case}</td>
+                                    <td class="is-vcentered">${schedule.interval.timeDuration} ${schedule.interval.timeUnit?lower_case}</td>
                                     <td>
                                         <@button.buttons isGrouped=true isRightAligned=true>
                                             <@button.button extraClasses="force-schedule-run" colour="normal-colour" size="small" title="Run this schedule now" extraAttributes='data-schedule-key="${schedule.key}"'>
