@@ -44,6 +44,7 @@ public interface Locations {
         String Image      = "image";
         String Schedule   = "schedule";
         String Sync       = "sync";
+        String Stats      = "stats";
     }
 
     interface Admin {

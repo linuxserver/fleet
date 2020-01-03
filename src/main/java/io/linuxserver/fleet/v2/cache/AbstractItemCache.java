@@ -52,10 +52,15 @@ public abstract class AbstractItemCache<KEY extends Key, ITEM extends HasKey<KEY
     @Override
     public final void addItem(final ITEM item) {
 
-        final ITEM cached = items.put(item.getKey(), item);
+        final ITEM original = items.get(item.getKey());
+        final ITEM cached   = items.put(item.getKey(), item);
 
         LOGGER.info("Item {} cached", item);
-        listeners.forEach(l -> l.onItemCached(cached));
+        if (null == original) {
+            listeners.forEach(l -> l.onItemAdded(cached));
+        } else {
+            listeners.forEach(l -> l.onItemUpdated(original, cached));
+        }
     }
 
     @Override

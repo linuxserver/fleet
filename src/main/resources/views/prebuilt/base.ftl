@@ -95,6 +95,7 @@
     <#nested>
 
     <script type="text/javascript" src="/assets/js/jquery-3.3.1.min.js"></script>
+    <script type="text/javascript" src="/assets/js/Chart.bundle.min.js"></script>
     <script type="text/javascript" src="/assets/js/jquery.tablesorter.js"></script>
     <script type="text/javascript" src="/assets/js/app.js"></script>
     <#if context?starts_with("admin")>
@@ -110,10 +111,14 @@
               formValidationManager.init();
               </#if>
 
+              <#if context=='image'>
+              chartManager.populateChart('${image.key}', 'Week');
+              </#if>
+
               appManager.init();
 
               <#if context?starts_with("admin")>
-                  adminManager.init();
+              adminManager.init();
               </#if>
 
               <#if context=='home'>
@@ -136,6 +141,12 @@
               });
 
           }, false);
+
+          window.addEventListener('beforeprint', function(e) {
+              for (var id in Chart.instances) {
+                  Chart.instances[id].resize();
+              }
+          });
         })();
 
     </script>

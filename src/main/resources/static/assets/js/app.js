@@ -184,7 +184,12 @@ var appManager = (function($) {
         });
 
         $body.on('click', '.has-switchable .switchable.field .is-accept-switchable', function() {
-            $(this).parents('.has-switchable').removeClass('is-active');
+
+            var $parent = $(this).parents('.has-switchable');
+            var $editableField = $parent.find('.switchable.field').find('.input');
+            var $plainTextField = $parent.find('.switchable.plaintext');
+            $plainTextField.text($editableField.val());
+            $parent.removeClass('is-active');
         });
     };
 
@@ -257,6 +262,61 @@ var imageSearchManager = (function($) {
 
     return {
         init: init
+    }
+
+}(jQuery));
+
+var chartManager = (function($) {
+
+    var populateChart = function(imageKey, groupMode) {
+
+        var request = {
+
+            url: '/internalapi/image/stats?imageKey=' + imageKey + '&groupMode=' + groupMode,
+            method: 'get'
+        };
+
+        ajaxManager.call(request, function(history) {
+
+            var ctx = document.getElementById('ImagePullHistory').getContext('2d');
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: history.pullDifferential.labels,
+                    datasets: [{
+                        data: history.pullDifferential.pulls,
+                        borderColor: 'rgba(0, 209, 178, 1)',
+                        backgroundColor: 'rgba(0, 209, 178, 0.3)'
+                    }]
+                },
+                options:  {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    legend: {
+                        display: false
+                    },
+                    scales: {
+                        fill: false,
+                        xAxes: [
+                            {
+                                gridLines: { display: false },
+                                display: false
+                            }
+                        ],
+                        yAxes: [
+                            {
+                                gridLines: { display: false },
+                                display: false
+                            }
+                        ]
+                    }
+                }
+            });
+        });
+    };
+
+    return {
+        populateChart: populateChart
     }
 
 }(jQuery));

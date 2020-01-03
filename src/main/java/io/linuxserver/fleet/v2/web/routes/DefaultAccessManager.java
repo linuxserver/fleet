@@ -22,7 +22,7 @@ import io.javalin.core.security.Role;
 import io.javalin.http.Context;
 import io.javalin.http.Handler;
 import io.linuxserver.fleet.v2.types.User;
-import io.linuxserver.fleet.v2.web.FleetRole;
+import io.linuxserver.fleet.v2.web.AppRole;
 import io.linuxserver.fleet.v2.web.Locations;
 import io.linuxserver.fleet.v2.web.SessionAttributes;
 import org.jetbrains.annotations.NotNull;
@@ -34,7 +34,7 @@ public class DefaultAccessManager implements AccessManager {
     @Override
     public void manage(@NotNull Handler handler, @NotNull Context ctx, @NotNull Set<Role> permittedRoles) throws Exception {
 
-        if (permittedRoles.contains(FleetRole.Anyone)) {
+        if (permittedRoles.contains(AppRole.Anyone)) {
             handler.handle(ctx);
         } else {
 

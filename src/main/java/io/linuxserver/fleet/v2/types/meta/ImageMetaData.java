@@ -1,5 +1,5 @@
 /*
- * Copyright (c)  2019 LinuxServer.io
+ * Copyright (c)  2020 LinuxServer.io
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -15,10 +15,22 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package io.linuxserver.fleet.v2.web;
+package io.linuxserver.fleet.v2.types.meta;
 
-import io.javalin.core.security.Role;
+import io.linuxserver.fleet.v2.types.meta.history.ImagePullHistory;
+import io.linuxserver.fleet.v2.types.meta.history.ImagePullStatistic;
 
-public enum FleetRole implements Role {
-    Anyone, AdminOnly
+import java.util.List;
+
+public class ImageMetaData {
+
+    private final ImagePullHistory pullHistory;
+
+    public ImageMetaData(final ImagePullHistory pullHistory) {
+        this.pullHistory = pullHistory;
+    }
+
+    public final List<ImagePullStatistic> getHistoryFor(final ImagePullStatistic.StatGroupMode groupMode) {
+        return pullHistory.getHistoryFor(groupMode);
+    }
 }

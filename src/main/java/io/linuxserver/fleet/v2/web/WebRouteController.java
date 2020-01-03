@@ -18,8 +18,10 @@
 package io.linuxserver.fleet.v2.web;
 
 import io.javalin.Javalin;
+import io.javalin.core.validation.JavalinValidation;
 import io.linuxserver.fleet.core.FleetAppController;
 import io.linuxserver.fleet.core.config.WebConfiguration;
+import io.linuxserver.fleet.v2.types.meta.history.ImagePullStatistic;
 import io.linuxserver.fleet.v2.web.routes.*;
 
 import static io.javalin.apibuilder.ApiBuilder.*;
@@ -46,6 +48,8 @@ public class WebRouteController {
 
         Javalin.log.info(printBanner());
 
+        JavalinValidation.register(ImagePullStatistic.StatGroupMode.class, ImagePullStatistic.StatGroupMode::valueOf);
+
         webInstance.exception(ApiException.class, (e, ctx) -> {
 
             ctx.status(400);
@@ -54,33 +58,42 @@ public class WebRouteController {
 
         webInstance.routes(() -> {
 
-            get(Locations.Login, new LoginController(app),                           roles(FleetRole.Anyone));
-            get(Locations.Home,  new HomeController( app), roles(FleetRole.Anyone));
-            get(Locations.Image, new ImageController(app), roles(FleetRole.Anyone));
+            get(Locations.Login, new LoginController(app),                           roles(AppRole.Anyone));
+            get(Locations.Home,  new HomeController( app), roles(AppRole.Anyone));
+            get(Locations.Image, new ImageController(app), roles(AppRole.Anyone));
 
-            get(Locations.Admin.Repositories, new AdminRepositoryController(app), roles(FleetRole.Anyone));
-            get(Locations.Admin.Images,       new AdminImageController(     app), roles(FleetRole.Anyone));
-            get(Locations.Admin.Schedules,    new AdminScheduleController(  app), roles(FleetRole.Anyone));
+            get(Locations.Admin.Repositories, new AdminRepositoryController(app), roles(AppRole.Anyone));
+            get(Locations.Admin.Images,       new AdminImageController(     app), roles(AppRole.Anyone));
+            get(Locations.Admin.Schedules,    new AdminScheduleController(  app), roles(AppRole.Anyone));
 
             path(Locations.Internal.Api, () -> {
 
                 path(Locations.Internal.Repository, () -> {
 
-                    put(apiController::updateRepositorySpec,  roles(FleetRole.Anyone));
-                    post(apiController::addNewRepository, roles(FleetRole.Anyone));
-                    delete(apiController::deleteRepository, roles(FleetRole.Anyone));
+                    put(apiController::updateRepositorySpec,  roles(AppRole.Anyone));
+                    post(apiController::addNewRepository, roles(AppRole.Anyone));
+                    delete(apiController::deleteRepository, roles(AppRole.Anyone));
 
                     path(Locations.Internal.Sync, () -> {
-                       put(apiController::syncRepository, roles(FleetRole.Anyone));
+                       put(apiController::syncRepository, roles(AppRole.Anyone));
                     });
                 });
 
                 path(Locations.Internal.Image, () -> {
-                    put(apiController::updateImageSpec, roles(FleetRole.Anyone));
+
+                    put(apiController::updateImageSpec, roles(AppRole.Anyone));
+
+                    path(Locations.Internal.Sync, () -> {
+                        put(apiController::syncImage, roles(AppRole.Anyone));
+                    });
+
+                    path(Locations.Internal.Stats, () -> {
+                        get(apiController::getImagePullHistory, roles(AppRole.Anyone));
+                    });
                 });
 
                 path(Locations.Internal.Schedule, () -> {
-                   put(apiController::runSchedule, roles(FleetRole.Anyone));
+                   put(apiController::runSchedule, roles(AppRole.Anyone));
                 });
             });
         });

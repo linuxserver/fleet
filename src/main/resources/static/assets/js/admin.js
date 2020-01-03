@@ -130,8 +130,32 @@ var adminManager = (function($) {
             })
         };
 
+        ajaxManager.call(request, function(data) {
+            notificationManager.makeNotification(data.name + ' updated', 'success');
+        });
+    };
+
+    var syncImage = function(trigger) {
+
+        var imageKey = trigger.data('image-key');
+
+        var request = {
+
+            url: '/internalapi/image/sync',
+            method: 'put',
+            data: {
+                'imageKey': imageKey
+            }
+        };
+
+        toggleButtonLoadingState(trigger);
         ajaxManager.call(request, function() {
-            notificationManager.makeNotification('Image updated', 'success');
+
+            notificationManager.makeNotification('Sync request submitted.', 'success');
+            toggleButtonLoadingState(trigger);
+
+        }, function() {
+            toggleButtonLoadingState(trigger);
         });
     };
 
@@ -160,9 +184,7 @@ var adminManager = (function($) {
             })
         };
 
-        ajaxManager.call(request, function(data) {
-            notificationManager.makeNotification('Updated ' + data.name, 'success');
-        });
+        ajaxManager.call(request, function() {});
     };
 
     var cleanEmpty = function(val) {
@@ -206,6 +228,10 @@ var adminManager = (function($) {
 
         $('.update-image-trigger').on('click', function() {
             updateImageSpec($(this).parents('.image-row'));
+        });
+
+        $('.sync-image').on('click', function() {
+            syncImage($(this));
         });
     };
 

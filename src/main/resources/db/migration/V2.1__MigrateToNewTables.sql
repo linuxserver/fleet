@@ -23,5 +23,5 @@ INSERT INTO
 VALUES
     ('SyncAllCachedImages', '1:hours',    '0:minutes',  'io.linuxserver.fleet.v2.thread.schedule.sync.AllImagesSyncSchedule'),
     ('GetMissingImages',    '30:minutes', '0:minutes',  'io.linuxserver.fleet.v2.thread.schedule.sync.GetMissingImagesSchedule'),
-    ('RefreshCache',        '1:days',     '10:minutes', 'io.linuxserver.fleet.v2.thread.schedule.cache.RefreshCacheSchedule'),
+    ('RefreshCache',        '1:days',     '15:minutes', 'io.linuxserver.fleet.v2.thread.schedule.cache.RefreshCacheSchedule'),
     ('CheckAppVersion',     '1:days',     '0:minutes',  'io.linuxserver.fleet.v2.thread.schedule.CheckAppVersionSchedule');

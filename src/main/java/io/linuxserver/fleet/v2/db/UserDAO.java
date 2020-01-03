@@ -17,12 +17,22 @@
 
 package io.linuxserver.fleet.v2.db;
 
+import io.linuxserver.fleet.db.query.InsertUpdateResult;
 import io.linuxserver.fleet.v2.key.UserKey;
 import io.linuxserver.fleet.v2.types.User;
+import io.linuxserver.fleet.v2.types.internal.UserOutlineRequest;
+
+import java.util.List;
 
 public interface UserDAO {
 
     User fetchUser(UserKey userKey);
 
     User lookUpUser(String username);
+
+    InsertUpdateResult<User> createUser(UserOutlineRequest request);
+
+    List<User> fetchAllUsers();
+
+    InsertUpdateResult<Void> removeUser(User user);
 }

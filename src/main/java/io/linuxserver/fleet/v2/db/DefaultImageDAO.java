@@ -27,7 +27,10 @@ import io.linuxserver.fleet.v2.types.*;
 import io.linuxserver.fleet.v2.types.internal.ImageOutlineRequest;
 import io.linuxserver.fleet.v2.types.internal.RepositoryOutlineRequest;
 import io.linuxserver.fleet.v2.types.internal.TagBranchOutlineRequest;
+import io.linuxserver.fleet.v2.types.meta.ImageMetaData;
 import io.linuxserver.fleet.v2.types.meta.ItemSyncSpec;
+import io.linuxserver.fleet.v2.types.meta.history.ImagePullHistory;
+import io.linuxserver.fleet.v2.types.meta.history.ImagePullStatistic;
 
 import java.sql.*;
 import java.time.LocalDateTime;
@@ -54,6 +57,7 @@ public class DefaultImageDAO extends AbstractDAO implements ImageDAO {
     private static final String CreateImageOutline     = "{CALL Image_CreateOutline(?,?,?,?,?,?,?,?,?,?)}";
     private static final String GetImage               = "{CALL Image_Get(?)}";
     private static final String DeleteImage            = "{CALL Image_Delete(?)}";
+    private static final String GetImageStats          = "{CALL Image_GetStats(?)}";
 
     public DefaultImageDAO(final DatabaseProvider databaseConnection) {
         super(databaseConnection);
@@ -458,8 +462,11 @@ public class DefaultImageDAO extends AbstractDAO implements ImageDAO {
 
         if (results.next()) {
 
-            final Image image = new Image(makeImageKey(results),
+            final ImageKey imageKey = makeImageKey(results);
+
+            final Image image = new Image(imageKey,
                                           makeSyncSpec(results),
+                                          makeImageMetaData(connection, imageKey),
                                           makeCountData(results),
                                           results.getString("Description"),
                                           results.getTimestamp("LastUpdated").toLocalDateTime());
@@ -470,6 +477,37 @@ public class DefaultImageDAO extends AbstractDAO implements ImageDAO {
         }
 
         return null;
+    }
+
+    private ImageMetaData makeImageMetaData(final Connection connection, final ImageKey imageKey) throws SQLException {
+
+        try (final CallableStatement call = connection.prepareCall(GetImageStats)) {
+
+            call.setInt(1, imageKey.getId());
+            final ResultSet results = call.executeQuery();
+
+            final ImagePullHistory pullHistory = new ImagePullHistory();
+            while (results.next()) {
+
+                final long imagePulls = results.getLong("ImagePulls");
+                if (!results.wasNull()) {
+
+                    final String timeGroup = results.getString("TimeGroup");
+                    final String groupMode = results.getString("GroupMode");
+
+                    final ImagePullStatistic statistic = new ImagePullStatistic(imagePulls,
+                                                                                timeGroup,
+                                                                                ImagePullStatistic.StatGroupMode.valueOf(groupMode));
+
+                    final boolean added = pullHistory.addStatistic(statistic);
+                    if (!added) {
+                        getLogger().warn("Unable to add pull history {} to image {}", statistic, imageKey);
+                    }
+                }
+            }
+
+            return new ImageMetaData(pullHistory);
+        }
     }
 
     private ImageKey makeImageKey(final ResultSet results) throws SQLException {

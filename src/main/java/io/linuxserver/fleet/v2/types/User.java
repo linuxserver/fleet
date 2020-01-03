@@ -19,56 +19,46 @@ package io.linuxserver.fleet.v2.types;
 
 import io.linuxserver.fleet.v2.key.AbstractHasKey;
 import io.linuxserver.fleet.v2.key.UserKey;
+import io.linuxserver.fleet.v2.web.AppRole;
 
 import java.time.LocalDateTime;
 
 public class User extends AbstractHasKey<UserKey> {
 
-    private final String username;
-    private final String password;
+    private final String        username;
+    private final String        password;
+    private final AppRole       role;
+    private final LocalDateTime modifiedTime;
 
-    private LocalDateTime modifiedTime;
+    public User(final UserKey key,
+                final String username,
+                final String password,
+                final LocalDateTime modifiedTime,
+                final AppRole role) {
+        super(key);
 
-    public User(String username, String password) {
-        super(new UserKey());
-
-        this.username = username;
-        this.password = password;
+        this.username     = username;
+        this.password     = password;
+        this.modifiedTime = LocalDateTime.of(modifiedTime.toLocalDate(), modifiedTime.toLocalTime());
+        this.role         = role;
     }
 
-    public User(Integer id, String username, String password) {
-        super(new UserKey(id));
-
-        this.username = username;
-        this.password = password;
-    }
-
-    public String getUsername() {
+    public final String getUsername() {
         return username;
     }
 
-    public String getPassword() {
+    public final String getPassword() {
         return password;
     }
 
-    public User withModifiedTime(LocalDateTime modifiedTime) {
-
-        this.modifiedTime = modifiedTime;
-        return this;
+    public final AppRole getRole() {
+        return role;
     }
 
-    public LocalDateTime getModifiedTime() {
+    public final LocalDateTime getModifiedTime() {
 
         if (null != modifiedTime) {
-
-            return LocalDateTime.of(
-                modifiedTime.getYear(),
-                modifiedTime.getMonth(),
-                modifiedTime.getDayOfMonth(),
-                modifiedTime.getHour(),
-                modifiedTime.getMinute(),
-                modifiedTime.getSecond()
-            );
+            return LocalDateTime.of(modifiedTime.toLocalDate(), modifiedTime.toLocalTime());
         }
 
         return null;

@@ -26,11 +26,13 @@ import io.linuxserver.fleet.v2.service.AbstractAppService;
 import io.linuxserver.fleet.v2.thread.schedule.AppSchedule;
 import io.linuxserver.fleet.v2.types.Image;
 import io.linuxserver.fleet.v2.types.Repository;
+import io.linuxserver.fleet.v2.types.api.ApiImagePullHistoryWrapper;
 import io.linuxserver.fleet.v2.types.api.ApiImageWrapper;
 import io.linuxserver.fleet.v2.types.api.ApiRepositoryWrapper;
 import io.linuxserver.fleet.v2.types.api.ApiScheduleWrapper;
 import io.linuxserver.fleet.v2.types.internal.RepositoryOutlineRequest;
 import io.linuxserver.fleet.v2.types.meta.ItemSyncSpec;
+import io.linuxserver.fleet.v2.types.meta.history.ImagePullStatistic;
 import io.linuxserver.fleet.v2.web.ApiException;
 import io.linuxserver.fleet.v2.web.request.NewRepositoryRequest;
 import io.linuxserver.fleet.v2.web.request.UpdateImageSpecRequest;
@@ -134,6 +136,20 @@ public class InternalApiController extends AbstractAppService {
         }
     }
 
+    public final void syncImage(final Context ctx) {
+
+        try {
+
+            final String imageKeyParam = ctx.formParam("imageKey", String.class).get();
+            getController().synchroniseImage(ImageKey.parse(imageKeyParam));
+
+            ctx.json("OK");
+
+        } catch (IllegalArgumentException e) {
+            throw new ApiException(e.getMessage(), e);
+        }
+    }
+
     public void deleteRepository(final Context ctx) {
 
         try {
@@ -142,6 +158,21 @@ public class InternalApiController extends AbstractAppService {
             getController().getRepositoryService().removeRepository(RepositoryKey.parse(repositoryKeyParam));
 
             ctx.result("OK");
+
+        } catch (IllegalArgumentException e) {
+            throw new ApiException(e.getMessage(), e);
+        }
+    }
+
+    public void getImagePullHistory(final Context ctx) {
+
+        try {
+
+            final String                           imageKeyParam = ctx.queryParam("imageKey", String.class).get();
+            final ImagePullStatistic.StatGroupMode groupMode     = ctx.queryParam("groupMode", ImagePullStatistic.StatGroupMode.class).get();
+            final Image                            cachedImage   = getController().getRepositoryService().getImage(ImageKey.parse(imageKeyParam));
+
+            ctx.json(new ApiImagePullHistoryWrapper(cachedImage.getMetaData().getHistoryFor(groupMode)));
 
         } catch (IllegalArgumentException e) {
             throw new ApiException(e.getMessage(), e);

@@ -23,66 +23,104 @@
 <#import "../ui/elements/table.ftl"    as table />
 <#import "../ui/elements/tag.ftl"      as tag />
 
-<@base.base title="${image.fullName}" context="image">
+<@base.base title="${(image.fullName)!'Unknown Image'}" context="image">
 
-    <@section.section>
-        <@container.container>
+    <#if image?has_content>
 
-            <div class="columns is-multiline">
+        <@section.section>
+            <@container.container>
 
-                <div class="column is-12">
+                <div class="columns is-multiline">
 
-                    <@title.title icon="cube" thinValue=image.repositoryName boldValue=image.name separator="/">
-                        <#if image.deprecated>
-                            <@tag.tag colour="warning" value="Deprecated" />
-                        </#if>
-                    </@title.title>
+                    <div class="column is-12">
 
-                    <div class="tags is-right">
+                        <@title.title icon="cube" thinValue=image.repositoryName boldValue=image.name separator="/" subtitle=image.description>
+                            <#if image.deprecated>
+                                <@tag.tag colour="warning" value="Deprecated" />
+                            </#if>
+                        </@title.title>
 
-                        <#assign latestBranch=image.findTagBranchByName("latest") />
-                        <#if latestBranch?has_content>
-                            <#list latestBranch.latestTag.digests as digest>
-                                <@tag.tag colour="light" value='<i class="fas fa-microchip"></i> ${digest.architecture}' extraAttributes='title="Architecture"' />
-                            </#list>
-                        </#if>
+                        <div class="tags is-right">
 
-                        <@tag.tag colour="light" value='<i class="fas fa-download"></i> ${image.pullCount}' extraAttributes='title="Pulls"' />
-                        <@tag.tag colour="light" value='<i class="fas fa-star"></i> ${image.starCount}' extraAttributes='title="Stars"' />
+                            <#assign latestBranch=image.findTagBranchByName("latest") />
+                            <#if latestBranch?has_content>
+                                <#list latestBranch.latestTag.digests as digest>
+                                    <@tag.tag colour="light" value='<i class="fas fa-microchip"></i> ${digest.architecture}' extraAttributes='title="Architecture"' />
+                                </#list>
+                            </#if>
+
+                            <@tag.tag colour="light" value='<i class="fas fa-download"></i> ${image.pullCount}' extraAttributes='title="Pulls"' />
+                            <@tag.tag colour="light" value='<i class="fas fa-star"></i> ${image.starCount}' extraAttributes='title="Stars"' />
+
+                        </div>
 
                     </div>
 
-                </div>
+                    <div class="column is-6-desktop is-12-tablet">
+                        <@box.box extraClasses="is-paddingless is-clipped">
 
-                <div class="column is-6-desktop is-12-tablet">
-                    <@box.box extraClasses="is-paddingless is-clipped">
-
-                        <h2 class="title is-5 has-text-centered has-margin-top">Build Information</h2>
-                        <@table.table isFullWidth=true isNarrow=true isStriped=true>
-                            <tbody>
+                            <h2 class="title is-5 has-text-centered has-margin-top">Build Information</h2>
+                            <@table.table isFullWidth=true isNarrow=true isStriped=true>
+                                <tbody>
                                 <@table.halfDisplayRow title="Repository"   value=image.repositoryName link="/?key=${image.repositoryKey}" />
                                 <@table.halfDisplayRow title="Build Time"   value=image.lastUpdatedAsString />
                                 <@table.halfDisplayRow title="Synchronised" value=image.syncEnabled?string("Yes", "No") />
                                 <@table.halfDisplayRow title="Stable"       value=image.stable?string("Yes", "No") />
                                 <@table.halfDisplayRow title="Deprecated"   value=image.deprecated?string("Yes", "No") />
-                            </tbody>
-                        </@table.table>
+                                </tbody>
+                            </@table.table>
 
-                        <h2 class="title is-5 has-text-centered has-margin-top">Tracked Tags</h2>
-                        <@table.table isFullWidth=true isNarrow=true isStriped=true>
-                            <tbody>
+                            <h2 class="title is-5 has-text-centered has-margin-top">Tracked Tags</h2>
+                            <@table.table isFullWidth=true isNarrow=true isStriped=true>
+                                <tbody>
                                 <#list image.tagBranches as tagBranch>
                                     <@table.halfDisplayRow title=tagBranch.branchName value='<i class="fas fa-tag"></i> ${image.getMaskedVersion(tagBranch.latestTag)}' />
                                 </#list>
-                            </tbody>
-                        </@table.table>
+                                </tbody>
+                            </@table.table>
 
-                    </@box.box>
+                        </@box.box>
+                    </div>
+
+                    <div class="column is-6-desktop is-12-tablet">
+                        <@box.box extraClasses="is-paddingless is-clipped is-relative">
+
+                            <h2 class="title is-5 has-text-centered has-margin-top">Pull Activity</h2>
+
+                            <div class="tabs is-toggle is-centered is-small is-marginless">
+                                <ul class="is-marginless">
+                                    <li data-group-mode="Day">
+                                        <a><span>1d</span></a>
+                                    </li>
+                                    <li class="is-active" data-group-mode="Week">
+                                        <a><span>1w</span></a>
+                                    </li>
+                                    <li data-group-mode="Month">
+                                        <a><span>1m</span></a>
+                                    </li>
+                                </ul>
+                            </div>
+
+                            <div class="chart-container" style="position: relative; width: 100%; height: 200px">
+                                <canvas id="ImagePullHistory"></canvas>
+                            </div>
+
+                        </@box.box>
+                    </div>
+
                 </div>
 
-            </div>
+            </@container.container>
+        </@section.section>
 
-        </@container.container>
-    </@section.section>
+    <#else>
+
+        <@section.section>
+            <@container.container>
+                Could not find image.
+            </@container.container>
+        </@section.section>
+
+    </#if>
 
 </@base.base>

@@ -63,6 +63,21 @@ CREATE TABLE Schedule (
 ) ENGINE=InnoDB;
 //
 
+CREATE TABLE AppSetting (
+    `id`          INT          NOT NULL auto_increment PRIMARY KEY,
+    `name`        VARCHAR(100) NOT NULL,
+    `string_val`  VARCHAR(255) DEFAULT NULL,
+    `int_val`     INT          DEFAULT NULL,
+    `double_val`  DOUBLE(6,2)  DEFAULT NULL,
+    `boolean_val` TINYINT      DEFAULT NULL,
+    UNIQUE KEY (`name`)
+) ENGINE=InnoDB;
+//
+
+ALTER TABLE Users
+    ADD COLUMN `role` enum('Admin') DEFAULT 'Admin';
+//
+
 CREATE OR REPLACE VIEW `Image_View` AS (
 
    SELECT
@@ -421,6 +436,93 @@ BEGIN
 
 END //
 
+CREATE OR REPLACE PROCEDURE `Image_StorePullHistory`
+(
+    in_image_id     INT,
+    in_image_pulls  BIGINT,
+
+    OUT out_status  ENUM('Updated', 'NoChange')
+)
+BEGIN
+
+    IF EXISTS(SELECT 1 FROM Image WHERE `id` = in_image_id) THEN
+
+        INSERT INTO ImagePullHistory
+        (
+            `image_id`,
+            `pull_timestamp`,
+            `pull_count`
+        )
+        VALUES
+        (
+            in_image_id,
+            UNIX_TIMESTAMP(NOW()),
+            in_image_pulls
+        );
+
+        SET out_status = 'Updated';
+    ELSE
+        SET out_status = 'NoChange';
+    END IF;
+
+END;
+//
+
+CREATE OR REPLACE PROCEDURE `Image_GetStats` (
+    in_image_id   INT
+)
+BEGIN
+
+    SELECT
+        `image_id`                                AS ImageId,
+        MAX(`pull_count`)                         AS ImagePulls,
+        FROM_UNIXTIME(`pull_timestamp`, '%Y%m%d') AS TimeGroup,
+        'Week'                                    AS GroupMode
+    FROM
+        ImagePullHistory
+    WHERE
+        `image_id` = in_image_id
+    AND
+        `pull_timestamp` > unix_timestamp(now() - interval 7 day)
+    GROUP BY
+        TimeGroup
+
+    UNION ALL
+
+    SELECT
+        `image_id`                                AS ImageId,
+        MAX(`pull_count`)                         AS ImagePulls,
+        FROM_UNIXTIME(`pull_timestamp`, '%Y%m%d') AS TimeGroup,
+        'Month'                                    AS GroupMode
+    FROM
+        ImagePullHistory
+    WHERE
+        `image_id` = in_image_id
+    AND
+        `pull_timestamp` > unix_timestamp(now() - interval 1 month)
+    GROUP BY
+        TimeGroup
+
+    UNION ALL
+
+    SELECT
+        `image_id`                                  AS ImageId,
+        MAX(`pull_count`)                           AS ImagePulls,
+        FROM_UNIXTIME(`pull_timestamp`, '%Y%m%d%h') AS TimeGroup,
+        'Day'                                       AS GroupMode
+    FROM
+        ImagePullHistory
+    WHERE
+        `image_id` = in_image_id
+    AND
+        `pull_timestamp` > unix_timestamp(date(now()))
+
+    ORDER BY
+        GroupMode, TimeGroup;
+
+END;
+//
+
 CREATE OR REPLACE PROCEDURE `Image_Store`
 (
     in_id           INT,
@@ -462,6 +564,8 @@ BEGIN
         ELSE
             SET out_status = 'Updated';
         END IF;
+
+        CALL Image_StorePullHistory(in_id, in_pulls, out_status);
 
         SELECT * FROM ImageKey_View WHERE `ImageId` = in_id;
 
@@ -535,5 +639,105 @@ BEGIN
         `java_class` AS `ScheduleClass`
     FROM
          Schedule;
+END;
+//
+
+CREATE OR REPLACE VIEW `User_View` AS (
+
+    SELECT
+        `id`        AS `UserId`,
+        `username`  AS `UserName`,
+        `password`  AS `UserPassword`,
+        `role`      AS `UserRole`,
+        `modified`  AS `ModifiedTime`
+    FROM
+        Users
+);
+//
+
+CREATE OR REPLACE PROCEDURE `User_Save`
+(
+    in_id           INT,
+    in_username     VARCHAR(255),
+    in_password     VARCHAR(255),
+    in_role         ENUM('Admin'),
+
+    OUT out_status  ENUM('Exists', 'Inserted')
+)
+BEGIN
+
+    IF in_id IS NULL THEN
+
+        INSERT INTO Users
+        (
+            `username`,
+            `password`,
+            `role`
+        )
+        VALUES
+        (
+            in_username,
+            in_password,
+            in_role
+        );
+
+        SET out_status = 'Inserted';
+
+        SELECT * FROM User_View WHERE `id` = LAST_INSERT_ID();
+
+    ELSE
+       SET out_status = 'Exists';
+    END IF;
+
+END;
+//
+
+CREATE OR REPLACE PROCEDURE `User_GetAll` ()
+BEGIN
+
+    SELECT * FROM User_View;
+
+END;
+//
+
+CREATE OR REPLACE PROCEDURE `User_Get`
+(
+    in_id   INT
+)
+BEGIN
+
+    SELECT
+        *
+    FROM
+         User_View
+    WHERE
+        UserId = in_id;
+
+END;
+//
+
+CREATE OR REPLACE PROCEDURE `User_GetByName`
+(
+    in_username   VARCHAR(255)
+)
+BEGIN
+
+    SELECT
+        *
+    FROM
+        User_View
+    WHERE
+        UserName = in_username;
+END;
+//
+
+CREATE OR REPLACE PROCEDURE `User_Delete`
+(
+    in_id   INT
+)
+BEGIN
+
+    DELETE FROM Users WHERE `id` = in_id;
+
 END;
 //

@@ -20,6 +20,7 @@ package io.linuxserver.fleet.v2.types;
 import io.linuxserver.fleet.v2.key.HasKey;
 import io.linuxserver.fleet.v2.key.ImageKey;
 import io.linuxserver.fleet.v2.key.RepositoryKey;
+import io.linuxserver.fleet.v2.types.meta.ImageMetaData;
 import io.linuxserver.fleet.v2.types.meta.ItemSyncSpec;
 
 import java.time.LocalDateTime;
@@ -37,9 +38,11 @@ public class Image extends AbstractSyncItem<ImageKey, Image> {
     private final String         description;
     private final LocalDateTime  lastUpdated;
     private final Set<TagBranch> tagBranches;
+    private final ImageMetaData  metaData;
 
     public Image(final ImageKey key,
                  final ItemSyncSpec syncSpec,
+                 final ImageMetaData metaData,
                  final ImageCountData countData,
                  final String description,
                  final LocalDateTime lastUpdated) {
@@ -47,6 +50,7 @@ public class Image extends AbstractSyncItem<ImageKey, Image> {
         super(key, syncSpec);
 
         this.countData   = countData;
+        this.metaData    = metaData;
         this.description = description;
         this.lastUpdated = parseDateTime(lastUpdated);
         this.tagBranches = new HashSet<>();
@@ -57,7 +61,7 @@ public class Image extends AbstractSyncItem<ImageKey, Image> {
                                       final String description,
                                       final LocalDateTime lastUpdated) {
 
-        final Image cloned = new Image(getKey(), getSpec(), new ImageCountData(pullCount,starCount), description, lastUpdated);
+        final Image cloned = new Image(getKey(), getSpec(), getMetaData(), new ImageCountData(pullCount,starCount), description, lastUpdated);
         tagBranches.forEach(t -> cloned.addTagBranch(t.cloneForUpdate()));
 
         return cloned;
@@ -66,7 +70,7 @@ public class Image extends AbstractSyncItem<ImageKey, Image> {
     @Override
     public final Image cloneWithSyncSpec(final ItemSyncSpec syncSpec) {
 
-        final Image cloned = new Image(getKey(), syncSpec, countData, getDescription(), getLastUpdated());
+        final Image cloned = new Image(getKey(), syncSpec, getMetaData(), countData, getDescription(), getLastUpdated());
         tagBranches.forEach(t -> cloned.addTagBranch(t.cloneForUpdate()));
 
         return cloned;
@@ -90,6 +94,10 @@ public class Image extends AbstractSyncItem<ImageKey, Image> {
 
     public final String getDescription() {
         return description;
+    }
+
+    public final ImageMetaData getMetaData() {
+        return metaData;
     }
 
     public final LocalDateTime getLastUpdated() {

@@ -42,7 +42,8 @@ public interface ItemCache<KEY extends Key, ITEM extends HasKey<KEY>> {
 
     interface ItemCacheListener<ITEM> {
 
-        void onItemCached(final ITEM item);
+        void onItemAdded(final ITEM item);
+        void onItemUpdated(final ITEM oldItem, final ITEM newItem);
         void onItemRemoved(final ITEM item);
     }
 }

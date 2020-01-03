@@ -56,7 +56,7 @@
                                         ${image.name}
                                     </td>
                                     <td class="editable-image-version-mask is-vcentered" style="width: 300px; min-width: 300px;">
-                                        <@input.switchable id="VersionMask_${repository.key.id}" icon="mask" value=repository.versionMask size="small" acceptClass="update-image-trigger" />
+                                        <@input.switchable id="VersionMask_${repository.key.id}" icon="mask" value=image.versionMask size="small" acceptClass="update-image-trigger" />
                                     </td>
                                     <td class="editable-image-sync-enabled is-vcentered has-text-centered" style="width: 100px; max-width: 100px;">
                                         <@input.toggle id="Enabled_${image.key.id}" size="small" inputClasses="update-image-trigger" isToggled=(repository.syncEnabled && image.syncEnabled) isDisabled=(!repository.syncEnabled) title="${(!repository.syncEnabled)?string('Repository sync has been disabled.', '')}" />
@@ -72,7 +72,7 @@
                                     </td>
                                     <td style="min-width: 100px; width: 100px;">
                                         <@button.buttons isGrouped=true isRightAligned=true>
-                                            <@button.button id="ForceResync_${image.key.id}" size="small" title="Force resync" colour="normal-colour" extraClasses="force-resync">
+                                            <@button.button id="ForceResync_${image.key.id}" size="small" title="Force resync" colour="normal-colour" extraAttributes='data-image-key="${image.key}"' extraClasses="sync-image">
                                                 <i class="fas fa-sync-alt is-marginless"></i>
                                             </@button.button>
                                             <@button.link size="small" title="Edit image metadata" colour="normal-colour" link="/admin/image?key=${image.fullName}">

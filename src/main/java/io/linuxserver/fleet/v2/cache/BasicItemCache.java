@@ -20,6 +20,6 @@ package io.linuxserver.fleet.v2.cache;
 import io.linuxserver.fleet.v2.key.HasKey;
 import io.linuxserver.fleet.v2.key.Key;
 
-public class BasicItemCache<KEY extends Key, ITEM extends HasKey<KEY>> extends AbstractItemCache<KEY, ITEM> {
+public final class BasicItemCache<KEY extends Key, ITEM extends HasKey<KEY>> extends AbstractItemCache<KEY, ITEM> {
     // Default implementation
 }

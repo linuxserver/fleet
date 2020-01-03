@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 LinuxServer.io
+ * Copyright (c)  2019 LinuxServer.io
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -15,11 +15,10 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package io.linuxserver.fleet.queue;
+package io.linuxserver.fleet.v2.web;
 
-public interface RequestQueue<T extends FleetRequest> {
+import io.javalin.core.security.Role;
 
-    void enqueueRequest(T request);
-
-    T takeOneRequest();
+public enum AppRole implements Role {
+    Anyone, Admin
 }
