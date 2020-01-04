@@ -64,6 +64,7 @@ public class WebRouteController {
 
             get(Locations.Admin.Repositories, new AdminRepositoryController(app), roles(AppRole.Anyone));
             get(Locations.Admin.Images,       new AdminImageController(     app), roles(AppRole.Anyone));
+            get(Locations.Admin.ImageEdit,    new AdminImageEditController( app), roles(AppRole.Anyone));
             get(Locations.Admin.Schedules,    new AdminScheduleController(  app), roles(AppRole.Anyone));
 
             path(Locations.Internal.Api, () -> {
@@ -89,6 +90,10 @@ public class WebRouteController {
 
                     path(Locations.Internal.Stats, () -> {
                         get(apiController::getImagePullHistory, roles(AppRole.Anyone));
+                    });
+
+                    path(Locations.Internal.Track, () -> {
+                        put(apiController::trackNewBranch, roles(AppRole.Anyone));
                     });
                 });
 

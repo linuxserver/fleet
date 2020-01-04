@@ -19,10 +19,10 @@ package io.linuxserver.fleet.v2.thread.schedule;
 
 import io.linuxserver.fleet.core.FleetAppController;
 
-public class CheckAppVersionSchedule extends AbstractAppSchedule {
+public class TidyHistoricDataSchedule extends AbstractAppSchedule {
 
-    public CheckAppVersionSchedule(final ScheduleSpec spec,
-                                   final FleetAppController controller) {
+    public TidyHistoricDataSchedule(final ScheduleSpec spec,
+                                    final FleetAppController controller) {
         super(spec, controller);
     }
 

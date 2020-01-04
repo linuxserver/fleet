@@ -268,6 +268,19 @@ var imageSearchManager = (function($) {
 
 var chartManager = (function($) {
 
+    var formatNumber = function(num) {
+
+        var array = num.toString().split('');
+        var index = -3;
+
+        while (array.length + index > 0) {
+            array.splice(index, 0, ',');
+            index -= 4;
+        }
+
+        return array.join('');
+    };
+
     var populateChart = function(imageKey, groupMode) {
 
         var request = {
@@ -278,16 +291,29 @@ var chartManager = (function($) {
 
         ajaxManager.call(request, function(history) {
 
-            var ctx = document.getElementById('ImagePullHistory').getContext('2d');
+            $('#PullActivityDataPoint').text(history.groupModeDataPoint);
+            $('#PullActivityRate').text(formatNumber(history.mean));
+
+            var ctx      = document.getElementById('ImagePullHistory').getContext('2d');
+            var gradient = ctx.createLinearGradient(0, 0, 0, 400);
+            gradient.addColorStop(0, 'rgba(0, 209, 178, 0.5)');
+            gradient.addColorStop(0.3, 'rgba(0, 209, 178, 0)');
+
             new Chart(ctx, {
                 type: 'line',
                 data: {
                     labels: history.pullDifferential.labels,
-                    datasets: [{
-                        data: history.pullDifferential.pulls,
-                        borderColor: 'rgba(0, 209, 178, 1)',
-                        backgroundColor: 'rgba(0, 209, 178, 0.3)'
-                    }]
+                    datasets: [
+                        {
+                            lineTension: 0,
+                            data: history.pullDifferential.pulls,
+                            pointRadius: 0,
+                            pointHitRadius: 2,
+                            borderWidth: 2,
+                            borderColor: 'rgba(0, 209, 178, 1)',
+                            backgroundColor : gradient
+                        }
+                    ]
                 },
                 options:  {
                     responsive: true,

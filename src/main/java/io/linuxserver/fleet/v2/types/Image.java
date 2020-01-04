@@ -67,6 +67,10 @@ public class Image extends AbstractSyncItem<ImageKey, Image> {
         return cloned;
     }
 
+    public final Image cloneForUpdate() {
+        return cloneWithSyncSpec(getSpec());
+    }
+
     @Override
     public final Image cloneWithSyncSpec(final ItemSyncSpec syncSpec) {
 

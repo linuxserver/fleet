@@ -17,12 +17,14 @@
 
 package io.linuxserver.fleet.v2.key;
 
+import io.linuxserver.fleet.v2.Utils;
+
 public abstract class AbstractHasKey<KEY extends Key> implements HasKey<KEY> {
 
     private final KEY key;
 
     public AbstractHasKey(final KEY key) {
-        this.key = key;
+        this.key = Utils.ensureNotNull(key);
     }
 
     @Override

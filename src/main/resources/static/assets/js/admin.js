@@ -187,6 +187,23 @@ var adminManager = (function($) {
         ajaxManager.call(request, function() {});
     };
 
+    var trackNewBranch = function(branchName, imageKey) {
+
+        var request = {
+
+            url: '/internalapi/image/track',
+            method: 'put',
+            data: {
+                'imageKey': imageKey,
+                'branchName': branchName
+            }
+        };
+
+        ajaxManager.call(request, function() {
+            window.location.reload();
+        });
+    };
+
     var cleanEmpty = function(val) {
         return (typeof val === 'undefined' || $.trim(val).length === 0) ? null : val;
     };
@@ -232,6 +249,14 @@ var adminManager = (function($) {
 
         $('.sync-image').on('click', function() {
             syncImage($(this));
+        });
+
+        $('#TrackNewBranch').on('click', function() {
+
+            var branchName = $.trim($('#NewTrackedBranch').val());
+            if (branchName.length > 0) {
+                trackNewBranch(branchName, $('#ImageKey').val());
+            }
         });
     };
 

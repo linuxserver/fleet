@@ -161,4 +161,10 @@ public class FleetAppController extends AbstractAppController implements Service
     public final AuthenticationResult authenticateUser(final String username, final String password) {
         return authenticationDelegate.authenticate(username, password);
     }
+
+    public final void trackBranch(final ImageKey imageKey, final String branchName) {
+
+        getRepositoryService().trackBranchOnImage(imageKey, branchName);
+        synchroniseImage(imageKey);
+    }
 }

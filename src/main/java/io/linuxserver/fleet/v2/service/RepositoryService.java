@@ -29,6 +29,7 @@ import io.linuxserver.fleet.v2.types.docker.DockerImage;
 import io.linuxserver.fleet.v2.types.docker.DockerTag;
 import io.linuxserver.fleet.v2.types.internal.ImageOutlineRequest;
 import io.linuxserver.fleet.v2.types.internal.RepositoryOutlineRequest;
+import io.linuxserver.fleet.v2.types.internal.TagBranchOutlineRequest;
 import io.linuxserver.fleet.v2.types.meta.ItemSyncSpec;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -230,6 +231,27 @@ public class RepositoryService {
 
             return storeImage(cloned);
         }
+    }
+
+    public void trackBranchOnImage(final ImageKey imageKey, final String branchName) {
+
+        final Image image = repositoryCache.findImage(imageKey);
+        if (null == image) {
+            throw new IllegalArgumentException("Could not find image with key " + imageKey);
+        }
+
+        if (image.findTagBranchByName(branchName) != null) {
+            throw new IllegalArgumentException("Image is already tracking branch " + branchName);
+        }
+
+        final InsertUpdateResult<TagBranch> outlineResult = imageDAO.createTagBranchOutline(new TagBranchOutlineRequest(imageKey, branchName));
+        if (outlineResult.isError()) {
+            throw new RuntimeException(outlineResult.getStatusMessage());
+        }
+
+        final Image updatableClone = image.cloneForUpdate();
+        updatableClone.addTagBranch(outlineResult.getResult());
+        storeImage(updatableClone);
     }
 
     private void updateCache(final Image storedImage) {

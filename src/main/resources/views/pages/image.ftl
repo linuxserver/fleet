@@ -83,26 +83,34 @@
                     </div>
 
                     <div class="column is-6-desktop is-12-tablet">
-                        <@box.box extraClasses="is-paddingless is-clipped is-relative">
+                        <@box.box>
 
-                            <h2 class="title is-5 has-text-centered has-margin-top">Pull Activity</h2>
+                            <h2 class="title is-5 has-text-centered">Pull Activity</h2>
 
                             <div class="tabs is-toggle is-centered is-small is-marginless">
                                 <ul class="is-marginless">
                                     <li data-group-mode="Day">
                                         <a><span>1d</span></a>
                                     </li>
-                                    <li class="is-active" data-group-mode="Week">
+                                    <li data-group-mode="Week">
                                         <a><span>1w</span></a>
                                     </li>
-                                    <li data-group-mode="Month">
+                                    <li class="is-active" data-group-mode="Month">
                                         <a><span>1m</span></a>
                                     </li>
                                 </ul>
                             </div>
 
-                            <div class="chart-container" style="position: relative; width: 100%; height: 200px">
-                                <canvas id="ImagePullHistory"></canvas>
+                            <div class="columns has-margin-top">
+                                <div class="column is-half-desktop is-full-mobile has-text-centered is-vcentered">
+                                    <h4 class="title is-6">Pulls per <span id="PullActivityDataPoint"></span></h4>
+                                    <@tag.tag value='<span id="PullActivityRate"></span>' colour="light" />
+                                </div>
+                                <div class="column is-half-desktop is-full-mobile">
+                                    <div class="chart-container" style="position: relative; width: 100%; height: 150px">
+                                        <canvas id="ImagePullHistory"></canvas>
+                                    </div>
+                                </div>
                             </div>
 
                         </@box.box>

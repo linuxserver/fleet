@@ -33,6 +33,7 @@ import io.linuxserver.fleet.v2.types.meta.history.ImagePullHistory;
 import io.linuxserver.fleet.v2.types.meta.history.ImagePullStatistic;
 
 import java.sql.*;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -58,6 +59,7 @@ public class DefaultImageDAO extends AbstractDAO implements ImageDAO {
     private static final String GetImage               = "{CALL Image_Get(?)}";
     private static final String DeleteImage            = "{CALL Image_Delete(?)}";
     private static final String GetImageStats          = "{CALL Image_GetStats(?)}";
+    private static final String DeleteStats            = "{CALL Image_ClearStatsBefore(?)}";
 
     public DefaultImageDAO(final DatabaseProvider databaseConnection) {
         super(databaseConnection);

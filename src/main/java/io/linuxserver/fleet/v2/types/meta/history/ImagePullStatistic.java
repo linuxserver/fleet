@@ -76,6 +76,19 @@ public class ImagePullStatistic implements Comparable<ImagePullStatistic> {
     }
 
     public enum StatGroupMode {
-        Day, Week, Month;
+
+        Day("hour"),
+        Week("day"),
+        Month("day");
+
+        private final String dataPoints;
+
+        StatGroupMode(final String dataPoints) {
+            this.dataPoints = dataPoints;
+        }
+
+        public final String getDataPoint() {
+            return dataPoints;
+        }
     }
 }

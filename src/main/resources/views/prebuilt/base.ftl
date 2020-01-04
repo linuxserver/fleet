@@ -112,7 +112,7 @@
               </#if>
 
               <#if context=='image'>
-              chartManager.populateChart('${image.key}', 'Week');
+              chartManager.populateChart('${image.key}', 'Month');
               </#if>
 
               appManager.init();

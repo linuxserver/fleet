@@ -172,7 +172,21 @@ public class InternalApiController extends AbstractAppService {
             final ImagePullStatistic.StatGroupMode groupMode     = ctx.queryParam("groupMode", ImagePullStatistic.StatGroupMode.class).get();
             final Image                            cachedImage   = getController().getRepositoryService().getImage(ImageKey.parse(imageKeyParam));
 
-            ctx.json(new ApiImagePullHistoryWrapper(cachedImage.getMetaData().getHistoryFor(groupMode)));
+            ctx.json(new ApiImagePullHistoryWrapper(cachedImage.getMetaData().getHistoryFor(groupMode), groupMode));
+
+        } catch (IllegalArgumentException e) {
+            throw new ApiException(e.getMessage(), e);
+        }
+    }
+
+    public void trackNewBranch(final Context ctx) {
+
+        try {
+
+            final String imageKeyParam = ctx.formParam("imageKey",   String.class).get();
+            final String branchName    = ctx.formParam("branchName", String.class).get();
+
+            getController().trackBranch(ImageKey.parse(imageKeyParam), branchName);
 
         } catch (IllegalArgumentException e) {
             throw new ApiException(e.getMessage(), e);

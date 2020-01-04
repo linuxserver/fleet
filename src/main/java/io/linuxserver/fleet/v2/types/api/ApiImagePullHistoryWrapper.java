@@ -24,8 +24,16 @@ import java.util.stream.Collectors;
 
 public class ApiImagePullHistoryWrapper extends AbstractApiWrapper<List<ImagePullStatistic>> {
 
-    public ApiImagePullHistoryWrapper(final List<ImagePullStatistic> originalObject) {
+    private final ImagePullStatistic.StatGroupMode groupMode;
+
+    public ApiImagePullHistoryWrapper(final List<ImagePullStatistic> originalObject,
+                                      final ImagePullStatistic.StatGroupMode groupMode) {
         super(originalObject);
+        this.groupMode = groupMode;
+    }
+
+    public final String getGroupModeDataPoint() {
+        return groupMode.getDataPoint();
     }
 
     public final List<String> getLabels() {
@@ -34,6 +42,10 @@ public class ApiImagePullHistoryWrapper extends AbstractApiWrapper<List<ImagePul
 
     public final List<Long> getPulls() {
         return getOriginalObject().stream().map(ImagePullStatistic::getPullCount).collect(Collectors.toList());
+    }
+
+    public final long getMean() {
+        return (long) getPullDifferential().getPulls().stream().mapToLong(Long::longValue).average().orElse(0.0);
     }
 
     public final PullDifferentialsWithLabels getPullDifferential() {

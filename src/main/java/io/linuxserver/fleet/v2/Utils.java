@@ -1,5 +1,5 @@
 /*
- * Copyright (c)  2019 LinuxServer.io
+ * Copyright (c)  2020 LinuxServer.io
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -15,19 +15,16 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package io.linuxserver.fleet.v2.thread.schedule;
+package io.linuxserver.fleet.v2;
 
-import io.linuxserver.fleet.core.FleetAppController;
+public final class Utils {
 
-public class CheckAppVersionSchedule extends AbstractAppSchedule {
+    public static <T> T ensureNotNull(final T obj) {
 
-    public CheckAppVersionSchedule(final ScheduleSpec spec,
-                                   final FleetAppController controller) {
-        super(spec, controller);
-    }
+        if (null == obj) {
+            throw new IllegalArgumentException("Parameter null");
+        }
 
-    @Override
-    public void executeSchedule() {
-        getLogger().info("Currently not implemented. This is a placeholder schedule");
+        return obj;
     }
 }

@@ -75,7 +75,7 @@
                                             <@button.button id="ForceResync_${image.key.id}" size="small" title="Force resync" colour="normal-colour" extraAttributes='data-image-key="${image.key}"' extraClasses="sync-image">
                                                 <i class="fas fa-sync-alt is-marginless"></i>
                                             </@button.button>
-                                            <@button.link size="small" title="Edit image metadata" colour="normal-colour" link="/admin/image?key=${image.fullName}">
+                                            <@button.link size="small" title="Edit image metadata" colour="normal-colour" link="/admin/image?imageKey=${image.key}">
                                                 <i class="fas fa-pencil-alt is-marginless"></i>
                                             </@button.link>
                                         </@button.buttons>

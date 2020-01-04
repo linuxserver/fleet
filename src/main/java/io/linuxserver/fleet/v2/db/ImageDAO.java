@@ -27,6 +27,7 @@ import io.linuxserver.fleet.v2.types.internal.ImageOutlineRequest;
 import io.linuxserver.fleet.v2.types.internal.RepositoryOutlineRequest;
 import io.linuxserver.fleet.v2.types.internal.TagBranchOutlineRequest;
 
+import java.time.LocalDate;
 import java.util.List;
 
 public interface ImageDAO {

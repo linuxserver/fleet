@@ -45,12 +45,14 @@ public interface Locations {
         String Schedule   = "schedule";
         String Sync       = "sync";
         String Stats      = "stats";
+        String Track      = "track";
     }
 
     interface Admin {
 
         String Repositories = "/admin/repositories";
         String Images       = "/admin/images";
+        String ImageEdit    = "/admin/image";
         String Schedules    = "/admin/schedules";
         String Users        = "/admin/users";
     }
