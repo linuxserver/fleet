@@ -15,74 +15,56 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-var adminManager = (function($) {
+var Admin = (function($) {
 
-    var toggleButtonLoadingState = function(button) {
-        button.prop('disabled', !button.prop('disabled')).toggleClass('is-loading');
+    'use strict';
+
+    // Repositories
+    var $SubmitNewRepository;
+    var $NewRepositoryName;
+    var $RepositoryPendingDeletion;
+    var $DeleteRepository;
+
+    // Image Edit
+    var $TrackNewBranch;
+    var $NewTrackedBranch;
+    var $ImageKey;
+
+    // Image Template
+    var $ImageTemplateTabContent;
+    var $ImageTemplatePorts;
+    var $AddNewPort;
+    var $ImageTemplateVolumes;
+    var $AddNewVolume;
+    var $ImageTemplateEnv;
+    var $AddNewEnv;
+    var $ImageTemplateDevices;
+    var $AddNewDevice;
+
+    var reload = function() {
+        window.location.reload();
+    };
+
+    var cleanEmpty = function(val) {
+        return (typeof val === 'undefined' || $.trim(val).length === 0) ? null : val;
     };
 
     var runSchedule = function(trigger) {
 
-        var scheduleKey = trigger.data('schedule-key');
-
-        var request = {
-
-            url: '/internalapi/schedule',
-            method: 'put',
-            data: {
-                'scheduleKey': scheduleKey
-            }
-        };
-
-        toggleButtonLoadingState(trigger);
-        ajaxManager.call(request, function() {
-
-            notificationManager.makeNotification('Schedule run submitted successfully.', 'success');
-            toggleButtonLoadingState(trigger);
-
-        }, function() {
-            toggleButtonLoadingState(trigger);
-        });
+        Ajax.put('/internalapi/schedule', { 'scheduleKey': trigger.data('schedule-key') }, function() {
+            Notifications.makeNotification('Schedule run submitted successfully.', 'success');
+        }, trigger);
     };
 
     var deleteRepository = function(trigger) {
-
-        var repositoryKey = trigger.data('repository-key');
-
-        var request = {
-
-            url: '/internalapi/repository?repositoryKey=' + repositoryKey,
-            method: 'delete'
-        };
-
-        toggleButtonLoadingState(trigger);
-        ajaxManager.call(request, function() { window.location.reload(); }, function() {
-            toggleButtonLoadingState(trigger);
-        });
+        Ajax.del('/internalapi/repository?repositoryKey=' + trigger.data('repository-key'), reload, trigger);
     };
 
     var syncRepository = function(trigger) {
 
-        var repositoryKey = trigger.data('repository-key');
-
-        var request = {
-
-            url: '/internalapi/repository/sync',
-            method: 'put',
-            data: {
-                'repositoryKey': repositoryKey
-            }
-        };
-
-        toggleButtonLoadingState(trigger);
-        ajaxManager.call(request, function() {
-
-            notificationManager.makeNotification('Sync request submitted.', 'success');
-            toggleButtonLoadingState(trigger);
-
-        }, function() {
-            toggleButtonLoadingState(trigger);
-        });
+        Ajax.put('/internalapi/repository/sync', { 'repositoryKey': trigger.data('repository-key') }, function() {
+            Notifications.makeNotification('Sync request submitted.', 'success');
+        }, trigger);
     };
 
     var addRepository = function(repositoryName) {
@@ -90,22 +72,9 @@ var adminManager = (function($) {
         var trimmedName = $.trim(repositoryName);
         if (trimmedName.length > 0) {
 
-            var request = {
+            Notifications.makeNotification('Verifying repository "' + trimmedName + '" and fetching images. Please wait...', 'info', '10000');
 
-                url: '/internalapi/repository',
-                method: 'post',
-                contentType: 'application/json',
-                dataType: 'json',
-                data: JSON.stringify({
-                    'repositoryName': trimmedName
-                })
-            };
-
-            notificationManager.makeNotification('Verifying repository "' + trimmedName + '" and fetching images. Please wait...');
-
-            ajaxManager.call(request, function() { window.location.reload(); }, function() {
-
-                toggleButtonLoadingState($('#SubmitNewRepository'));
+            Ajax.postJson('/internalapi/repository', { 'repositoryName': trimmedName }, reload, $SubmitNewRepository, function() {
                 $('#NewRepositoryName').val('');
             });
         }
@@ -113,110 +82,177 @@ var adminManager = (function($) {
 
     var updateRepositorySpec = function($row) {
 
-        var repositoryKey = $row.data('repository-key');
-        var syncEnabled   = $row.find('.editable-repository-enabled').find('input[type="checkbox"]').is(':checked');
-        var versionMask   = cleanEmpty($row.find('.editable-repository-version-mask').find('.switchable.field input[type="text"]').val());
-
-        var request = {
-
-            url: '/internalapi/repository',
-            method: 'put',
-            contentType: 'application/json',
-            dataType: 'json',
-            data: JSON.stringify({
-                'repositoryKey': repositoryKey,
-                'syncEnabled': syncEnabled,
-                'versionMask': versionMask
-            })
+        var data = {
+            'repositoryKey': $row.data('repository-key'),
+            'syncEnabled':   $row.find('.editable-repository-enabled').find('input[type="checkbox"]').is(':checked'),
+            'versionMask':   cleanEmpty($row.find('.editable-repository-version-mask').find('.switchable.field input[type="text"]').val())
         };
 
-        ajaxManager.call(request, function(data) {
-            notificationManager.makeNotification(data.name + ' updated', 'success');
+        Ajax.putJson('/internalapi/repository', data, function(data) {
+            Notifications.makeNotification(data.name + ' updated', 'success');
         });
     };
 
     var syncImage = function(trigger) {
 
-        var imageKey = trigger.data('image-key');
-
-        var request = {
-
-            url: '/internalapi/image/sync',
-            method: 'put',
-            data: {
-                'imageKey': imageKey
-            }
-        };
-
-        toggleButtonLoadingState(trigger);
-        ajaxManager.call(request, function() {
-
-            notificationManager.makeNotification('Sync request submitted.', 'success');
-            toggleButtonLoadingState(trigger);
-
-        }, function() {
-            toggleButtonLoadingState(trigger);
-        });
+        Ajax.put('/internalapi/image/sync', { 'imageKey': trigger.data('image-key') }, function() {
+            Notifications.makeNotification('Sync request submitted.', 'success');
+        }, trigger);
     };
 
     var updateImageSpec = function($row) {
 
-        var imageKey     = $row.data('image-key');
-        var syncEnabled  = $row.find('.editable-image-sync-enabled').find('input[type="checkbox"]').is(':checked');
-        var stable       = $row.find('.editable-image-stable').find('input[type="checkbox"]').is(':checked');
-        var hidden       = $row.find('.editable-image-hidden').find('input[type="checkbox"]').is(':checked');
-        var deprecated   = $row.find('.editable-image-deprecated').find('input[type="checkbox"]').is(':checked');
-        var versionMask  = cleanEmpty($row.find('.editable-image-version-mask').find('.switchable.field input[type="text"]').val());
-
-        var request = {
-
-            url: '/internalapi/image',
-            method: 'put',
-            contentType: 'application/json',
-            dataType: 'json',
-            data: JSON.stringify({
-                'imageKey': imageKey,
-                'syncEnabled': syncEnabled,
-                'versionMask': versionMask,
-                'stable': stable,
-                'hidden': hidden,
-                'deprecated': deprecated
-            })
+        var data = {
+            'imageKey':    $row.data('image-key'),
+            'syncEnabled': $row.find('.editable-image-sync-enabled').find('input[type="checkbox"]').is(':checked'),
+            'versionMask': cleanEmpty($row.find('.editable-image-version-mask').find('.switchable.field input[type="text"]').val()),
+            'stable':      $row.find('.editable-image-stable').find('input[type="checkbox"]').is(':checked'),
+            'hidden':      $row.find('.editable-image-hidden').find('input[type="checkbox"]').is(':checked'),
+            'deprecated':  $row.find('.editable-image-deprecated').find('input[type="checkbox"]').is(':checked')
         };
 
-        ajaxManager.call(request, function() {});
+        Ajax.putJson('/internalapi/image', data, function() {});
     };
 
     var trackNewBranch = function(branchName, imageKey) {
-
-        var request = {
-
-            url: '/internalapi/image/track',
-            method: 'put',
-            data: {
-                'imageKey': imageKey,
-                'branchName': branchName
-            }
-        };
-
-        ajaxManager.call(request, function() {
-            window.location.reload();
-        });
+        Ajax.put('/internalapi/image/track', { 'imageKey': imageKey, 'branchName': branchName }, reload, $TrackNewBranch);
     };
 
-    var cleanEmpty = function(val) {
-        return (typeof val === 'undefined' || $.trim(val).length === 0) ? null : val;
+    var makeInput = function(name, type='text', required=false) {
+        return '<input type="' + type + '" class="input is-small" name="' + name + '"' + (required ? 'required' : '') + ' />'
+    };
+
+    var makeSelect = function(name, values=[]) {
+
+        var options = '';
+        values.forEach(function(value) {
+           options += '<option value="' + value + '">' + value + '</option>';
+        });
+
+        return (
+            '<div class="select is-small"><select name="' + name + '">' +
+                options +
+            '</select></div>'
+        );
+    };
+
+    var makeButton = function(value, classes, colour) {
+        return '<button class="button is-small is-' + colour + ' ' + classes + '">' + value + '</button>';
+    };
+
+    var makeToggle = function(name) {
+
+        return (
+            '<label class="switch is-large is-primary" title="Toggle">' +
+                '<input name="' + name + '" type="checkbox" />' +
+                '<span class="slider round"></span>' +
+            '</label>'
+        );
+    };
+
+    var addPortRow = function() {
+
+        $ImageTemplatePorts.find('tbody').append($(
+           '<tr>' +
+                '<td>' +
+                    makeInput('imageTemplatePort', 'number', true) +
+                '</td>' +
+                '<td>' +
+                    makeSelect('imageTemplatePortProtocol', ['tcp', 'udp']) +
+                '</td>' +
+                '<td>' +
+                    makeInput('imageTemplatePortDescription') +
+                '</td>' +
+                '<td>' +
+                    '<div class="buttons is-right">' +
+                        makeButton('<i class="fas fa-trash is-marginless"></i>', 'remove-image-template-item', 'danger') +
+                    '</div>' +
+                '</td>' +
+           '</tr>'
+        ));
+    };
+
+    var addVolumeRow = function() {
+
+        $ImageTemplateVolumes.find('tbody').append($(
+            '<tr>' +
+                '<td>' +
+                    makeInput('imageTemplateVolume', 'text', true) +
+                '</td>' +
+                '<td>' +
+                    makeToggle('imageTemplateVolumeReadonly') +
+                '</td>' +
+                '<td>' +
+                    makeInput('imageTemplateVolumeDescription') +
+                '</td>' +
+                '<td>' +
+                    '<div class="buttons is-right">' +
+                        makeButton('<i class="fas fa-trash is-marginless"></i>', 'remove-image-template-item', 'danger') +
+                    '</div>' +
+                '</td>' +
+            '</tr>'
+        ));
+    };
+
+    var addEnvRow = function() {
+
+        $ImageTemplateEnv.find('tbody').append($(
+            '<tr>' +
+                '<td>' +
+                    makeInput('imageTemplateEnv', 'text', true) +
+                '</td>' +
+                '<td>' +
+                    makeInput('imageTemplateEnvDescription') +
+                '</td>' +
+                '<td>' +
+                    '<div class="buttons is-right">' +
+                        makeButton('<i class="fas fa-trash is-marginless"></i>', 'remove-image-template-item', 'danger') +
+                    '</div>' +
+                '</td>' +
+            '</tr>'
+        ));
+    };
+
+    var addDeviceRow = function() {
+
+        $ImageTemplateDevices.find('tbody').append($(
+            '<tr>' +
+                '<td>' +
+                    makeInput('imageTemplateDevice', 'text', true) +
+                '</td>' +
+                '<td>' +
+                    makeInput('imageTemplateDeviceDescription') +
+                '</td>' +
+                '<td>' +
+                    '<div class="buttons is-right">' +
+                        makeButton('<i class="fas fa-trash is-marginless"></i>', 'remove-image-template-item', 'danger') +
+                    '</div>' +
+                '</td>' +
+            '</tr>'
+        ));
     };
 
     var init = function() {
 
-        $('#SubmitNewRepository').on('click', function() {
+        $SubmitNewRepository       = $('#SubmitNewRepository');
+        $NewRepositoryName         = $('#NewRepositoryName');
+        $TrackNewBranch            = $('#TrackNewBranch');
+        $NewTrackedBranch          = $('#NewTrackedBranch');
+        $RepositoryPendingDeletion = $('#RepositoryPendingDeletion');
+        $DeleteRepository          = $('#DeleteRepository');
+        $ImageKey                  = $('#ImageKey');
+        $ImageTemplateTabContent   = $('#ImageTemplateTabContent');
+        $ImageTemplatePorts        = $('#ImageTemplatePorts');
+        $AddNewPort                = $('#AddNewPort');
+        $ImageTemplateVolumes      = $('#ImageTemplateVolumes');
+        $AddNewVolume              = $('#AddNewVolume');
+        $ImageTemplateEnv          = $('#ImageTemplateEnv');
+        $AddNewEnv                 = $('#AddNewEnv');
+        $ImageTemplateDevices      = $('#ImageTemplateDevices');
+        $AddNewDevice              = $('#AddNewDevice');
 
-            var $button        = $(this);
-            var repositoryName = $('#NewRepositoryName').val();
-
-            toggleButtonLoadingState($button);
-            addRepository(repositoryName);
+        $SubmitNewRepository.on('click', function() {
+            addRepository($NewRepositoryName.val());
         });
 
         $('.force-schedule-run').on('click', function() {
@@ -231,7 +267,7 @@ var adminManager = (function($) {
             updateRepositorySpec($(this).parents('.repository-row'));
         });
 
-        $('#DeleteRepository').on('click', function() {
+        $DeleteRepository.on('click', function() {
             deleteRepository($(this));
         });
 
@@ -239,8 +275,8 @@ var adminManager = (function($) {
 
             var $trigger = $(this);
 
-            $('#RepositoryPendingDeletion').text($trigger.data('repository-name'));
-            $('#DeleteRepository').data('repository-key', $trigger.data('repository-key'))
+            $RepositoryPendingDeletion.text($trigger.data('repository-name'));
+            $DeleteRepository.data('repository-key', $trigger.data('repository-key'))
         });
 
         $('.update-image-trigger').on('click', function() {
@@ -251,12 +287,21 @@ var adminManager = (function($) {
             syncImage($(this));
         });
 
-        $('#TrackNewBranch').on('click', function() {
+        $TrackNewBranch.on('click', function() {
 
-            var branchName = $.trim($('#NewTrackedBranch').val());
+            var branchName = $.trim($NewTrackedBranch.val());
             if (branchName.length > 0) {
-                trackNewBranch(branchName, $('#ImageKey').val());
+                trackNewBranch(branchName, $ImageKey.val());
             }
+        });
+
+        $AddNewPort.on('click',   addPortRow);
+        $AddNewVolume.on('click', addVolumeRow);
+        $AddNewEnv.on('click',    addEnvRow);
+        $AddNewDevice.on('click', addDeviceRow);
+
+        $ImageTemplateTabContent.on('click', '.remove-image-template-item', function() {
+           $(this).parents('tr').remove();
         });
     };
 

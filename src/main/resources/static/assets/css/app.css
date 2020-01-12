@@ -1,4 +1,4 @@
-body {
+.has-text-small {
     font-size: 0.85rem;
 }
 
@@ -46,6 +46,10 @@ span.image-title {
 
 .has-margin-top {
     margin-top: 1rem;
+}
+
+.has-margin-bottom {
+    margin-bottom: 1rem;
 }
 
 .is-paddingless-top {
@@ -159,7 +163,7 @@ input:checked + .slider:before {
     border-radius: 50%;
 }
 
-table tbody th.is-half {
+table tbody .is-half {
     width: 50%;
 }
 
@@ -202,7 +206,7 @@ table tr th.tablesorter-header {
 
 #NotificationWrapper {
     position: relative;
-    margin: 10px 10px 0 10px;
+    margin: 0 10px 0 10px;
     z-index: 1000;
 }
 
@@ -210,4 +214,28 @@ table tr th.tablesorter-header {
     position: absolute;
     right: 0;
     max-width: 100%;
+}
+
+.columns.has-tabs-content > .column {
+    display: none;
+}
+
+.columns.has-tabs-content > .column.is-active {
+    display: block;
+}
+
+#ImageTemplatePorts .template-port {
+    width: 200px !important;
+}
+
+#ImageTemplatePorts .template-port-protocol {
+    width: 150px !important;
+}
+
+#ImageTemplatePorts .template-port-description {
+    min-width: 300px !important;
+}
+
+#ImageTemplatePorts .template-port-delete {
+    width: 50px !important;
 }

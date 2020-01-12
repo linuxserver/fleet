@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Wallett
+ * Copyright (c) 2019 LinuxServer.io
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-var notificationManager = (function($) {
+var Notifications = (function($) {
 
     var makeNotification = function(message, level='info', delay) {
 
@@ -38,16 +38,23 @@ var notificationManager = (function($) {
 
 }(jQuery));
 
-var ajaxManager = (function($) {
+var Ajax = (function($) {
+
+    var toggleLoadingState = function(button) {
+
+        if (typeof button !== 'undefined' && null !== button) {
+            button.prop('disabled', !button.prop('disabled')).toggleClass('is-loading');
+        }
+    };
 
     var handleError = function(jqXHR, onError) {
 
         $('.modal').removeClass('is-active');
 
         if (jqXHR.status === 403) {
-            notificationManager.makeNotification('Permission denied', 'danger');
+            Notifications.makeNotification('Permission denied', 'danger');
         } else {
-            notificationManager.makeNotification(jqXHR.responseText, 'danger');
+            Notifications.makeNotification(jqXHR.responseText, 'danger');
         }
 
         if (onError) {
@@ -55,17 +62,53 @@ var ajaxManager = (function($) {
         }
     };
 
-    var call = function(param, onDone, onError) {
-        return $.ajax(param).done(onDone).fail(function(jqXHR) { handleError(jqXHR, onError); });
+    var call = function(param, onDone, triggerButton, onError) {
+
+        toggleLoadingState(triggerButton);
+
+        return $.ajax(param)
+            .done(function(data) { if (onDone) onDone(data); })
+            .fail(function(jqXHR) { handleError(jqXHR, onError); })
+            .always(function() { toggleLoadingState(triggerButton); });
+    };
+
+    var get = function(url, params, onDone, triggerButton, onError) {
+        call({ method: 'get', url: url, data: params}, onDone, triggerButton, onError);
+    };
+
+    var put = function(url, params, onDone, triggerButton, onError) {
+        call({ method: 'put', url: url, data: params}, onDone, triggerButton, onError);
+    };
+
+    var putJson = function(url, params, onDone, triggerButton, onError) {
+        call({ method: 'put', url: url, contentType: 'application/json', dataType: 'json', data: JSON.stringify(params) }, onDone, triggerButton, onError);
+    };
+
+    var post = function(url, params, onDone, triggerButton, onError) {
+        call({ method: 'post', url: url, data: params}, onDone, triggerButton, onError);
+    };
+
+    var postJson = function(url, params, onDone, triggerButton, onError) {
+        call({ method: 'post', url: url, contentType: 'application/json', dataType: 'json', data: JSON.stringify(params) }, onDone, triggerButton, onError);
+    };
+
+    var del = function(url, onDone, triggerButton, onError) {
+        call({ method: 'delete', url: url }, onDone, triggerButton, onError);
     };
 
     return {
-        call: call
+        call:     call,
+        get:      get,
+        put:      put,
+        putJson:  putJson,
+        post:     post,
+        postJson: postJson,
+        del:      del
     };
 
 }(jQuery));
 
-var formValidationManager = (function($) {
+var FormValidation = (function($) {
 
     var setValid = function(element) {
         element.classList.remove('is-danger');
@@ -147,7 +190,7 @@ var formValidationManager = (function($) {
 
 }(jQuery));
 
-var appManager = (function($) {
+var App = (function($) {
 
     var initMenu = function() {
 
@@ -218,6 +261,29 @@ var appManager = (function($) {
         });
     };
 
+    var initTabs = function() {
+
+        $('.tabs').each(function (i, tab) {
+
+            var $tab     = $(tab);
+            var $items   = $tab.find('ul li');
+            var $content = $($tab.data('tabs-for'));
+
+            $items.each(function(j, item) {
+
+                var $item = $(item);
+                $item.on('click', function() {
+
+                    $items.removeClass('is-active');
+                    $content.find('.tab-content').removeClass('is-active');
+
+                    $item.addClass('is-active');
+                    $($item.data('tab-for')).addClass('is-active');
+                });
+            });
+        });
+    };
+
     var init = function() {
 
         initRepositorySwitcher();
@@ -226,6 +292,7 @@ var appManager = (function($) {
         initNotifications();
         initMenu();
         initModals();
+        initTabs();
     };
 
     return {
@@ -234,20 +301,23 @@ var appManager = (function($) {
 
 }(jQuery));
 
-var imageSearchManager = (function($) {
+var Search = (function($) {
+
+    var $ImageTable;
+    var $SearchImages;
 
     var performSearch = function() {
 
         var $searchBox      = $(this);
         var currentSearch   = $.trim($searchBox.val()).toLowerCase();
-        var rows            = $('#ImageTable').find('tbody tr');
+        var rows            = $ImageTable.find('tbody tr');
 
         rows.each(function(i, row) {
 
             var $row = $(row);
             var imageName = $row.data('image-name').toLowerCase();
 
-            if (imageName.startsWith(currentSearch) || currentSearch.length === 0) {
+            if (imageName.includes(currentSearch) || currentSearch.length === 0) {
                 $row.show();
             } else {
                 $row.hide();
@@ -257,7 +327,11 @@ var imageSearchManager = (function($) {
     };
 
     var init = function() {
-        $('#SearchImages').on('keyup', performSearch);
+
+        $SearchImages = $('#SearchImages');
+        $ImageTable   = $('#ImageTable');
+
+        $SearchImages.on('keyup', performSearch);
     };
 
     return {
@@ -266,38 +340,42 @@ var imageSearchManager = (function($) {
 
 }(jQuery));
 
-var chartManager = (function($) {
+var PullChart = (function($) {
+
+    var DATE_MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
     var formatNumber = function(num) {
 
-        var array = num.toString().split('');
-        var index = -3;
+        var numericalNum = parseInt(num);
+        if (numericalNum > 1000000) {
+            return (num / 1000000) + 'm';
+        } else if (numericalNum > 1000) {
+            return (num / 1000) + 'k';
+        } else {
+            return num;
+        }
+    };
 
-        while (array.length + index > 0) {
-            array.splice(index, 0, ',');
-            index -= 4;
+    var formatDate = function(group) {
+
+        if (group.length === 8) {
+
+            var year  = parseInt(group.substr(0, 4));
+            var month = parseInt(group.substr(4, 2));
+            var day   = parseInt(group.substr(6, 2));
+
+            var date = new Date(year, month - 1, day);
+            return date.getDate() + ' ' + DATE_MONTHS[date.getMonth()];
         }
 
-        return array.join('');
+        return group;
     };
 
     var populateChart = function(imageKey, groupMode) {
 
-        var request = {
+        Ajax.get('/internalapi/image/stats', { 'imageKey': imageKey, 'groupMode': groupMode }, function(history) {
 
-            url: '/internalapi/image/stats?imageKey=' + imageKey + '&groupMode=' + groupMode,
-            method: 'get'
-        };
-
-        ajaxManager.call(request, function(history) {
-
-            $('#PullActivityDataPoint').text(history.groupModeDataPoint);
-            $('#PullActivityRate').text(formatNumber(history.mean));
-
-            var ctx      = document.getElementById('ImagePullHistory').getContext('2d');
-            var gradient = ctx.createLinearGradient(0, 0, 0, 400);
-            gradient.addColorStop(0, 'rgba(0, 209, 178, 0.5)');
-            gradient.addColorStop(0.3, 'rgba(0, 209, 178, 0)');
+            var ctx = document.getElementById('ImagePullHistory').getContext('2d');
 
             new Chart(ctx, {
                 type: 'line',
@@ -305,13 +383,13 @@ var chartManager = (function($) {
                     labels: history.pullDifferential.labels,
                     datasets: [
                         {
-                            lineTension: 0,
+                            lineTension: .3,
                             data: history.pullDifferential.pulls,
                             pointRadius: 0,
-                            pointHitRadius: 2,
+                            pointHitRadius: 6,
                             borderWidth: 2,
-                            borderColor: 'rgba(0, 209, 178, 1)',
-                            backgroundColor : gradient
+                            borderColor: 'rgba(0, 209, 178, 0.8)',
+                            backgroundColor : 'rgba(0, 209, 178, 0.3)'
                         }
                     ]
                 },
@@ -326,13 +404,22 @@ var chartManager = (function($) {
                         xAxes: [
                             {
                                 gridLines: { display: false },
-                                display: false
+                                display: true,
+                                ticks: {
+                                    callback: function(label) {
+                                        return formatDate(label);
+                                    }
+                                }
                             }
                         ],
                         yAxes: [
                             {
                                 gridLines: { display: false },
-                                display: false
+                                ticks: {
+                                    callback: function(label) {
+                                        return formatNumber(label);
+                                    }
+                                }
                             }
                         ]
                     }

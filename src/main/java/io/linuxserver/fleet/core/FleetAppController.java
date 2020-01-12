@@ -30,7 +30,7 @@ import io.linuxserver.fleet.v2.db.DefaultImageDAO;
 import io.linuxserver.fleet.v2.db.DefaultScheduleDAO;
 import io.linuxserver.fleet.v2.db.DefaultUserDAO;
 import io.linuxserver.fleet.v2.key.ImageKey;
-import io.linuxserver.fleet.v2.service.RepositoryService;
+import io.linuxserver.fleet.v2.service.ImageService;
 import io.linuxserver.fleet.v2.service.ScheduleService;
 import io.linuxserver.fleet.v2.service.SynchronisationService;
 import io.linuxserver.fleet.v2.service.UserService;
@@ -48,7 +48,7 @@ import io.linuxserver.fleet.v2.web.WebRouteController;
 public class FleetAppController extends AbstractAppController implements ServiceProvider {
 
     public  final DockerApiDelegate      dockerApiDelegate;
-    private final RepositoryService      repositoryService;
+    private final ImageService           imageService;
     private final ScheduleService        scheduleService;
     private final SynchronisationService syncService;
     private final UserService            userService;
@@ -56,7 +56,7 @@ public class FleetAppController extends AbstractAppController implements Service
 
     public FleetAppController() {
 
-        repositoryService = new RepositoryService(new DefaultImageDAO(getDatabaseProvider()));
+        imageService      = new ImageService(new DefaultImageDAO(getDatabaseProvider()));
         scheduleService   = new ScheduleService(this, new DefaultScheduleDAO(getDatabaseProvider()));
         dockerApiDelegate = new DockerApiDelegate(this);
         syncService       = new SynchronisationService(this);
@@ -120,12 +120,12 @@ public class FleetAppController extends AbstractAppController implements Service
         return dockerApiDelegate;
     }
 
-    public final RepositoryService getRepositoryService() {
-        return repositoryService;
+    public final ImageService getImageService() {
+        return imageService;
     }
 
     public final Image storeUpdatedImage(final Image updatedImage) {
-        return repositoryService.storeImage(updatedImage);
+        return imageService.storeImage(updatedImage);
     }
 
     @Override
@@ -137,7 +137,7 @@ public class FleetAppController extends AbstractAppController implements Service
 
         if (getConfiguredDockerDelegate().isRepositoryValid(request.getRepositoryName())) {
 
-            final Repository repositoryOutline = getRepositoryService()
+            final Repository repositoryOutline = getImageService()
                     .createRepositoryOutline(new RepositoryOutlineRequest(request.getRepositoryName()));
 
             getSynchronisationService().synchroniseUpstreamRepository(repositoryOutline);
@@ -164,7 +164,7 @@ public class FleetAppController extends AbstractAppController implements Service
 
     public final void trackBranch(final ImageKey imageKey, final String branchName) {
 
-        getRepositoryService().trackBranchOnImage(imageKey, branchName);
+        getImageService().trackBranchOnImage(imageKey, branchName);
         synchroniseImage(imageKey);
     }
 }

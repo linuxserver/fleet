@@ -20,16 +20,16 @@ package io.linuxserver.fleet.v2.web.routes;
 import io.javalin.http.Context;
 import io.linuxserver.fleet.core.FleetAppController;
 import io.linuxserver.fleet.v2.key.ImageLookupKey;
-import io.linuxserver.fleet.v2.service.RepositoryService;
+import io.linuxserver.fleet.v2.service.ImageService;
 import io.linuxserver.fleet.v2.web.PageModelSpec;
 
 public class ImageController extends AbstractPageHandler {
 
-    private final RepositoryService repositoryService;
+    private final ImageService imageService;
 
     public ImageController(final FleetAppController controller) {
         super(controller);
-        repositoryService = controller.getRepositoryService();
+        imageService = controller.getImageService();
     }
 
     @Override
@@ -39,7 +39,7 @@ public class ImageController extends AbstractPageHandler {
         if (null != imageLookupParam) {
 
             final PageModelSpec modelSpec = new PageModelSpec("views/pages/image.ftl");
-            modelSpec.addModelAttribute("image", repositoryService.lookupImage(new ImageLookupKey(imageLookupParam)));
+            modelSpec.addModelAttribute("image", imageService.lookupImage(new ImageLookupKey(imageLookupParam)));
             return modelSpec;
 
         } else {

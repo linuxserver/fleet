@@ -31,6 +31,7 @@ import io.linuxserver.fleet.v2.types.meta.ImageMetaData;
 import io.linuxserver.fleet.v2.types.meta.ItemSyncSpec;
 import io.linuxserver.fleet.v2.types.meta.history.ImagePullHistory;
 import io.linuxserver.fleet.v2.types.meta.history.ImagePullStatistic;
+import io.linuxserver.fleet.v2.types.meta.template.ImageTemplateHolder;
 
 import java.sql.*;
 import java.time.LocalDate;
@@ -483,12 +484,18 @@ public class DefaultImageDAO extends AbstractDAO implements ImageDAO {
 
     private ImageMetaData makeImageMetaData(final Connection connection, final ImageKey imageKey) throws SQLException {
 
+        return new ImageMetaData(makePullHistory(connection, imageKey),
+                                 makeTemplateHolder(connection, imageKey));
+    }
+
+    private ImagePullHistory makePullHistory(final Connection connection, final ImageKey imageKey) throws SQLException {
+
+        final ImagePullHistory pullHistory = new ImagePullHistory();
         try (final CallableStatement call = connection.prepareCall(GetImageStats)) {
 
             call.setInt(1, imageKey.getId());
             final ResultSet results = call.executeQuery();
 
-            final ImagePullHistory pullHistory = new ImagePullHistory();
             while (results.next()) {
 
                 final long imagePulls = results.getLong("ImagePulls");
@@ -498,8 +505,8 @@ public class DefaultImageDAO extends AbstractDAO implements ImageDAO {
                     final String groupMode = results.getString("GroupMode");
 
                     final ImagePullStatistic statistic = new ImagePullStatistic(imagePulls,
-                                                                                timeGroup,
-                                                                                ImagePullStatistic.StatGroupMode.valueOf(groupMode));
+                            timeGroup,
+                            ImagePullStatistic.StatGroupMode.valueOf(groupMode));
 
                     final boolean added = pullHistory.addStatistic(statistic);
                     if (!added) {
@@ -507,9 +514,12 @@ public class DefaultImageDAO extends AbstractDAO implements ImageDAO {
                     }
                 }
             }
-
-            return new ImageMetaData(pullHistory);
         }
+        return pullHistory;
+    }
+
+    private ImageTemplateHolder makeTemplateHolder(final Connection connection, final ImageKey imageKey) {
+        return new ImageTemplateHolder();
     }
 
     private ImageKey makeImageKey(final ResultSet results) throws SQLException {

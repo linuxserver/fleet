@@ -31,13 +31,26 @@
         <@section.section id="ManageImages">
             <@container.container>
 
-                <div class="columns is-multiline">
-                    <div class="column is-12">
-                        <@title.title boldValue="Images under ${repository.name}" subtitle="Manage all synchronised images" />
-                    </div>
-                    <div class="column is-12 has-margin-top">
+                <nav class="breadcrumb" aria-label="breadcrumbs">
+                    <ul>
+                        <li>
+                            <a href="/admin/repositories">
+                                <i class="fas fa-arrow-left"></i> Back
+                            </a>
+                        </li>
+                    </ul>
+                </nav>
 
-                        <@table.table isFullWidth=true isHoverable=true isScrollable=true extraClasses="table--sortable">
+                <div class="columns is-multiline">
+                    <div class="column is-full">
+                        <@title.title thinValue="Images under" separator=" " boldValue="${repository.name}" subtitle="Manage all synchronised images" />
+                    </div>
+                    <div class="column is-full has-margin-top">
+                        <@input.text id="SearchImages" icon="search" placeholder="Search..." />
+                    </div>
+                    <div class="column is-full has-margin-top">
+
+                        <@table.table id="ImageTable" isFullWidth=true isHoverable=true isScrollable=true extraClasses="table--sortable">
                             <thead>
                             <tr>
                                 <th>Name</th>
@@ -51,7 +64,7 @@
                             </thead>
                             <tbody>
                             <#list repository.images as image>
-                                <tr class="image-row" data-repository-key="${repository.key}" data-image-key="${image.key}">
+                                <tr class="image-row" data-repository-key="${repository.key}" data-image-key="${image.key}" data-image-name="${image.name}">
                                     <td class="is-vcentered">
                                         ${image.name}
                                     </td>

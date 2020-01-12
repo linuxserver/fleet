@@ -15,20 +15,16 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package io.linuxserver.fleet.core;
+package io.linuxserver.fleet.v2.web.request.json;
 
-import io.linuxserver.fleet.v2.service.ImageService;
-import io.linuxserver.fleet.v2.service.ScheduleService;
-import io.linuxserver.fleet.v2.service.SynchronisationService;
-import io.linuxserver.fleet.v2.service.UserService;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
-public interface ServiceProvider {
+public class NewRepositoryRequest {
 
-    SynchronisationService getSynchronisationService();
+    @JsonProperty
+    private String repositoryName;
 
-    ImageService getImageService();
-
-    ScheduleService getScheduleService();
-
-    UserService getUserService();
+    public final String getRepositoryName() {
+        return repositoryName;
+    }
 }

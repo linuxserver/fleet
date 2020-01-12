@@ -19,18 +19,25 @@ package io.linuxserver.fleet.v2.types.meta;
 
 import io.linuxserver.fleet.v2.types.meta.history.ImagePullHistory;
 import io.linuxserver.fleet.v2.types.meta.history.ImagePullStatistic;
+import io.linuxserver.fleet.v2.types.meta.template.ImageTemplateHolder;
 
 import java.util.List;
 
 public class ImageMetaData {
 
-    private final ImagePullHistory pullHistory;
+    private final ImagePullHistory    pullHistory;
+    private final ImageTemplateHolder templateHolder;
 
-    public ImageMetaData(final ImagePullHistory pullHistory) {
-        this.pullHistory = pullHistory;
+    public ImageMetaData(final ImagePullHistory pullHistory, final ImageTemplateHolder templateHolder) {
+        this.pullHistory    = pullHistory;
+        this.templateHolder = templateHolder;
     }
 
     public final List<ImagePullStatistic> getHistoryFor(final ImagePullStatistic.StatGroupMode groupMode) {
         return pullHistory.getHistoryFor(groupMode);
+    }
+
+    public final ImageTemplateHolder getTemplates() {
+        return templateHolder;
     }
 }

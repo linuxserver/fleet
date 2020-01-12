@@ -15,10 +15,19 @@ Reference: https://bulma.io/documentation/form/input/
     requiredHelp:String                     - If "required" is true, some help text to be displayed
     size:enum(small, normal, large)         - The size of the input
 -->
-<#macro input type id value="" label="" title="" placeholder="" extraClasses="" extraAttributes="" icon="" isRequired=false isReadonly=false isDisabled=false isInvalid=false requiredHelp="" size="normal">
+<#macro input type id value="" label="" title="" placeholder="" extraClasses="" extraAttributes="" icon="" isRequired=false isReadonly=false isDisabled=false isInvalid=false isInline=false requiredHelp="" size="normal">
 
-    <div class="field">
-        <#if label?has_content>
+    <div class="field<#if isInline> is-horizontal</#if>">
+        <#if isInline>
+            <div class="field-label is-${size}">
+                <#if label?has_content>
+                    <label class="label" for="${id}">${label}</label>
+                </#if>
+            </div>
+            <div class="field-body">
+                <div class="field">
+        </#if>
+        <#if label?has_content && !isInline>
             <label class="label is-${size}" for="${id}">${label}</label>
         </#if>
         <div class="control is-${size}<#if icon?has_content> has-icons has-icons-left</#if>">
@@ -30,6 +39,10 @@ Reference: https://bulma.io/documentation/form/input/
                 <p class="help invalid-feedback is-danger">${requiredHelp}</p>
             </#if>
         </div>
+        <#if isInline>
+                </div>
+            </div>
+        </#if>
     </div>
 
 </#macro>
@@ -51,8 +64,8 @@ Convenience macro to generate a text input
     requiredHelp:String                     - If "required" is true, some help text to be displayed
     size:enum(small, normal, large)         - The size of the input
 -->
-<#macro text id value="" label="" title="" placeholder="" extraClasses="" extraAttributes="" icon="" isRequired=false isReadonly=false isDisabled=false isInvalid=false requiredHelp="" size="normal">
-    <@input type="text" id=id value=value title=title label=label placeholder=placeholder extraAttributes=extraAttributes extraClasses=extraClasses icon=icon isRequired=isRequired isReadonly=isReadonly isDisabled=isDisabled isInvalid=isInvalid requiredHelp=requiredHelp size=size />
+<#macro text id value="" label="" title="" placeholder="" extraClasses="" extraAttributes="" icon="" isRequired=false isReadonly=false isDisabled=false isInvalid=false isInline=false requiredHelp="" size="normal">
+    <@input type="text" id=id value=value title=title label=label placeholder=placeholder extraAttributes=extraAttributes extraClasses=extraClasses icon=icon isRequired=isRequired isReadonly=isReadonly isDisabled=isDisabled isInvalid=isInvalid isInline=isInline requiredHelp=requiredHelp size=size />
 </#macro>
 
 <#--
@@ -72,8 +85,8 @@ Convenience macro to generate a password input
     requiredHelp:String                     - If "required" is true, some help text to be displayed
     size:enum(small, normal, large)         - The size of the input
 -->
-<#macro password id value="" label="" placeholder="" extraClasses="" extraAttributes="" icon="" isRequired=false isReadonly=false isDisabled=false isInvalid=false requiredHelp="" size="normal">
-    <@input type="password" id=id value=value label=label placeholder=placeholder extraAttributes=extraAttributes extraClasses=extraClasses icon=icon isRequired=isRequired isReadonly=isReadonly isDisabled=isDisabled isInvalid=isInvalid requiredHelp=requiredHelp size=size />
+<#macro password id value="" label="" placeholder="" extraClasses="" extraAttributes="" icon="" isRequired=false isReadonly=false isDisabled=false isInvalid=false isInline=false requiredHelp="" size="normal">
+    <@input type="password" id=id value=value label=label placeholder=placeholder extraAttributes=extraAttributes extraClasses=extraClasses icon=icon isRequired=isRequired isReadonly=isReadonly isDisabled=isDisabled isInvalid=isInvalid isInline=isInline requiredHelp=requiredHelp size=size />
 </#macro>
 
 <#--
@@ -93,8 +106,8 @@ Convenience macro to generate a number input
     requiredHelp:String                     - If "required" is true, some help text to be displayed
     size:enum(small, normal, large)         - The size of the input
 -->
-<#macro number id value="" label="" placeholder="" extraClasses="" extraAttributes="" icon="" isRequired=false isReadonly=false isDisabled=false isInvalid=false requiredHelp="" size="normal">
-    <@input type="number" id=id value=value label=label placeholder=placeholder extraAttributes=extraAttributes extraClasses=extraClasses icon=icon isRequired=isRequired isReadonly=isReadonly isDisabled=isDisabled isInvalid=isInvalid requiredHelp=requiredHelp size=size />
+<#macro number id value="" label="" placeholder="" extraClasses="" extraAttributes="" icon="" isRequired=false isReadonly=false isDisabled=false isInvalid=false isInline=false requiredHelp="" size="normal">
+    <@input type="number" id=id value=value label=label placeholder=placeholder extraAttributes=extraAttributes extraClasses=extraClasses icon=icon isRequired=isRequired isReadonly=isReadonly isDisabled=isDisabled isInvalid=isInvalid isInline=isInline requiredHelp=requiredHelp size=size />
 </#macro>
 
 <#macro dropdown id label="" extraClasses="" extraAttributes="" icon="" colour="" isInline=false isMultiple=false isRequired=false isReadonly=false isDisabled=false requiredHelp="" size="normal">

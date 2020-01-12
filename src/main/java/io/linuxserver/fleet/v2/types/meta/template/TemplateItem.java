@@ -1,5 +1,5 @@
 /*
- * Copyright (c)  2019 LinuxServer.io
+ * Copyright (c)  2020 LinuxServer.io
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -15,30 +15,11 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package io.linuxserver.fleet.v2.web.request;
+package io.linuxserver.fleet.v2.types.meta.template;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
+public interface TemplateItem<T> {
 
-public class UpdateRepositoryRequest {
+    T getName();
 
-    @JsonProperty
-    private String  repositoryKey;
-
-    @JsonProperty
-    private boolean syncEnabled;
-
-    @JsonProperty
-    private String  versionMask;
-
-    public final String getRepositoryKey() {
-        return repositoryKey;
-    }
-
-    public final boolean isSyncEnabled() {
-        return syncEnabled;
-    }
-
-    public final String getVersionMask() {
-        return versionMask;
-    }
+    String getDescription();
 }

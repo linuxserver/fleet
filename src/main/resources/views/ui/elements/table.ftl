@@ -34,9 +34,9 @@ the right side contains the value.
 <#macro halfDisplayRow title value link="" id="">
 
     <tr>
-        <th scope="row" class="is-half has-text-right has-text-grey-dark">
+        <td class="is-half has-text-grey-dark">
             ${title}
-        </th>
+        </td>
         <td<#if id?has_content> id="${id}"</#if>>
             <#if link?has_content>
                 <a href="${link}">

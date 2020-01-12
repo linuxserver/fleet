@@ -24,7 +24,6 @@ import io.linuxserver.fleet.v2.client.docker.queue.DockerImageUpdateRequest;
 import io.linuxserver.fleet.v2.client.docker.queue.TaskQueue;
 import io.linuxserver.fleet.v2.key.ImageKey;
 import io.linuxserver.fleet.v2.key.ImageLookupKey;
-import io.linuxserver.fleet.v2.thread.ThreadStatus;
 import io.linuxserver.fleet.v2.types.Image;
 import io.linuxserver.fleet.v2.types.Repository;
 import io.linuxserver.fleet.v2.types.docker.DockerImage;
@@ -52,7 +51,7 @@ public class SynchronisationService extends AbstractAppService {
             final List<DockerImage> apiImages = getController().getConfiguredDockerDelegate().getImagesForRepository(repository.getKey());
             for (DockerImage apiImage : apiImages) {
 
-                final Image cachedImage = getController().getRepositoryService()
+                final Image cachedImage = getController().getImageService()
                         .lookupImage(new ImageLookupKey(apiImage.getRepository() + "/" + apiImage.getName()));
 
                 if (null == cachedImage) {
@@ -63,7 +62,7 @@ public class SynchronisationService extends AbstractAppService {
                                                                                        apiImage.getDescription(),
                                                                                        apiImage.getBuildDate());
 
-                    final Image imageOutline = getController().getRepositoryService().createImageOutline(outlineRequest);
+                    final Image imageOutline = getController().getImageService().createImageOutline(outlineRequest);
                     synchroniseImage(imageOutline.getKey());
                 }
             }

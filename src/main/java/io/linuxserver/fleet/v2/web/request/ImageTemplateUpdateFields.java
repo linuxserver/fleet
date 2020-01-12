@@ -1,5 +1,5 @@
 /*
- * Copyright (c)  2019 LinuxServer.io
+ * Copyright (c)  2020 LinuxServer.io
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -15,20 +15,13 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package io.linuxserver.fleet.core;
+package io.linuxserver.fleet.v2.web.request;
 
-import io.linuxserver.fleet.v2.service.ImageService;
-import io.linuxserver.fleet.v2.service.ScheduleService;
-import io.linuxserver.fleet.v2.service.SynchronisationService;
-import io.linuxserver.fleet.v2.service.UserService;
+import java.util.List;
+import java.util.Map;
 
-public interface ServiceProvider {
+public class ImageTemplateUpdateFields {
 
-    SynchronisationService getSynchronisationService();
-
-    ImageService getImageService();
-
-    ScheduleService getScheduleService();
-
-    UserService getUserService();
+    public ImageTemplateUpdateFields(final Map<String, List<String>> templateParams) {
+    }
 }

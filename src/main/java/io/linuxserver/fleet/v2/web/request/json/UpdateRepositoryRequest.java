@@ -15,14 +15,14 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package io.linuxserver.fleet.v2.web.request;
+package io.linuxserver.fleet.v2.web.request.json;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-public class UpdateImageSpecRequest {
+public class UpdateRepositoryRequest {
 
     @JsonProperty
-    private String imageKey;
+    private String  repositoryKey;
 
     @JsonProperty
     private boolean syncEnabled;
@@ -30,17 +30,8 @@ public class UpdateImageSpecRequest {
     @JsonProperty
     private String  versionMask;
 
-    @JsonProperty
-    private boolean stable;
-
-    @JsonProperty
-    private boolean hidden;
-
-    @JsonProperty
-    private boolean deprecated;
-
-    public final String getImageKey() {
-        return imageKey;
+    public final String getRepositoryKey() {
+        return repositoryKey;
     }
 
     public final boolean isSyncEnabled() {
@@ -49,17 +40,5 @@ public class UpdateImageSpecRequest {
 
     public final String getVersionMask() {
         return versionMask;
-    }
-
-    public final boolean isStable() {
-        return stable;
-    }
-
-    public final boolean isHidden() {
-        return hidden;
-    }
-
-    public boolean isDeprecated() {
-        return deprecated;
     }
 }

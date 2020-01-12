@@ -8,9 +8,9 @@ Constructs a navigation bar for display (usually) at the top of the page.
     itemPlacement:enum("start", "end") - Informs the navbar where to place the items.
     extraClasses:String                - Any additional classes that this element should have
 -->
-<#macro navbar id="" hasShadow=true itemPlacement="start" extraClasses="">
+<#macro navbar id="" hasShadow=true itemPlacement="start" extraClasses="" colour="normal-colour">
 
-    <nav <#if id?has_content>id="${id}"</#if> class="navbar<#if hasShadow> has-shadow</#if><#if extraClasses?has_content> ${extraClasses}</#if>" role="navigation" aria-label="main navigation">
+    <nav <#if id?has_content>id="${id}"</#if> class="navbar is-${colour}<#if hasShadow> has-shadow</#if><#if extraClasses?has_content> ${extraClasses}</#if>" role="navigation" aria-label="main navigation">
         <div class="navbar-brand">
 
             <a class="navbar-item" href="/">

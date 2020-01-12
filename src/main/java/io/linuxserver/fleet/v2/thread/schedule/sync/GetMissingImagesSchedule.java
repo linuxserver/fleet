@@ -34,7 +34,7 @@ public final class GetMissingImagesSchedule extends AbstractAppSchedule {
     @Override
     public void executeSchedule() {
 
-        final List<Repository> cachedRepositories = getController().getRepositoryService().getAllRepositories();
+        final List<Repository> cachedRepositories = getController().getImageService().getAllRepositories();
         for (Repository repository : cachedRepositories) {
             getController().getSynchronisationService().synchroniseUpstreamRepository(repository);
         }

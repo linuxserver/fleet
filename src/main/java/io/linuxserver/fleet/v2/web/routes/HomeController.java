@@ -20,17 +20,17 @@ package io.linuxserver.fleet.v2.web.routes;
 import io.javalin.http.Context;
 import io.linuxserver.fleet.core.FleetAppController;
 import io.linuxserver.fleet.v2.key.RepositoryKey;
-import io.linuxserver.fleet.v2.service.RepositoryService;
+import io.linuxserver.fleet.v2.service.ImageService;
 import io.linuxserver.fleet.v2.types.Repository;
 import io.linuxserver.fleet.v2.web.PageModelSpec;
 
 public class HomeController extends AbstractPageHandler {
 
-    private final RepositoryService repositoryService;
+    private final ImageService imageService;
 
     public HomeController(final FleetAppController controller) {
         super(controller);
-        repositoryService = controller.getRepositoryService();
+        imageService = controller.getImageService();
     }
 
     @Override
@@ -41,17 +41,17 @@ public class HomeController extends AbstractPageHandler {
         final String repositoryLookupParam = ctx.queryParam("key");
         if (null == repositoryLookupParam) {
 
-            final Repository repository = repositoryService.getFirstRepository();
+            final Repository repository = imageService.getFirstRepository();
             setSingleRepository(modelSpec, repository);
 
         } else {
 
             final RepositoryKey repositoryLookupKey = RepositoryKey.parse(repositoryLookupParam);
-            final Repository repository = repositoryService.getRepository(repositoryLookupKey);
+            final Repository repository = imageService.getRepository(repositoryLookupKey);
             setSingleRepository(modelSpec, repository);
         }
 
-        modelSpec.addModelAttribute("availableRepositories", repositoryService.getAllShownRepositories());
+        modelSpec.addModelAttribute("availableRepositories", imageService.getAllShownRepositories());
 
         return modelSpec;
     }

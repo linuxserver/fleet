@@ -64,8 +64,11 @@ public class WebRouteController {
 
             get(Locations.Admin.Repositories, new AdminRepositoryController(app), roles(AppRole.Anyone));
             get(Locations.Admin.Images,       new AdminImageController(     app), roles(AppRole.Anyone));
-            get(Locations.Admin.ImageEdit,    new AdminImageEditController( app), roles(AppRole.Anyone));
             get(Locations.Admin.Schedules,    new AdminScheduleController(  app), roles(AppRole.Anyone));
+
+            final AdminImageEditController imageEditController = new AdminImageEditController(app);
+            get(Locations.Admin.ImageEdit,  imageEditController, roles(AppRole.Anyone));
+            post(Locations.Admin.ImageEdit, imageEditController, roles(AppRole.Anyone));
 
             path(Locations.Internal.Api, () -> {
 

@@ -20,17 +20,21 @@ package io.linuxserver.fleet.v2.web.routes;
 import io.javalin.http.Context;
 import io.linuxserver.fleet.core.FleetAppController;
 import io.linuxserver.fleet.v2.key.ImageKey;
-import io.linuxserver.fleet.v2.service.RepositoryService;
+import io.linuxserver.fleet.v2.service.ImageService;
 import io.linuxserver.fleet.v2.types.docker.DockerCapability;
 import io.linuxserver.fleet.v2.web.PageModelSpec;
+import io.linuxserver.fleet.v2.web.request.ImageTemplateUpdateFields;
+
+import java.util.List;
+import java.util.Map;
 
 public class AdminImageEditController extends AbstractPageHandler {
 
-    private RepositoryService repositoryService;
+    private ImageService imageService;
 
     public AdminImageEditController(final FleetAppController controller) {
         super(controller);
-        repositoryService = controller.getRepositoryService();
+        imageService = controller.getImageService();
     }
 
     @Override
@@ -40,7 +44,7 @@ public class AdminImageEditController extends AbstractPageHandler {
         if (null != imageKeyParam) {
 
             final PageModelSpec modelSpec = new PageModelSpec("views/pages/admin/image-edit.ftl");
-            modelSpec.addModelAttribute("image", repositoryService.getImage(ImageKey.parse(imageKeyParam)));
+            modelSpec.addModelAttribute("image", imageService.getImage(ImageKey.parse(imageKeyParam)));
             modelSpec.addModelAttribute("containerCapabilities", DockerCapability.values());
             return modelSpec;
 
@@ -51,6 +55,12 @@ public class AdminImageEditController extends AbstractPageHandler {
 
     @Override
     protected PageModelSpec handleFormSubmission(final Context ctx) {
+
+        final String                    imageKey       = ctx.formParam("imageKey", String.class).get();
+        final Map<String, List<String>> templateParams = ctx.formParamMap();
+
+        getLogger().info("{}", ctx.formParamMap());
+        //imageService.updateImageTemplate(imageKey, new ImageTemplateUpdateFields(templateParams));
         return null;
     }
 }

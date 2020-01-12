@@ -19,23 +19,23 @@ package io.linuxserver.fleet.v2.web.routes;
 
 import io.javalin.http.Context;
 import io.linuxserver.fleet.core.FleetAppController;
-import io.linuxserver.fleet.v2.service.RepositoryService;
+import io.linuxserver.fleet.v2.service.ImageService;
 import io.linuxserver.fleet.v2.web.PageModelSpec;
 
 public class AdminRepositoryController extends AbstractPageHandler {
 
-    private final RepositoryService repositoryService;
+    private final ImageService imageService;
 
     public AdminRepositoryController(final FleetAppController controller) {
         super(controller);
-        repositoryService = controller.getRepositoryService();
+        imageService = controller.getImageService();
     }
 
     @Override
     protected PageModelSpec handlePageLoad(final Context ctx) {
 
         final PageModelSpec modelSpec = new PageModelSpec("views/pages/admin/repositories.ftl");
-        modelSpec.addModelAttribute("repositories", repositoryService.getAllRepositories());
+        modelSpec.addModelAttribute("repositories", imageService.getAllRepositories());
         return modelSpec;
     }
 

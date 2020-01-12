@@ -30,7 +30,7 @@ public final class RefreshCacheSchedule extends AbstractAppSchedule {
 
     @Override
     public void executeSchedule() {
-        getController().getRepositoryService().reloadCache();
+        getController().getImageService().reloadCache();
     }
 
     @Override

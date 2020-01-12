@@ -34,7 +34,7 @@ public final class AllImagesSyncSchedule extends AbstractAppSchedule {
     @Override
     public void executeSchedule() {
 
-        final List<Repository> allRepositories = getController().getRepositoryService().getAllRepositories();
+        final List<Repository> allRepositories = getController().getImageService().getAllRepositories();
         for (Repository repository : allRepositories) {
             getController().getSynchronisationService().synchroniseCachedRepository(repository);
         }

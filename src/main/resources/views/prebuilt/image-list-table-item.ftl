@@ -40,13 +40,13 @@
             <td class="is-vcentered">
                 <@tag.tag colour="light" value='<i class="fas fa-tag"></i> ${image.latestTag.version}' extraAttributes='title="Latest Version"' />
             </td>
-            <td class="is-vcentered">
+            <td class="is-vcentered has-text-small">
                 ${image.pullCount}
             </td>
-            <td class="is-vcentered">
+            <td class="is-vcentered has-text-small">
                 ${image.starCount}
             </td>
-            <td class="is-vcentered">
+            <td class="is-vcentered has-text-small">
             ${image.lastUpdatedAsString!""}
             </td>
         </tr>

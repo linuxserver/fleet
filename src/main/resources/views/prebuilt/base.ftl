@@ -21,7 +21,7 @@
 <#import "../ui/form/input.ftl"         as input />
 <#import "../prebuilt/system-alert.ftl" as systemAlert />
 
-<#macro base title context showTitle=true backgroundColour="white">
+<#macro base title context showTitle=true backgroundColour="white" hasHero=false>
 
 <!DOCTYPE html>
 <html lang="en">
@@ -33,15 +33,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
 
     <link href="https://fonts.googleapis.com/css?family=Pacifico|Nunito" rel="stylesheet">
-    <link rel="stylesheet" type="text/css" href="/assets/css/bulma-0.7.5.min.css" />
+    <link rel="stylesheet" type="text/css" href="/assets/css/bulma-0.8.0.min.css" />
     <link rel="stylesheet" type="text/css" href="/assets/css/app.css" />
-    <link rel="stylesheet" type="text/css" href="/assets/css/fontawesome-all.css" />
+    <link rel="stylesheet" type="text/css" href="/assets/css/fontawesome-all.min.css" />
 
 </head>
 
 <body class="has-background-${backgroundColour} has-text-grey-dark">
 
-    <@navbar.navbar id="MainNav" hasShadow=false itemPlacement="end">
+    <@navbar.navbar id="MainNav" hasShadow=false itemPlacement="end" colour=(hasHero?string('dark', 'normal-colour')) extraClasses=''>
 
         <#if context="home">
             <div class="navbar-item">
@@ -72,7 +72,7 @@
 
         <#else>
             <@navbar.buttons size="small">
-                <@button.link id="LogIn" link="/login" size="small">
+                <@button.link id="LogIn" link="/login" size="small" colour="white">
                     <i class="fas fa-sign-in-alt"></i> Log In
                 </@button.link>
             </@navbar.buttons>
@@ -107,22 +107,16 @@
           'use strict';
           window.addEventListener('load', function() {
 
-              <#if context=='users'>
-              formValidationManager.init();
-              </#if>
+              App.init();
+              Search.init();
+              FormValidation.init();
 
               <#if context=='image'>
-              chartManager.populateChart('${image.key}', 'Month');
+              PullChart.populateChart('${image.key}', 'Month');
               </#if>
-
-              appManager.init();
 
               <#if context?starts_with("admin")>
-              adminManager.init();
-              </#if>
-
-              <#if context=='home'>
-              imageSearchManager.init();
+              Admin.init();
               </#if>
 
               jQuery.tablesorter.addParser({
@@ -142,11 +136,6 @@
 
           }, false);
 
-          window.addEventListener('beforeprint', function(e) {
-              for (var id in Chart.instances) {
-                  Chart.instances[id].resize();
-              }
-          });
         })();
 
     </script>

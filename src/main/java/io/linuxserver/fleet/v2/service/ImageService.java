@@ -28,6 +28,7 @@ import io.linuxserver.fleet.v2.types.*;
 import io.linuxserver.fleet.v2.types.docker.DockerImage;
 import io.linuxserver.fleet.v2.types.docker.DockerTag;
 import io.linuxserver.fleet.v2.types.internal.ImageOutlineRequest;
+import io.linuxserver.fleet.v2.types.internal.ImageTemplateMergeRequest;
 import io.linuxserver.fleet.v2.types.internal.RepositoryOutlineRequest;
 import io.linuxserver.fleet.v2.types.internal.TagBranchOutlineRequest;
 import io.linuxserver.fleet.v2.types.meta.ItemSyncSpec;
@@ -39,14 +40,14 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
-public class RepositoryService {
+public class ImageService {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(RepositoryService.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ImageService.class);
 
     private final ImageDAO        imageDAO;
     private final RepositoryCache repositoryCache;
 
-    public RepositoryService(final ImageDAO imageDAO) {
+    public ImageService(final ImageDAO imageDAO) {
 
         this.imageDAO        = imageDAO;
         this.repositoryCache = new RepositoryCache();
@@ -56,8 +57,10 @@ public class RepositoryService {
 
     public final void reloadCache() {
 
+        final List<Repository> allItems = imageDAO.fetchAllRepositories();
+
         repositoryCache.clear();
-        repositoryCache.addAllItems(imageDAO.fetchAllRepositories());
+        repositoryCache.addAllItems(allItems);
     }
 
     public final Image updateImageSpec(final ImageKey imageKey, final ItemSyncSpec updatedSpec) {
@@ -263,5 +266,8 @@ public class RepositoryService {
         } else {
             LOGGER.warn("Could not find repository for image {}", storedImage);
         }
+    }
+
+    public void updateImageTemplate(final String imageKey, final ImageTemplateMergeRequest imageTemplateUpdateFields) {
     }
 }

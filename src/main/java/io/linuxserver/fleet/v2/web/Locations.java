@@ -46,6 +46,7 @@ public interface Locations {
         String Sync       = "sync";
         String Stats      = "stats";
         String Track      = "track";
+        String Template   = "template";
     }
 
     interface Admin {

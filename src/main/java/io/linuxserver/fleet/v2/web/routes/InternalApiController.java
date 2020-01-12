@@ -34,9 +34,9 @@ import io.linuxserver.fleet.v2.types.internal.RepositoryOutlineRequest;
 import io.linuxserver.fleet.v2.types.meta.ItemSyncSpec;
 import io.linuxserver.fleet.v2.types.meta.history.ImagePullStatistic;
 import io.linuxserver.fleet.v2.web.ApiException;
-import io.linuxserver.fleet.v2.web.request.NewRepositoryRequest;
-import io.linuxserver.fleet.v2.web.request.UpdateImageSpecRequest;
-import io.linuxserver.fleet.v2.web.request.UpdateRepositoryRequest;
+import io.linuxserver.fleet.v2.web.request.json.NewRepositoryRequest;
+import io.linuxserver.fleet.v2.web.request.json.UpdateImageSpecRequest;
+import io.linuxserver.fleet.v2.web.request.json.UpdateRepositoryRequest;
 
 public class InternalApiController extends AbstractAppService {
 
@@ -58,7 +58,7 @@ public class InternalApiController extends AbstractAppService {
             spec.setDeprecated(request.isDeprecated());
             spec.setVersionMask(request.getVersionMask());
 
-            final Image updated = getController().getRepositoryService()
+            final Image updated = getController().getImageService()
                     .updateImageSpec(ImageKey.parse(request.getImageKey()), spec);
 
             ctx.json(new ApiImageWrapper(updated));
@@ -79,7 +79,7 @@ public class InternalApiController extends AbstractAppService {
             spec.setSynchronised(request.isSyncEnabled());
             spec.setVersionMask(request.getVersionMask());
 
-            final Repository updated = getController().getRepositoryService()
+            final Repository updated = getController().getImageService()
                     .updateRepositorySpec(RepositoryKey.parse(request.getRepositoryKey()), spec);
 
             ctx.json(new ApiRepositoryWrapper(updated));
@@ -125,7 +125,7 @@ public class InternalApiController extends AbstractAppService {
         try {
 
             final String     repositoryKeyParam = ctx.formParam("repositoryKey", String.class).get();
-            final Repository repository = getController().getRepositoryService().getRepository(RepositoryKey.parse(repositoryKeyParam));
+            final Repository repository = getController().getImageService().getRepository(RepositoryKey.parse(repositoryKeyParam));
 
             getController().synchroniseRepository(repository);
 
@@ -155,7 +155,7 @@ public class InternalApiController extends AbstractAppService {
         try {
 
             final String     repositoryKeyParam = ctx.queryParam("repositoryKey", String.class).get();
-            getController().getRepositoryService().removeRepository(RepositoryKey.parse(repositoryKeyParam));
+            getController().getImageService().removeRepository(RepositoryKey.parse(repositoryKeyParam));
 
             ctx.result("OK");
 
@@ -170,7 +170,7 @@ public class InternalApiController extends AbstractAppService {
 
             final String                           imageKeyParam = ctx.queryParam("imageKey", String.class).get();
             final ImagePullStatistic.StatGroupMode groupMode     = ctx.queryParam("groupMode", ImagePullStatistic.StatGroupMode.class).get();
-            final Image                            cachedImage   = getController().getRepositoryService().getImage(ImageKey.parse(imageKeyParam));
+            final Image                            cachedImage   = getController().getImageService().getImage(ImageKey.parse(imageKeyParam));
 
             ctx.json(new ApiImagePullHistoryWrapper(cachedImage.getMetaData().getHistoryFor(groupMode), groupMode));
 
