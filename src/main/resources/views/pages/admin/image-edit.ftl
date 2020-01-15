@@ -127,7 +127,7 @@
                             <#list image.tagBranches as tagBranch>
                                 <tr>
                                     <td class="is-vcentered">
-                                        ${tagBranch.branchName}
+                                        ${tagBranch.branchName?html}
                                     </td>
                                     <td>
                                         <#if !tagBranch.branchProtected>

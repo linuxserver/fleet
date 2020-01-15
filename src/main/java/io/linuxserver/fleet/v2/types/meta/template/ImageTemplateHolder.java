@@ -106,4 +106,8 @@ public class ImageTemplateHolder {
     public final boolean isPrivilegedMode() {
         return privilegedMode;
     }
+
+    public final String getRegistryUrl() {
+        return registryUrl;
+    }
 }

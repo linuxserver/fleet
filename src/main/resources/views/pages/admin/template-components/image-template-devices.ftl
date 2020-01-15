@@ -36,7 +36,7 @@
                         <input title="Device mapping" type="text" class="input is-small" value="${device.device}" name="imageTemplateDevice" required />
                     </td>
                     <td>
-                        <input title="Device mapping description" type="text" class="input is-small" value="${device.description}" name="imageTemplateDeviceDescription" required />
+                        <input title="Device mapping description" type="text" class="input is-small" value="${device.description!""}" name="imageTemplateDeviceDescription" required />
                     </td>
                     <td>
                         <@button.buttons isRightAligned=true>

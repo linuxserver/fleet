@@ -65,6 +65,8 @@
         <@section.section>
             <@container.container>
 
+                <div class="columns is-multiline">
+
                     <div class="column is-full has-margin-bottom">
 
                         <h2 class="title is-5">Build Information</h2>
@@ -99,7 +101,7 @@
                             </thead>
                             <tbody>
                                 <#list image.tagBranches as tagBranch>
-                                    <@table.halfDisplayRow title=tagBranch.branchName value='<i class="fas fa-tag"></i> ${image.getMaskedVersion(tagBranch.latestTag)}' />
+                                    <@table.halfDisplayRow title=tagBranch.branchName?html value='<i class="fas fa-tag"></i> ${image.getMaskedVersion(tagBranch.latestTag)}' />
                                 </#list>
                             </tbody>
                         </@table.table>

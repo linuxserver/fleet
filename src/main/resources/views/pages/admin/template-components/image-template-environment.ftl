@@ -36,7 +36,7 @@
                         <input title="Environment mapping" type="text" class="input is-small" value="${env.env}" name="imageTemplateEnv" required />
                     </td>
                     <td>
-                        <input title="Environment mapping description" type="text" class="input is-small" value="${env.description}" name="imageTemplateEnvDescription" required />
+                        <input title="Environment mapping description" type="text" class="input is-small" value="${env.description!""}" name="imageTemplateEnvDescription" required />
                     </td>
                     <td>
                         <@button.buttons isRightAligned=true>

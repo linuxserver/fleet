@@ -40,13 +40,13 @@
                         <div class="select is-small">
                             <select title="Port protocol" name="imageTemplatePortProtocol">
                                 <#list protocols as protocol>
-                                    <option<#if port.protocol==protocol> selected</#if> value="${port.protocol}">${port.protocol}</option>
+                                    <option<#if port.protocol==protocol> selected</#if> value="${protocol}">${protocol}</option>
                                 </#list>
                             </select>
                         </div>
                     </td>
                     <td>
-                        <input title="Port mapping description" type="text" class="input is-small" name="imageTemplatePortDescription" value="${port.description}" required />
+                        <input title="Port mapping description" type="text" class="input is-small" name="imageTemplatePortDescription" value="${port.description!""}" required />
                     </td>
                     <td>
                         <@button.buttons isRightAligned=true>

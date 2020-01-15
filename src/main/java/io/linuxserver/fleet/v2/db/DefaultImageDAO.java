@@ -17,6 +17,7 @@
 
 package io.linuxserver.fleet.v2.db;
 
+import freemarker.cache.TemplateConfigurationFactory;
 import io.linuxserver.fleet.core.db.DatabaseProvider;
 import io.linuxserver.fleet.db.query.InsertUpdateResult;
 import io.linuxserver.fleet.db.query.InsertUpdateStatus;
@@ -60,8 +61,11 @@ public class DefaultImageDAO extends AbstractDAO implements ImageDAO {
     private static final String DeleteImage            = "{CALL Image_Delete(?)}";
     private static final String GetImageStats          = "{CALL Image_GetStats(?)}";
 
+    private final ImageTemplateFactory templateFactory;
+
     public DefaultImageDAO(final DatabaseProvider databaseConnection) {
         super(databaseConnection);
+        this.templateFactory = new ImageTemplateFactory();
     }
 
     @Override
@@ -127,7 +131,8 @@ public class DefaultImageDAO extends AbstractDAO implements ImageDAO {
 
         try (final Connection connection = getConnection()) {
 
-            storeImageTemplates(connection, image);
+            templateFactory.storeImageTemplates(connection, image);
+            return new InsertUpdateResult<>(makeImage(image.getKey(), connection));
 
         } catch (SQLException e) {
 
@@ -135,7 +140,6 @@ public class DefaultImageDAO extends AbstractDAO implements ImageDAO {
             return new InsertUpdateResult<>(InsertUpdateStatus.FAILED, e.getMessage());
         }
 
-        return null;
     }
 
     @Override
@@ -372,10 +376,6 @@ public class DefaultImageDAO extends AbstractDAO implements ImageDAO {
         }
     }
 
-    private void storeImageTemplates(final Connection connection, final Image image) throws SQLException {
-
-    }
-
     private void storeTagBranches(final Connection connection, final Image image) throws SQLException {
 
         try (final CallableStatement call = connection.prepareCall(StoreTagBranch)) {
@@ -502,7 +502,7 @@ public class DefaultImageDAO extends AbstractDAO implements ImageDAO {
     private ImageMetaData makeImageMetaData(final Connection connection, final ImageKey imageKey) throws SQLException {
 
         return new ImageMetaData(makePullHistory(connection, imageKey),
-                                 makeTemplateHolder(connection, imageKey));
+                                 templateFactory.makeTemplateHolder(connection, imageKey));
     }
 
     private ImagePullHistory makePullHistory(final Connection connection, final ImageKey imageKey) throws SQLException {
@@ -533,10 +533,6 @@ public class DefaultImageDAO extends AbstractDAO implements ImageDAO {
             }
         }
         return pullHistory;
-    }
-
-    private ImageTemplateHolder makeTemplateHolder(final Connection connection, final ImageKey imageKey) {
-        return new ImageTemplateHolder(null, "always", false, false);
     }
 
     private ImageKey makeImageKey(final ResultSet results) throws SQLException {

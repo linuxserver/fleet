@@ -383,13 +383,13 @@ var PullChart = (function($) {
                     labels: history.pullDifferential.labels,
                     datasets: [
                         {
-                            lineTension: .3,
+                            lineTension: 0,
                             data: history.pullDifferential.pulls,
                             pointRadius: 0,
                             pointHitRadius: 6,
-                            borderWidth: 2,
-                            borderColor: 'rgba(33, 96, 196, 0.8)',
-                            backgroundColor : 'rgba(33, 96, 196, 0.2)'
+                            borderWidth: 1,
+                            borderColor: 'rgba(33, 96, 196, 0.7)',
+                            backgroundColor : 'rgba(33, 96, 196, 0.1)'
                         }
                     ]
                 },

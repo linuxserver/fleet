@@ -21,7 +21,7 @@
 
     <div class="columns is-multiline">
         <div class="column is-full">
-            <@input.text id="ImageTemplateUpstreamUrl" label="Registry Url" />
+            <@input.text id="ImageTemplateUpstreamUrl" label="Registry Url" value=templateHolder.registryUrl!""?html />
         </div>
         <div class="column is-3-desktop is-full-tablet is-full-mobile">
             <@input.dropdown label="Restart Policy" id="ImageTemplateRestartPolicy">

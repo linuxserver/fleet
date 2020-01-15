@@ -38,15 +38,14 @@
                     </td>
                     <td>
                         <div class="select is-small">
-                            <select title="Port protocol" name="imageTemplatePortProtocol">
+                            <select title="Port protocol" name="imageTemplateVolumeReadonly">
                                 <option<#if !volume.readonly> selected</#if> value="read-write">read-write</option>
                                 <option<#if volume.readonly> selected</#if> value="readonly">readonly</option>
                             </select>
                         </div>
-                        <@input.toggle inputClasses='name="imageTemplateVolumeReadonly"' isToggled=volume.readonly />
                     </td>
                     <td>
-                        <input title="Volume mapping description" type="text" class="input is-small" value="${volume.description}" name="imageTemplatePortDescription" required />
+                        <input title="Volume mapping description" type="text" class="input is-small" value="${volume.description!""}" name="imageTemplateVolumeDescription" required />
                     </td>
                     <td>
                         <@button.buttons isRightAligned=true>
