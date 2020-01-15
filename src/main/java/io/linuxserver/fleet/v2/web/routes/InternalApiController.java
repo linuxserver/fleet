@@ -32,7 +32,7 @@ import io.linuxserver.fleet.v2.types.api.ApiRepositoryWrapper;
 import io.linuxserver.fleet.v2.types.api.ApiScheduleWrapper;
 import io.linuxserver.fleet.v2.types.internal.RepositoryOutlineRequest;
 import io.linuxserver.fleet.v2.types.meta.ItemSyncSpec;
-import io.linuxserver.fleet.v2.types.meta.history.ImagePullStatistic;
+import io.linuxserver.fleet.v2.types.meta.history.ImagePullStatistic.StatGroupMode;
 import io.linuxserver.fleet.v2.web.ApiException;
 import io.linuxserver.fleet.v2.web.request.json.NewRepositoryRequest;
 import io.linuxserver.fleet.v2.web.request.json.UpdateImageSpecRequest;
@@ -124,8 +124,8 @@ public class InternalApiController extends AbstractAppService {
 
         try {
 
-            final String     repositoryKeyParam = ctx.formParam("repositoryKey", String.class).get();
-            final Repository repository = getController().getImageService().getRepository(RepositoryKey.parse(repositoryKeyParam));
+            final RepositoryKey repositoryKey = ctx.formParam("repositoryKey", RepositoryKey.class).get();
+            final Repository    repository    = getController().getImageService().getRepository(repositoryKey);
 
             getController().synchroniseRepository(repository);
 
@@ -140,8 +140,8 @@ public class InternalApiController extends AbstractAppService {
 
         try {
 
-            final String imageKeyParam = ctx.formParam("imageKey", String.class).get();
-            getController().synchroniseImage(ImageKey.parse(imageKeyParam));
+            final ImageKey imageKeyParam = ctx.formParam("imageKey", ImageKey.class).get();
+            getController().synchroniseImage(imageKeyParam);
 
             ctx.json("OK");
 
@@ -154,8 +154,8 @@ public class InternalApiController extends AbstractAppService {
 
         try {
 
-            final String     repositoryKeyParam = ctx.queryParam("repositoryKey", String.class).get();
-            getController().getImageService().removeRepository(RepositoryKey.parse(repositoryKeyParam));
+            final RepositoryKey repositoryKeyParam = ctx.queryParam("repositoryKey", RepositoryKey.class).get();
+            getController().getImageService().removeRepository(repositoryKeyParam);
 
             ctx.result("OK");
 
@@ -168,9 +168,9 @@ public class InternalApiController extends AbstractAppService {
 
         try {
 
-            final String                           imageKeyParam = ctx.queryParam("imageKey", String.class).get();
-            final ImagePullStatistic.StatGroupMode groupMode     = ctx.queryParam("groupMode", ImagePullStatistic.StatGroupMode.class).get();
-            final Image                            cachedImage   = getController().getImageService().getImage(ImageKey.parse(imageKeyParam));
+            final ImageKey      imageKeyParam = ctx.queryParam("imageKey", ImageKey.class).get();
+            final StatGroupMode groupMode     = ctx.queryParam("groupMode", StatGroupMode.class).get();
+            final Image         cachedImage   = getController().getImageService().getImage(imageKeyParam);
 
             ctx.json(new ApiImagePullHistoryWrapper(cachedImage.getMetaData().getHistoryFor(groupMode), groupMode));
 
@@ -183,10 +183,10 @@ public class InternalApiController extends AbstractAppService {
 
         try {
 
-            final String imageKeyParam = ctx.formParam("imageKey",   String.class).get();
-            final String branchName    = ctx.formParam("branchName", String.class).get();
+            final ImageKey imageKey   = ctx.formParam("imageKey",   ImageKey.class).get();
+            final String   branchName = ctx.formParam("branchName", String.class).get();
 
-            getController().trackBranch(ImageKey.parse(imageKeyParam), branchName);
+            getController().trackBranch(imageKey, branchName);
 
         } catch (IllegalArgumentException e) {
             throw new ApiException(e.getMessage(), e);

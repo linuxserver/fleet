@@ -23,12 +23,12 @@
 <#import "../ui/elements/table.ftl"    as table />
 <#import "../ui/elements/tag.ftl"      as tag />
 
-<@base.base title="${(image.fullName)!'Unknown Image'}" context="image" hasHero=true>
+<@base.base title="${(image.fullName)!'Unknown Image'}" context="image" hasHero=false>
 
     <#if image?has_content>
 
-        <section class="hero is-dark">
-            <@section.section>
+        <section class="hero">
+            <@section.section extraClasses="is-paddingless-bottom">
                 <@container.container extraClasses="has-margin-bottom">
 
                     <div class="columns is-multiline">
@@ -41,17 +41,17 @@
                                 </#if>
                             </@title.title>
 
-                            <div class="tags is-right">
+                            <div class="tags">
+
+                                <@tag.tag colour="light" value='<i class="fas fa-download"></i> ${image.pullCount}' extraAttributes='title="Pulls"' />
+                                <@tag.tag colour="light" value='<i class="fas fa-star"></i> ${image.starCount}' extraAttributes='title="Stars"' />
 
                                 <#assign latestBranch=image.findTagBranchByName("latest") />
                                 <#if latestBranch?has_content>
                                     <#list latestBranch.latestTag.digests as digest>
-                                        <@tag.tag colour="white" value='<i class="fas fa-microchip"></i> ${digest.architecture}' extraAttributes='title="Architecture"' />
+                                        <@tag.tag colour="light" value='<i class="fas fa-microchip"></i> ${digest.architecture}' extraAttributes='title="Architecture"' />
                                     </#list>
                                 </#if>
-
-                                <@tag.tag colour="white" value='<i class="fas fa-download"></i> ${image.pullCount}' extraAttributes='title="Pulls"' />
-                                <@tag.tag colour="white" value='<i class="fas fa-star"></i> ${image.starCount}' extraAttributes='title="Stars"' />
 
                             </div>
 

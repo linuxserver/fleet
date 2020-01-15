@@ -47,7 +47,7 @@ public class ImagePullStatistic implements Comparable<ImagePullStatistic> {
     @Override
     public int compareTo(final ImagePullStatistic o) {
 
-        final int dateComparison = groupedDateTime.compareTo(o.getGroupedDateTime());
+        final int dateComparison = groupedDateTime.compareTo(o.groupedDateTime);
         if (dateComparison == 0) {
             return groupMode.compareTo(o.groupMode);
         }
@@ -67,7 +67,7 @@ public class ImagePullStatistic implements Comparable<ImagePullStatistic> {
         }
 
         final ImagePullStatistic other = (ImagePullStatistic) obj;
-        return other.getGroupedDateTime().equals(getGroupedDateTime()) && other.isGroupedBy(groupMode);
+        return other.groupedDateTime.equals(groupedDateTime) && other.isGroupedBy(groupMode);
     }
 
     @Override

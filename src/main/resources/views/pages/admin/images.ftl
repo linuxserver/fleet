@@ -68,7 +68,7 @@
                                     <td class="is-vcentered">
                                         ${image.name}
                                     </td>
-                                    <td class="editable-image-version-mask is-vcentered" style="width: 300px; min-width: 300px;">
+                                    <td class="editable-image-version-mask is-vcentered" style="width: 350px; min-width: 300px;">
                                         <@input.switchable id="VersionMask_${repository.key.id}" icon="mask" value=image.versionMask size="small" acceptClass="update-image-trigger" />
                                     </td>
                                     <td class="editable-image-sync-enabled is-vcentered has-text-centered" style="width: 100px; max-width: 100px;">

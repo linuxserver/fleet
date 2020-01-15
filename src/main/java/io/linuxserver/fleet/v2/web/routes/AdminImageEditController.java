@@ -22,11 +22,8 @@ import io.linuxserver.fleet.core.FleetAppController;
 import io.linuxserver.fleet.v2.key.ImageKey;
 import io.linuxserver.fleet.v2.service.ImageService;
 import io.linuxserver.fleet.v2.types.docker.DockerCapability;
+import io.linuxserver.fleet.v2.types.internal.ImageTemplateRequest;
 import io.linuxserver.fleet.v2.web.PageModelSpec;
-import io.linuxserver.fleet.v2.web.request.ImageTemplateUpdateFields;
-
-import java.util.List;
-import java.util.Map;
 
 public class AdminImageEditController extends AbstractPageHandler {
 
@@ -56,11 +53,34 @@ public class AdminImageEditController extends AbstractPageHandler {
     @Override
     protected PageModelSpec handleFormSubmission(final Context ctx) {
 
-        final String                    imageKey       = ctx.formParam("imageKey", String.class).get();
-        final Map<String, List<String>> templateParams = ctx.formParamMap();
+        final String updateType = ctx.formParam("updateType", String.class).get();
+        final ImageKey imageKey = ctx.formParam("imageKey",   ImageKey.class).get();
 
-        getLogger().info("{}", ctx.formParamMap());
-        //imageService.updateImageTemplate(imageKey, new ImageTemplateUpdateFields(templateParams));
-        return null;
+        switch (updateType) {
+
+            case "GENERAL":
+                handleGeneralUpdate(ctx, imageKey);
+                break;
+
+            case "TEMPLATE":
+                handleTemplateUpdate(ctx, imageKey);
+                break;
+
+            default:
+                throw new IllegalArgumentException("Unknown updateType provided: " + updateType);
+        }
+
+        return new PageModelSpec("redirect:/admin/image?imageKey=" + imageKey);
+    }
+
+    private void handleGeneralUpdate(final Context ctx, final ImageKey imageKey) {
+
+        if (!ctx.isMultipartFormData()) {
+            throw new IllegalArgumentException("Form submission must be form/multipart");
+        }
+    }
+
+    private void handleTemplateUpdate(final Context ctx, final ImageKey imageKey) {
+        imageService.updateImageTemplate(imageKey, new ImageTemplateRequest(ctx.formParamMap()));
     }
 }

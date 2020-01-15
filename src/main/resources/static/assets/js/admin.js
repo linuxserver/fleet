@@ -180,7 +180,7 @@ var Admin = (function($) {
                     makeInput('imageTemplateVolume', 'text', true) +
                 '</td>' +
                 '<td>' +
-                    makeToggle('imageTemplateVolumeReadonly') +
+                    makeSelect('imageTemplateVolumeReadonly', ['read-write', 'readonly']) +
                 '</td>' +
                 '<td>' +
                     makeInput('imageTemplateVolumeDescription') +

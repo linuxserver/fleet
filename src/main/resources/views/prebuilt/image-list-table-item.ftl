@@ -31,10 +31,10 @@
             </td>
             <td>
                 <#if image.deprecated>
-                    <@tag.tag colour="warning" value='<i class="fas fa-exclamation-circle"></i> Deprecated' />
+                    <@tag.tag colour="warning is-light" value='<i class="fas fa-exclamation-circle"></i> Deprecated' />
                 </#if>
                 <#if !image.stable>
-                    <@tag.tag colour="danger" value='<i class="fas fa-exclamation-triangle"></i> Unstable!' />
+                    <@tag.tag colour="danger is-light" value='<i class="fas fa-exclamation-triangle"></i> Unstable!' />
                 </#if>
             </td>
             <td class="is-vcentered">
@@ -47,7 +47,7 @@
                 ${image.starCount}
             </td>
             <td class="is-vcentered has-text-small">
-            ${image.lastUpdatedAsString!""}
+                ${image.lastUpdatedAsString!""}
             </td>
         </tr>
     </#if>

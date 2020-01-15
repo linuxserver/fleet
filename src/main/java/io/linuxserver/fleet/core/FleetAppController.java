@@ -86,9 +86,7 @@ public class FleetAppController extends AbstractAppController implements Service
     @Override
     protected final void run() {
         super.run();
-
         configureWeb();
-
         scheduleService.initialiseSchedules();
     }
 

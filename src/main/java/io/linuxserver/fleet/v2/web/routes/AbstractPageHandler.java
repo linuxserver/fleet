@@ -98,7 +98,7 @@ public abstract class AbstractPageHandler extends AbstractAppService implements 
     private void checkViewForRedirect(final Context ctx, final PageModelSpec spec) {
 
         if (isRedirect(spec.getViewName())) {
-            ctx.redirect(spec.getViewName().split(":")[1]);
+            ctx.redirect(spec.getViewName().split(":", 2)[1]);
         } else {
             ctx.render(spec.getViewName(), spec.getModel());
         }

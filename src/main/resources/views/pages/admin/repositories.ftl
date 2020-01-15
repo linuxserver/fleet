@@ -103,11 +103,11 @@
 
         <@button.buttons isRightAligned=true>
 
-            <@button.button colour="light" extraClasses="is-modal-cancel">
+            <@button.button colour="light" extraClasses="is-modal-cancel is-wide-mobile">
                 Cancel
             </@button.button>
 
-            <@button.button id="DeleteRepository" colour="danger">
+            <@button.button id="DeleteRepository" colour="danger is-wide-mobile">
                 <i class="fas fa-trash"></i> Delete
             </@button.button>
 

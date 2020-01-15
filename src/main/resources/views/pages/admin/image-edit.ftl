@@ -59,44 +59,50 @@
                     <#--
                     General base information which is to be added manually (data which can't necessarily be inferred from upstream)
                     -->
-                    <div class="column is-full has-margin-top">
-                        <div class="columns is-multiline">
-                            <div class="column is-full">
-                                <h2 class="title is-4">General</h2>
-                            </div>
-                            <div class="column is-full">
-                                <div class="field is-horizontal">
-                                    <div class="field-label">
-                                        <label class="label" for="ImageAppLogo">App Logo</label>
-                                    </div>
-                                    <div class="field-body">
-                                        <input type="file" name="imageAppLogo" id="ImageAppLogo" />
+                    <form class="needs-validation" novalidate action="/admin/image" method="post" enctype="multipart/form-data">
+                        <div class="column is-full has-margin-top">
+                            <div class="columns is-multiline">
+                                <div class="column is-full">
+                                    <h2 class="title is-4">General</h2>
+                                </div>
+                                <div class="column is-full">
+                                    <div class="field is-horizontal">
+                                        <div class="field-label">
+                                            <label class="label" for="ImageAppLogo">App Logo</label>
+                                        </div>
+                                        <div class="field-body">
+                                            <input type="file" name="imageAppLogo" id="ImageAppLogo" />
+                                        </div>
                                     </div>
                                 </div>
+                                <div class="column is-full">
+                                    <@input.text id="ImageBase" label="Base Image" isInline=true />
+                                </div>
+                                <div class="column is-full">
+                                    <@input.text id="ImageCategory" label="Category" isInline=true />
+                                </div>
+                                <div class="column is-full">
+                                    <@input.text id="ImageSupportUrl" label="Support Url" isInline=true />
+                                </div>
+                                <div class="column is-full">
+                                    <@input.text id="ImageAppUrl" label="Application Url" isInline=true />
+                                </div>
                             </div>
-                            <div class="column is-full">
-                                <@input.text id="ImageBase" label="Base Image" isInline=true />
-                            </div>
-                            <div class="column is-full">
-                                <@input.text id="ImageCategory" label="Category" isInline=true />
-                            </div>
-                            <div class="column is-full">
-                                <@input.text id="ImageSupportUrl" label="Support Url" isInline=true />
-                            </div>
-                            <div class="column is-full">
-                                <@input.text id="ImageAppUrl" label="Application Url" isInline=true />
+                            <div class="columns">
+                                <div class="column is-full">
+
+                                    <input type="hidden" name="imageKey" value="${image.key}" />
+                                    <input type="hidden" name="updateType" value="GENERAL" />
+
+                                    <@button.buttons isRightAligned=true>
+                                        <@button.submit colour="success" extraClasses="is-fullwidth-mobile">
+                                            <i class="fas fa-save"></i> Save General Changes
+                                        </@button.submit>
+                                    </@button.buttons>
+                                </div>
                             </div>
                         </div>
-                        <div class="columns">
-                            <div class="column is-full">
-                                <@button.buttons isRightAligned=true>
-                                    <@button.submit colour="success" extraClasses="is-fullwidth-mobile">
-                                        <i class="fas fa-save"></i> Save General Changes
-                                    </@button.submit>
-                                </@button.buttons>
-                            </div>
-                        </div>
-                    </div>
+                    </form>
 
                     <#--
                     Tag branches
@@ -157,44 +163,44 @@
 
                     </div>
                 </div>
-                <div class="columns is-multiline has-margin-top">
 
-                    <#--
-                    Port/Volume mappings for containers created from this image
-                    -->
-                    <div class="column is-full has-margin-top">
-                        <h2 class="title is-4">Container Template</h2>
-                        <@message.message colour="info">
-                            This information is for display purposes and has no impact on this image's synchronisation processes. The
-                            data stored here will be used to generate various templates for downstream systems to consume, as well as
-                            for the display page to provide run commands and Compose snippets
-                        </@message.message>
-                    </div>
+                <form class="needs-validation" novalidate action="/admin/image" method="post">
+                    <div class="columns is-multiline has-margin-top">
 
-                    <div class="column is-full">
-                        <div class="tabs" data-tabs-for="#ImageTemplateTabContent">
-                            <ul>
-                                <li data-tab-for="#ImageTemplatePorts" class="is-active">
-                                    <a><i class="fas fa-ethernet"></i> Ports</a>
-                                </li>
-                                <li data-tab-for="#ImageTemplateVolumes">
-                                    <a><i class="fas fa-folder"></i>Volumes</a>
-                                </li>
-                                <li data-tab-for="#ImageTemplateEnv">
-                                    <a><i class="fas fa-code"></i> Environment</a>
-                                </li>
-                                <li data-tab-for="#ImageTemplateDevices">
-                                    <a><i class="fas fa-microchip"></i> Devices</a>
-                                </li>
-                                <li data-tab-for="#ImageTemplateMisc">
-                                    <a><i class="fas fa-tag"></i> Misc</a>
-                                </li>
-                            </ul>
+                        <#--
+                        Port/Volume mappings for containers created from this image
+                        -->
+                        <div class="column is-full has-margin-top">
+                            <h2 class="title is-4">Container Template</h2>
+                            <@message.message colour="info">
+                                This information is for display purposes and has no impact on this image's synchronisation processes. The
+                                data stored here will be used to generate various templates for downstream systems to consume, as well as
+                                for the display page to provide run commands and Compose snippets
+                            </@message.message>
+                        </div>
+
+                        <div class="column is-full">
+                            <div class="tabs" data-tabs-for="#ImageTemplateTabContent">
+                                <ul>
+                                    <li data-tab-for="#ImageTemplatePorts" class="is-active">
+                                        <a><i class="fas fa-ethernet"></i> Ports</a>
+                                    </li>
+                                    <li data-tab-for="#ImageTemplateVolumes">
+                                        <a><i class="fas fa-folder"></i>Volumes</a>
+                                    </li>
+                                    <li data-tab-for="#ImageTemplateEnv">
+                                        <a><i class="fas fa-code"></i> Environment</a>
+                                    </li>
+                                    <li data-tab-for="#ImageTemplateDevices">
+                                        <a><i class="fas fa-microchip"></i> Devices</a>
+                                    </li>
+                                    <li data-tab-for="#ImageTemplateMisc">
+                                        <a><i class="fas fa-tag"></i> Misc</a>
+                                    </li>
+                                </ul>
+                            </div>
                         </div>
                     </div>
-                </div>
-
-                <form action="" method="post" novalidate class="needs-validation">
 
                     <div id="ImageTemplateTabContent" class="columns has-tabs-content">
                         <div id="ImageTemplatePorts" class="column tab-content is-active is-full has-margin-top">
@@ -216,14 +222,18 @@
 
                     <div class="columns">
                         <div class="column is-full">
+
+                            <input type="hidden" name="imageKey" value="${image.key}" />
+                            <input type="hidden" name="updateType" value="TEMPLATE" />
+
                             <@button.buttons isRightAligned=true>
-                                <@button.submit colour="success" extraClasses="is-fullwidth-mobile">
+                                <@button.submit id="SaveTemplateChanges" colour="success" extraClasses="is-fullwidth-mobile">
                                     <i class="fas fa-save"></i> Save Template Changes
                                 </@button.submit>
                             </@button.buttons>
+
                         </div>
                     </div>
-
                 </form>
 
             </@container.container>

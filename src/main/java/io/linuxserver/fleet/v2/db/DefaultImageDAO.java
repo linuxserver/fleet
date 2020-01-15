@@ -34,7 +34,6 @@ import io.linuxserver.fleet.v2.types.meta.history.ImagePullStatistic;
 import io.linuxserver.fleet.v2.types.meta.template.ImageTemplateHolder;
 
 import java.sql.*;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -60,7 +59,6 @@ public class DefaultImageDAO extends AbstractDAO implements ImageDAO {
     private static final String GetImage               = "{CALL Image_Get(?)}";
     private static final String DeleteImage            = "{CALL Image_Delete(?)}";
     private static final String GetImageStats          = "{CALL Image_GetStats(?)}";
-    private static final String DeleteStats            = "{CALL Image_ClearStatsBefore(?)}";
 
     public DefaultImageDAO(final DatabaseProvider databaseConnection) {
         super(databaseConnection);
@@ -107,11 +105,10 @@ public class DefaultImageDAO extends AbstractDAO implements ImageDAO {
 
                 final DbUpdateStatus status = DbUpdateStatus.valueOf(call.getString(i));
                 if (status.isNoChange()) {
-                    getLogger().warn("removeImage attempted to remove an image which did not exist in the database: {}", image);
+                    getLogger().warn("storeImage attempted to update an image which did not exist in the database: {}", image);
                 } else if (results.next()) {
 
                     storeTagBranches(connection, image);
-
                     return new InsertUpdateResult<>(makeImage(makeImageKey(results), connection));
                 }
 
@@ -123,6 +120,22 @@ public class DefaultImageDAO extends AbstractDAO implements ImageDAO {
             getLogger().error("Error caught when executing SQL: storeImage", e);
             return new InsertUpdateResult<>(InsertUpdateStatus.FAILED, e.getMessage());
         }
+    }
+
+    @Override
+    public InsertUpdateResult<Image> storeImageMetaData(final Image image) {
+
+        try (final Connection connection = getConnection()) {
+
+            storeImageTemplates(connection, image);
+
+        } catch (SQLException e) {
+
+            getLogger().error("Error caught when executing SQL: storeImageMetaData", e);
+            return new InsertUpdateResult<>(InsertUpdateStatus.FAILED, e.getMessage());
+        }
+
+        return null;
     }
 
     @Override
@@ -359,6 +372,10 @@ public class DefaultImageDAO extends AbstractDAO implements ImageDAO {
         }
     }
 
+    private void storeImageTemplates(final Connection connection, final Image image) throws SQLException {
+
+    }
+
     private void storeTagBranches(final Connection connection, final Image image) throws SQLException {
 
         try (final CallableStatement call = connection.prepareCall(StoreTagBranch)) {
@@ -519,7 +536,7 @@ public class DefaultImageDAO extends AbstractDAO implements ImageDAO {
     }
 
     private ImageTemplateHolder makeTemplateHolder(final Connection connection, final ImageKey imageKey) {
-        return new ImageTemplateHolder();
+        return new ImageTemplateHolder(null, "always", false, false);
     }
 
     private ImageKey makeImageKey(final ResultSet results) throws SQLException {

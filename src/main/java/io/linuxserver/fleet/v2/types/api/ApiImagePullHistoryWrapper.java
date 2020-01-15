@@ -52,7 +52,7 @@ public class ApiImagePullHistoryWrapper extends AbstractApiWrapper<List<ImagePul
 
         final PullDifferentialsWithLabels differentialsWithLabels = new PullDifferentialsWithLabels();
         int i;
-        for (i = 1; i < getOriginalObject().size(); i++) {
+        for (i = 1; i < (getOriginalObject().size() - 1); i++) {
 
             final ImagePullStatistic previousStat = getOriginalObject().get(i - 1);
             final ImagePullStatistic currentStat  = getOriginalObject().get(i);

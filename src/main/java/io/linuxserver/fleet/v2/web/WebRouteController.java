@@ -21,6 +21,9 @@ import io.javalin.Javalin;
 import io.javalin.core.validation.JavalinValidation;
 import io.linuxserver.fleet.core.FleetAppController;
 import io.linuxserver.fleet.core.config.WebConfiguration;
+import io.linuxserver.fleet.v2.key.ImageKey;
+import io.linuxserver.fleet.v2.key.ImageLookupKey;
+import io.linuxserver.fleet.v2.key.RepositoryKey;
 import io.linuxserver.fleet.v2.types.meta.history.ImagePullStatistic;
 import io.linuxserver.fleet.v2.web.routes.*;
 
@@ -49,6 +52,9 @@ public class WebRouteController {
         Javalin.log.info(printBanner());
 
         JavalinValidation.register(ImagePullStatistic.StatGroupMode.class, ImagePullStatistic.StatGroupMode::valueOf);
+        JavalinValidation.register(ImageKey.class, ImageKey::parse);
+        JavalinValidation.register(ImageLookupKey.class, ImageLookupKey::new);
+        JavalinValidation.register(RepositoryKey.class, RepositoryKey::parse);
 
         webInstance.exception(ApiException.class, (e, ctx) -> {
 
@@ -105,6 +111,8 @@ public class WebRouteController {
                 });
             });
         });
+
+        Runtime.getRuntime().addShutdownHook(new Thread(webInstance::stop));
     }
 
     private static String printBanner() {

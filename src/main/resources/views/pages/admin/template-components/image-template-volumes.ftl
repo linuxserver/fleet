@@ -37,7 +37,13 @@
                         <input title="Volume mapping" type="text" class="input is-small" value="${volume.volume}" name="imageTemplateVolume" required />
                     </td>
                     <td>
-                        <@input.toggle extraClasses='name="imageTemplateVolumeReadonly"' isToggled=volume.readonly />
+                        <div class="select is-small">
+                            <select title="Port protocol" name="imageTemplatePortProtocol">
+                                <option<#if !volume.readonly> selected</#if> value="read-write">read-write</option>
+                                <option<#if volume.readonly> selected</#if> value="readonly">readonly</option>
+                            </select>
+                        </div>
+                        <@input.toggle inputClasses='name="imageTemplateVolumeReadonly"' isToggled=volume.readonly />
                     </td>
                     <td>
                         <input title="Volume mapping description" type="text" class="input is-small" value="${volume.description}" name="imageTemplatePortDescription" required />

@@ -23,8 +23,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
-import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicReference;
 
 public class ImageTemplateHolder {
 
@@ -35,13 +33,34 @@ public class ImageTemplateHolder {
     private final Set<DeviceTemplateItem>      devices     = new TreeSet<>();
 
     // Misc
-    private final Set<DockerCapability>   capabilities          = new TreeSet<>();
-    private final AtomicReference<String> restartPolicy         = new AtomicReference<>();
-    private final AtomicBoolean           hostNetworkingEnabled = new AtomicBoolean();
-    private final AtomicBoolean           privilegedMode        = new AtomicBoolean();
+    private final Set<DockerCapability> capabilities = new TreeSet<>();
+
+    private final String  registryUrl;
+    private final String  restartPolicy;
+    private final boolean hostNetworkingEnabled;
+    private final boolean privilegedMode;
+
+    public ImageTemplateHolder(final String registryUrl,
+                               final String restartPolicy,
+                               final boolean hostNetworkingEnabled,
+                               final boolean privilegedMode) {
+
+        this.registryUrl           = registryUrl;
+        this.restartPolicy         = restartPolicy;
+        this.hostNetworkingEnabled = hostNetworkingEnabled;
+        this.privilegedMode        = privilegedMode;
+    }
 
     public final boolean hasCapability(final DockerCapability capability) {
         return capabilities.contains(capability);
+    }
+
+    public final void addCapability(final DockerCapability capability) {
+        capabilities.add(capability);
+    }
+
+    public final List<DockerCapability> getCapabilities() {
+        return new ArrayList<>(capabilities);
     }
 
     public final void addPort(final PortTemplateItem port) {
@@ -74,5 +93,17 @@ public class ImageTemplateHolder {
 
     public final List<DeviceTemplateItem> getDevices() {
         return new ArrayList<>(devices);
+    }
+
+    public final String getRestartPolicy() {
+        return restartPolicy;
+    }
+
+    public final boolean isHostNetworkingEnabled() {
+        return hostNetworkingEnabled;
+    }
+
+    public final boolean isPrivilegedMode() {
+        return privilegedMode;
     }
 }

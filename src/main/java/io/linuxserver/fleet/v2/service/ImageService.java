@@ -24,11 +24,12 @@ import io.linuxserver.fleet.v2.db.ImageDAO;
 import io.linuxserver.fleet.v2.key.ImageKey;
 import io.linuxserver.fleet.v2.key.ImageLookupKey;
 import io.linuxserver.fleet.v2.key.RepositoryKey;
+import io.linuxserver.fleet.v2.service.util.TemplateMerger;
 import io.linuxserver.fleet.v2.types.*;
 import io.linuxserver.fleet.v2.types.docker.DockerImage;
 import io.linuxserver.fleet.v2.types.docker.DockerTag;
 import io.linuxserver.fleet.v2.types.internal.ImageOutlineRequest;
-import io.linuxserver.fleet.v2.types.internal.ImageTemplateMergeRequest;
+import io.linuxserver.fleet.v2.types.internal.ImageTemplateRequest;
 import io.linuxserver.fleet.v2.types.internal.RepositoryOutlineRequest;
 import io.linuxserver.fleet.v2.types.internal.TagBranchOutlineRequest;
 import io.linuxserver.fleet.v2.types.meta.ItemSyncSpec;
@@ -46,11 +47,13 @@ public class ImageService {
 
     private final ImageDAO        imageDAO;
     private final RepositoryCache repositoryCache;
+    private final TemplateMerger  templateMerger;
 
     public ImageService(final ImageDAO imageDAO) {
 
         this.imageDAO        = imageDAO;
         this.repositoryCache = new RepositoryCache();
+        this.templateMerger  = new TemplateMerger();
 
         reloadCache();
     }
@@ -131,16 +134,13 @@ public class ImageService {
 
     public final void removeImage(final ImageKey imageKey) {
 
-        final Image cachedImage = repositoryCache.findImage(imageKey);
-        if (null != cachedImage) {
-
-            final InsertUpdateResult<Void> removalResult = imageDAO.removeImage(cachedImage);
-            if (removalResult.isError()) {
-                throw new RuntimeException("Unable to remove persisted image: " + removalResult.getStatusMessage());
-            }
-
-            repositoryCache.findItem(cachedImage.getRepositoryKey()).removeImage(cachedImage);
+        final Image                    cachedImage   = findImage(imageKey);
+        final InsertUpdateResult<Void> removalResult = imageDAO.removeImage(cachedImage);
+        if (removalResult.isError()) {
+            throw new RuntimeException("Unable to remove persisted image: " + removalResult.getStatusMessage());
         }
+
+        repositoryCache.findItem(cachedImage.getRepositoryKey()).removeImage(cachedImage);
     }
 
     public final void removeRepository(final RepositoryKey repositoryKey) {
@@ -161,18 +161,11 @@ public class ImageService {
     }
 
     public final Image storeImage(final Image image) {
+        return storeImage(image, imageDAO::storeImage);
+    }
 
-        final InsertUpdateResult<Image> result = imageDAO.storeImage(image);
-        if (result.isError()) {
-
-            LOGGER.error("Unable to store image {}. Update returned error: {}", image, result.getStatusMessage());
-            throw new RuntimeException("Failed to store image: " + result.getStatusMessage());
-        }
-
-        final Image storedImage = result.getResult();
-        updateCache(storedImage);
-
-        return storedImage;
+    public final Image storeImageMetaData(final Image image) {
+        return storeImage(image, imageDAO::storeImageMetaData);
     }
 
     public final Image getImage(final ImageKey imageKey) {
@@ -201,47 +194,37 @@ public class ImageService {
 
     public Image applyImageUpdate(final ImageKey imageKey, final DockerImage latestImage) {
 
-        final Image cachedImage = getImage(imageKey);
-        if (null == cachedImage) {
+        final Image cachedImage = findImage(imageKey);
+        final Image cloned      = cachedImage.cloneForUpdate(latestImage.getPullCount(),
+                                                             latestImage.getStarCount(),
+                                                             latestImage.getDescription(),
+                                                             latestImage.getBuildDate());
 
-            LOGGER.warn("Attempted to update an image which is not currently cached. {} Skipping...", imageKey);
-            return null;
+        for (TagBranch branch : cloned.getTagBranches()) {
 
-        } else {
+            final DockerTag matchingTag = DockerTagFinder.findVersionedTagMatchingBranch(latestImage.getTags(), branch.getBranchName());
+            if (null == matchingTag) {
+                LOGGER.warn("Unable to find tag for branch {} in image {}. Will not update tags.", branch.getBranchName(), cloned.getFullName());
+            } else {
 
-            final Image cloned = cachedImage.cloneForUpdate(latestImage.getPullCount(),
-                                                            latestImage.getStarCount(),
-                                                            latestImage.getDescription(),
-                                                            latestImage.getBuildDate());
-
-            for (TagBranch branch : cloned.getTagBranches()) {
-
-                final DockerTag matchingTag = DockerTagFinder.findVersionedTagMatchingBranch(latestImage.getTags(), branch.getBranchName());
-                if (null == matchingTag) {
-                    LOGGER.warn("Unable to find tag for branch {} in image {}. Will not update tags.", branch.getBranchName(), cloned.getFullName());
-                } else {
-
-                    branch.updateLatestTag(new Tag(matchingTag.getName(),
-                            matchingTag.getBuildDate(),
-                            matchingTag.getDigests().stream()
-                                    .filter(Objects::nonNull)
-                                    .map(d -> new TagDigest(d.getSize(),
-                                            d.getDigest(),
-                                            d.getArchitecture(),
-                                            d.getArchVariant())).collect(Collectors.toSet())));
-                }
+                branch.updateLatestTag(new Tag(matchingTag.getName(),
+                        matchingTag.getBuildDate(),
+                        matchingTag.getDigests().stream()
+                                .filter(Objects::nonNull)
+                                .map(d -> new TagDigest(d.getSize(),
+                                        d.getDigest(),
+                                        d.getArchitecture(),
+                                        d.getArchVariant())).collect(Collectors.toSet())));
             }
-
-            return storeImage(cloned);
         }
+
+        return storeImage(cloned);
+
     }
 
     public void trackBranchOnImage(final ImageKey imageKey, final String branchName) {
 
-        final Image image = repositoryCache.findImage(imageKey);
-        if (null == image) {
-            throw new IllegalArgumentException("Could not find image with key " + imageKey);
-        }
+        final Image image = findImage(imageKey);
 
         if (image.findTagBranchByName(branchName) != null) {
             throw new IllegalArgumentException("Image is already tracking branch " + branchName);
@@ -257,6 +240,39 @@ public class ImageService {
         storeImage(updatableClone);
     }
 
+    public void updateImageTemplate(final ImageKey imageKey, final ImageTemplateRequest imageTemplateUpdateFields) {
+
+        final Image image  = findImage(imageKey);
+        final Image cloned = templateMerger.mergeTemplateRequestIntoImage(image, imageTemplateUpdateFields);
+
+        LOGGER.info("{} merged with new template", cloned);
+        storeImageMetaData(cloned);
+    }
+
+    private synchronized Image storeImage(final Image image, final ImageStorage storageFunction) {
+
+        final InsertUpdateResult<Image> result = storageFunction.store(image);
+        if (result.isError()) {
+
+            LOGGER.error("Unable to store image {}. Update returned error: {}", image, result.getStatusMessage());
+            throw new RuntimeException("Failed to store image: " + result.getStatusMessage());
+        }
+
+        final Image storedImage = result.getResult();
+        updateCache(storedImage);
+
+        return storedImage;
+    }
+
+    private Image findImage(ImageKey imageKey) {
+
+        final Image image = repositoryCache.findImage(imageKey);
+        if (null == image) {
+            throw new IllegalArgumentException("Could not find image with key " + imageKey);
+        }
+        return image;
+    }
+
     private void updateCache(final Image storedImage) {
 
         final Repository imageParentRepository = repositoryCache.findItem(storedImage.getRepositoryKey());
@@ -268,6 +284,8 @@ public class ImageService {
         }
     }
 
-    public void updateImageTemplate(final String imageKey, final ImageTemplateMergeRequest imageTemplateUpdateFields) {
+    @FunctionalInterface
+    interface ImageStorage {
+        InsertUpdateResult<Image> store(final Image image);
     }
 }

@@ -388,8 +388,8 @@ var PullChart = (function($) {
                             pointRadius: 0,
                             pointHitRadius: 6,
                             borderWidth: 2,
-                            borderColor: 'rgba(0, 209, 178, 0.8)',
-                            backgroundColor : 'rgba(0, 209, 178, 0.3)'
+                            borderColor: 'rgba(33, 96, 196, 0.8)',
+                            backgroundColor : 'rgba(33, 96, 196, 0.2)'
                         }
                     ]
                 },

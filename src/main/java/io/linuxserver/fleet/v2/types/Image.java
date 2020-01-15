@@ -61,14 +61,20 @@ public class Image extends AbstractSyncItem<ImageKey, Image> {
                                       final String description,
                                       final LocalDateTime lastUpdated) {
 
-        final Image cloned = new Image(getKey(), getSpec(), getMetaData(), new ImageCountData(pullCount,starCount), description, lastUpdated);
+        final Image cloned = new Image(getKey(), getSpec(), getMetaData(), new ImageCountData(pullCount, starCount), description, lastUpdated);
         tagBranches.forEach(t -> cloned.addTagBranch(t.cloneForUpdate()));
-
         return cloned;
     }
 
     public final Image cloneForUpdate() {
         return cloneWithSyncSpec(getSpec());
+    }
+
+    public final Image cloneWithMetaData(final ImageMetaData metaData) {
+
+        final Image cloned = new Image(getKey(), getSpec(), metaData, new ImageCountData(getPullCount(), getStarCount()), getDescription(), getLastUpdated());
+        tagBranches.forEach(t -> cloned.addTagBranch(t.cloneForUpdate()));
+        return cloned;
     }
 
     @Override

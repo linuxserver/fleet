@@ -33,6 +33,10 @@ public class ImageMetaData {
         this.templateHolder = templateHolder;
     }
 
+    public final ImageMetaData cloneWithTemplate(final ImageTemplateHolder templateHolder) {
+        return new ImageMetaData(pullHistory, templateHolder);
+    }
+
     public final List<ImagePullStatistic> getHistoryFor(final ImagePullStatistic.StatGroupMode groupMode) {
         return pullHistory.getHistoryFor(groupMode);
     }

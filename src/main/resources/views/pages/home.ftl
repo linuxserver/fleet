@@ -48,10 +48,10 @@
 
                     <div class="column is-12">
                         <@button.buttons isGrouped=true isRightAligned=true>
-                            <@button.button id="DisplayImageTable" colour="normal-colour" title="Display as table" extraClasses="is-active">
+                            <@button.button id="DisplayImageTable" colour="normal-colour" size="small" title="Display as table" extraClasses="is-active">
                                 <i class="fas fa-table is-marginless"></i>
                             </@button.button>
-                            <@button.button id="DisplayImageGrid" colour="normal-colour" title="Display as grid">
+                            <@button.button id="DisplayImageGrid" colour="normal-colour" size="small" title="Display as grid">
                                 <i class="fas fa-th-large is-marginless"></i>
                             </@button.button>
                         </@button.buttons>

@@ -35,11 +35,11 @@ public class AdminImageController extends AbstractPageHandler {
     @Override
     protected PageModelSpec handlePageLoad(final Context ctx) {
 
-        final String repositoryKeyParam = ctx.queryParam("repositoryKey");
-        if (null != repositoryKeyParam) {
+        final RepositoryKey repositoryKey = ctx.queryParam("repositoryKey", RepositoryKey.class).getOrNull();
+        if (null != repositoryKey) {
 
             final PageModelSpec modelSpec = new PageModelSpec("views/pages/admin/images.ftl");
-            modelSpec.addModelAttribute("repository", imageService.getRepository(RepositoryKey.parse(repositoryKeyParam)));
+            modelSpec.addModelAttribute("repository", imageService.getRepository(repositoryKey));
             return modelSpec;
 
         } else {

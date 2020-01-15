@@ -36,6 +36,8 @@ public interface ImageDAO {
 
     InsertUpdateResult<Image> storeImage(final Image image);
 
+    InsertUpdateResult<Image> storeImageMetaData(final Image image);
+
     InsertUpdateResult<Image> createImageOutline(final ImageOutlineRequest request);
 
     InsertUpdateResult<TagBranch> createTagBranchOutline(final TagBranchOutlineRequest request);
