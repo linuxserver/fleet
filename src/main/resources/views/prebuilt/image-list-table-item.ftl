@@ -25,7 +25,7 @@
             <td class="is-vcentered">
                 <h4 class="title is-6">
                     <a class="has-text-grey-dark" href="/image?name=${image.fullName}">
-                        <i class="fas fa-cube"></i> <span class="has-text-weight-light">${image.repositoryKey.name} / </span><span class="has-text-weight-500">${image.name}</span>
+                        <i class="fas fa-cube"></i> <span class="has-text-weight-light">${image.repositoryKey.name} / </span><span class="has-text-weight-bold">${image.name}</span>
                     </a>
                 </h4>
             </td>

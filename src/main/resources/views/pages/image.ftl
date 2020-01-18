@@ -15,13 +15,15 @@
  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 -->
 
-<#import "../prebuilt/base.ftl"        as base />
-<#import "../prebuilt/fleet-title.ftl" as title />
-<#import "../ui/layout/section.ftl"    as section />
-<#import "../ui/layout/container.ftl"  as container />
-<#import "../ui/elements/box.ftl"      as box />
-<#import "../ui/elements/table.ftl"    as table />
-<#import "../ui/elements/tag.ftl"      as tag />
+<#import "../prebuilt/base.ftl"           as base />
+<#import "../prebuilt/fleet-title.ftl"    as title />
+<#import "../prebuilt/docker-example.ftl" as dockerExample />
+
+<#import "../ui/layout/section.ftl"     as section />
+<#import "../ui/layout/container.ftl"   as container />
+<#import "../ui/elements/box.ftl"       as box />
+<#import "../ui/elements/table.ftl"     as table />
+<#import "../ui/elements/tag.ftl"       as tag />
 
 <@base.base title="${(image.fullName)!'Unknown Image'}" context="image" hasHero=false>
 
@@ -35,11 +37,7 @@
 
                         <div class="column is-full">
 
-                            <@title.title icon="cube" thinValue=image.repositoryName boldValue=image.name separator="/" subtitle=image.description>
-                                <#if image.deprecated>
-                                    <@tag.tag colour="warning" value="Deprecated" />
-                                </#if>
-                            </@title.title>
+                            <@title.title icon="cube" thinValue=image.repositoryName boldValue=image.name separator="/" subtitle=image.description />
 
                             <div class="tags">
 
@@ -53,9 +51,17 @@
                                     </#list>
                                 </#if>
 
+                                <#if image.deprecated>
+                                    <@tag.tag colour="warning" value="Deprecated" />
+                                </#if>
+                                <#if !image.stable>
+                                    <@tag.tag colour="danger" value="Unstable" />
+                                </#if>
+
                             </div>
 
                         </div>
+
                     </div>
 
                 </@container.container>
@@ -65,56 +71,107 @@
         <@section.section>
             <@container.container>
 
-                <div class="columns is-multiline">
-
-                    <div class="column is-full has-margin-bottom">
-
-                        <h2 class="title is-5">Build Information</h2>
-                        <h3 class="subtitle is-6">General build information for this image</h3>
-
-                        <@table.table isFullWidth=true isNarrow=false isStriped=true isScrollable=true>
-                            <thead>
-                                <tr>
-                                    <th scope="row" colspan="2"></th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <@table.halfDisplayRow title="Repository"   value=image.repositoryName link="/?key=${image.repositoryKey}" />
-                                <@table.halfDisplayRow title="Build Time"   value=image.lastUpdatedAsString />
-                                <@table.halfDisplayRow title="Synchronised" value=image.syncEnabled?string("Yes", "No") />
-                                <@table.halfDisplayRow title="Stable"       value=image.stable?string("Yes", "No") />
-                                <@table.halfDisplayRow title="Deprecated"   value=image.deprecated?string("Yes", "No") />
-                            </tbody>
-                        </@table.table>
-                    </div>
-
-                    <div class="column is-full has-margin-bottom">
-
-                        <h2 class="title is-5">Tracked Tags</h2>
-                        <h3 class="subtitle is-6">Known tags which link to a specific branched app version.</h3>
-
-                        <@table.table isFullWidth=true isNarrow=false isStriped=true isScrollable=true>
-                            <thead>
-                                <tr>
-                                    <th scope="row" colspan="2"></th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <#list image.tagBranches as tagBranch>
-                                    <@table.halfDisplayRow title=tagBranch.branchName?html value='<i class="fas fa-tag"></i> ${image.getMaskedVersion(tagBranch.latestTag)}' />
-                                </#list>
-                            </tbody>
-                        </@table.table>
-                    </div>
-
+                <div class="columns">
                     <div class="column is-full">
-                        <div class="columns has-margin-top">
+                        <div class="tabs" data-tabs-for="#ImageViewTabContent">
+                            <ul>
+                                <li data-tab-for="#GeneralInfo" class="is-active">
+                                    <a><i class="fas fa-info"></i> General</a>
+                                </li>
+                                <li data-tab-for="#PullStatsInfo">
+                                    <a><i class="fas fa-chart-line"></i> Statistics</a>
+                                </li>
+                                <li data-tab-for="#TemplateInfo">
+                                    <a><i class="fas fa-layer-group"></i> Container Info</a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="ImageViewTabContent" class="columns has-tabs-content is-multiline has-margin-top">
+
+                    <div id="GeneralInfo" class="column tab-content is-full is-active">
+
+                        <div class="columns is-multiline">
+
+                            <div class="column is-full">
+
+                                <h2 class="title is-5">Build Information</h2>
+                                <h3 class="subtitle is-6">General build information for this image</h3>
+
+                                <@table.table isFullWidth=true isNarrow=false isStriped=true isScrollable=true>
+                                    <thead>
+                                        <tr>
+                                            <th scope="row" colspan="2"></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <@table.halfDisplayRow title="Repository"   value=image.repositoryName link="/?key=${image.repositoryKey}" />
+                                        <@table.halfDisplayRow title="Build Time"   value=image.lastUpdatedAsString />
+                                        <@table.halfDisplayRow title="Synchronised" value=image.syncEnabled?string("Yes", "No") />
+                                        <@table.halfDisplayRow title="Stable"       value=image.stable?string("Yes", "No") />
+                                        <@table.halfDisplayRow title="Deprecated"   value=image.deprecated?string("Yes", "No") />
+                                    </tbody>
+                                </@table.table>
+
+                            </div>
+
+                            <div class="column is-full has-margin-bottom">
+
+                                <h2 class="title is-5">Tracked Tags</h2>
+                                <h3 class="subtitle is-6">Known tags which link to a specific branched app version.</h3>
+
+                                <@table.table isFullWidth=true isNarrow=false isStriped=true isScrollable=true>
+                                    <thead>
+                                    <tr>
+                                        <th scope="row" colspan="2"></th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    <#list image.tagBranches as tagBranch>
+                                        <@table.halfDisplayRow title=tagBranch.branchName?html value='<i class="fas fa-tag"></i> ${image.getMaskedVersion(tagBranch.latestTag)}' />
+                                    </#list>
+                                    </tbody>
+                                </@table.table>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                    <div id="PullStatsInfo" class="column tab-content is-full">
+                        <div class="columns">
                             <div class="column is-full is-full-mobile">
                                 <h2 class="title is-5">Daily Pull Statistics</h2>
                                 <div class="chart-container" style="position: relative; width: 100%; height: 250px">
                                     <canvas id="ImagePullHistory"></canvas>
                                 </div>
                             </div>
+                        </div>
+                    </div>
+
+                    <div id="TemplateInfo" class="column tab-content is-full">
+                        <div id="TemplateInfo" class="columns is-multiline">
+
+                            <div class="column is-full">
+                                <h2 class="title is-5">Running this as a container</h2>
+                                <h3 class="subtitle is-6">
+                                    Basic examples for getting this image running as a container
+                                </h3>
+                            </div>
+
+                            <div class="column is-full has-margin-bottom">
+                                <h2 class="title is-6">Docker Compose</h2>
+                                <@dockerExample.compose fullName=image.fullName containerName=image.name templates=image.metaData.templates latest=image.latestTag.version />
+                            </div>
+
+                            <div class="column is-full has-margin-bottom">
+                                <h2 class="title is-6">CLI</h2>
+                                <@dockerExample.cli fullName=image.fullName containerName=image.name templates=image.metaData.templates latest=image.latestTag.version />
+                            </div>
+
                         </div>
                     </div>
 

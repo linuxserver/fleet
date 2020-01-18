@@ -36,6 +36,7 @@
     <link rel="stylesheet" type="text/css" href="/assets/css/bulma-0.8.0.min.css" />
     <link rel="stylesheet" type="text/css" href="/assets/css/app.css" />
     <link rel="stylesheet" type="text/css" href="/assets/css/fontawesome-all.min.css" />
+    <link rel="stylesheet" type="text/css" href="/assets/css/prism.css" />
 
 </head>
 
@@ -98,6 +99,7 @@
     <script type="text/javascript" src="/assets/js/Chart.bundle.min.js"></script>
     <script type="text/javascript" src="/assets/js/jquery.tablesorter.js"></script>
     <script type="text/javascript" src="/assets/js/app.js"></script>
+    <script type="text/javascript" src="/assets/js/prism.js"></script>
     <#if context?starts_with("admin")>
         <script type="text/javascript" src="/assets/js/admin.js"></script>
     </#if>

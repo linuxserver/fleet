@@ -14,7 +14,7 @@ Constructs a navigation bar for display (usually) at the top of the page.
         <div class="navbar-brand">
 
             <a class="navbar-item" href="/">
-                <span class="navbar-title">fleet<span class="has-text-primary">.</span></span>
+                <span class="title">fleet<span class="has-text-primary">.</span></span>
             </a>
 
             <a role="button" class="navbar-burger burger" aria-label="menu" aria-expanded="false" data-target="navbarBasicExample">

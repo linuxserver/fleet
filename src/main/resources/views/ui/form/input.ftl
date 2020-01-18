@@ -31,7 +31,7 @@ Reference: https://bulma.io/documentation/form/input/
             <label class="label is-${size}" for="${id}">${label}</label>
         </#if>
         <div class="control is-${size}<#if icon?has_content> has-icons has-icons-left</#if>">
-            <input type="${type}"<#if title?has_content> title="${title}"</#if> class="input<#if isReadonly> is-static</#if> is-${size}<#if extraClasses?has_content> ${extraClasses}</#if>" id="${id}" name="${id}"<#if isRequired> required</#if><#if isReadonly> readonly</#if><#if isDisabled> disabled</#if><#if value?has_content> value="${value}"</#if><#if placeholder?has_content> placeholder="${placeholder}"</#if><#if extraAttributes?has_content> ${extraAttributes}</#if>/>
+            <input type="${type}"<#if title?has_content> title="${title}"</#if> class="input<#if isReadonly> is-static</#if> is-${size}<#if extraClasses?has_content> ${extraClasses}</#if>" id="${id}" name="${id}"<#if isRequired> required</#if><#if isReadonly> readonly</#if><#if isDisabled> disabled</#if><#if value?has_content> value="${value?html}"</#if><#if placeholder?has_content> placeholder="${placeholder}"</#if><#if extraAttributes?has_content> ${extraAttributes}</#if>/>
             <#if icon?has_content>
                 <span class="icon is-${size} is-left"><i class="fas fa-${icon}"></i></span>
             </#if>

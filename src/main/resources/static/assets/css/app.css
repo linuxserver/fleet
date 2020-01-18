@@ -5,6 +5,12 @@
     }
 }
 
+.title {
+    font-family: 'Nunito', sans-serif !important;
+    font-weight: 600;
+    letter-spacing: .01rem;
+}
+
 .has-text-small {
     font-size: 0.85rem;
 }
@@ -17,6 +23,10 @@
     font-weight: 500 !important;
 }
 
+.has-text-weight-600 {
+    font-weight: 600 !important;
+}
+
 span.icon i.fas, span.icon i.far, span.icon i.fab {
     margin: 0;
 }
@@ -27,12 +37,6 @@ i.fas, i.far, i.fab {
 
 .navbar-title {
     font-size: 1.8rem;
-}
-
-.navbar-title, .repository-title {
-    font-family: 'Nunito', sans-serif !important;
-    font-weight: 600;
-    letter-spacing: .01rem;
 }
 
 .has-icon-large i.fas, .has-icon-large i.far, .has-icon-large i.fab {

@@ -16,7 +16,7 @@
 -->
 <#macro title thinValue="" boldValue="" separator="" icon="" subtitle="">
 
-    <h2 class="title is-size-3-desktop is-size-4-mobile repository-title">
+    <h2 class="title is-size-3-desktop is-size-4-mobile">
         <#if icon?has_content><i class="fas fa-${icon}"></i> </#if><#if thinValue?has_content><span class="has-text-weight-light">${thinValue}</span>${separator}</#if>${boldValue}<span class="has-text-primary">.</span>
         <#nested />
     </h2>
