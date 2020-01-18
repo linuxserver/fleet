@@ -18,10 +18,13 @@
 package io.linuxserver.fleet.v2.web.routes;
 
 import io.javalin.http.Context;
+import io.javalin.http.UploadedFile;
 import io.linuxserver.fleet.core.FleetAppController;
 import io.linuxserver.fleet.v2.key.ImageKey;
 import io.linuxserver.fleet.v2.service.ImageService;
 import io.linuxserver.fleet.v2.types.docker.DockerCapability;
+import io.linuxserver.fleet.v2.types.internal.ImageAppLogo;
+import io.linuxserver.fleet.v2.types.internal.ImageGeneralInfoUpdateRequest;
 import io.linuxserver.fleet.v2.types.internal.ImageTemplateRequest;
 import io.linuxserver.fleet.v2.web.PageModelSpec;
 
@@ -78,9 +81,31 @@ public class AdminImageEditController extends AbstractPageHandler {
         if (!ctx.isMultipartFormData()) {
             throw new IllegalArgumentException("Form submission must be form/multipart");
         }
+
+        imageService.updateImageGeneralInfo(imageKey, makeInfoRequest(imageKey, ctx));
     }
 
     private void handleTemplateUpdate(final Context ctx, final ImageKey imageKey) {
         imageService.updateImageTemplate(imageKey, new ImageTemplateRequest(ctx.formParamMap()));
+    }
+
+    private ImageGeneralInfoUpdateRequest makeInfoRequest(final ImageKey imageKey, final Context ctx) {
+
+        return new ImageGeneralInfoUpdateRequest(ctx.formParamMap(),
+                                                 makeImageLogoIfPresent(imageKey, ctx.uploadedFile("ImageAppLogo")));
+    }
+
+    private ImageAppLogo makeImageLogoIfPresent(final ImageKey imageKey, final UploadedFile uploadedFile) {
+
+        if (null != uploadedFile) {
+
+            return new ImageAppLogo(imageKey,
+                                    uploadedFile.getContent(),
+                                    uploadedFile.getFilename(),
+                                    uploadedFile.getSize(),
+                                    uploadedFile.getExtension());
+        }
+
+        return null;
     }
 }

@@ -41,7 +41,7 @@ public class DockerImageUpdateResponse implements AsyncDockerApiResponse {
 
     @Override
     public void handleDockerApiResponse() {
-        controller.getImageService().applyImageUpdate(imageKey, latestImage);
+        controller.getImageService().applyImageUpstreamUpdate(imageKey, latestImage);
     }
 
     @Override

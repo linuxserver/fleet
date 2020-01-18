@@ -20,15 +20,11 @@ package io.linuxserver.fleet.v2.types.internal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
-import java.util.stream.Stream;
 
-public class ImageTemplateRequest {
-
-    private final Map<String, List<String>> rawTemplateParams;
+public class ImageTemplateRequest extends AbstractParamRequest {
 
     public ImageTemplateRequest(final Map<String, List<String>> rawTemplateParams) {
-        this.rawTemplateParams = rawTemplateParams;
+        super(rawTemplateParams);
     }
 
     public final String getRegistryUrl() {
@@ -48,14 +44,14 @@ public class ImageTemplateRequest {
     }
 
     public final List<String> getCapabilities() {
-        return rawTemplateParams.get("ImageTemplateCapabilities");
+        return getParams("ImageTemplateCapabilities");
     }
 
     public final List<TemplateItem<String>> getPorts() {
 
-        final List<String> portNumbers      = rawTemplateParams.get("imageTemplatePort");
-        final List<String> portProtocols    = rawTemplateParams.get("imageTemplatePortProtocol");
-        final List<String> portDescriptions = rawTemplateParams.get("imageTemplatePortDescription");
+        final List<String> portNumbers      = getParams("imageTemplatePort");
+        final List<String> portProtocols    = getParams("imageTemplatePortProtocol");
+        final List<String> portDescriptions = getParams("imageTemplatePortDescription");
 
         checkLists(portNumbers, portProtocols, portDescriptions);
 
@@ -77,9 +73,9 @@ public class ImageTemplateRequest {
 
     public final List<TemplateItem<Boolean>> getVolumes() {
 
-        final List<String> volumeNames        = rawTemplateParams.get("imageTemplateVolume");
-        final List<String> volumeReadOnlys    = rawTemplateParams.get("imageTemplateVolumeReadonly");
-        final List<String> volumeDescriptions = rawTemplateParams.get("imageTemplateVolumeDescription");
+        final List<String> volumeNames        = getParams("imageTemplateVolume");
+        final List<String> volumeReadOnlys    = getParams("imageTemplateVolumeReadonly");
+        final List<String> volumeDescriptions = getParams("imageTemplateVolumeDescription");
 
         checkLists(volumeNames, volumeReadOnlys, volumeDescriptions);
 
@@ -101,8 +97,8 @@ public class ImageTemplateRequest {
 
     public final List<TemplateItem<Void>> getEnvironment() {
 
-        final List<String> envNames        = rawTemplateParams.get("imageTemplateEnv");
-        final List<String> envDescriptions = rawTemplateParams.get("imageTemplateEnvDescription");
+        final List<String> envNames        = getParams("imageTemplateEnv");
+        final List<String> envDescriptions = getParams("imageTemplateEnvDescription");
 
         checkLists(envNames, envDescriptions);
 
@@ -121,8 +117,8 @@ public class ImageTemplateRequest {
 
     public final List<TemplateItem<Void>> getDevices() {
 
-        final List<String> deviceNames        = rawTemplateParams.get("imageTemplateDevice");
-        final List<String> deviceDescriptions = rawTemplateParams.get("imageTemplateDeviceDescription");
+        final List<String> deviceNames        = getParams("imageTemplateDevice");
+        final List<String> deviceDescriptions = getParams("imageTemplateDeviceDescription");
 
         checkLists(deviceNames, deviceDescriptions);
 
@@ -137,62 +133,6 @@ public class ImageTemplateRequest {
         }
 
         return env;
-    }
-
-    private String getOrNull(final String value) {
-        return "".equalsIgnoreCase(value.trim()) ? null : value;
-    }
-
-    private String getFirstOrNull(final String key) {
-
-        final List<String> strings = rawTemplateParams.get(key);
-        if (null == strings || strings.isEmpty()) {
-            return null;
-        }
-        return strings.get(0);
-    }
-
-    private boolean getAsBoolean(final String value) {
-        return "true".equalsIgnoreCase(value) || "on".equalsIgnoreCase(value);
-    }
-
-    @SafeVarargs
-    private final void checkLists(final List<String>... lists) {
-
-        boolean containsDifferent = false;
-
-        boolean allNull  = Stream.of(lists).allMatch(Objects::isNull);
-        boolean noneNull = Stream.of(lists).allMatch(Objects::nonNull);
-
-        if (allNull || noneNull) {
-
-            if (allNull) {
-                return;
-            }
-
-        } else {
-            containsDifferent = true;
-        }
-
-        if (!containsDifferent) {
-
-            int prevSize = -1;
-            for (List<String> list : lists) {
-
-                if (prevSize != -1 && list.size() != prevSize) {
-
-                    containsDifferent = true;
-                    break;
-
-                } else {
-                    prevSize = list.size();
-                }
-            }
-        }
-
-        if (containsDifferent) {
-            throw new IllegalArgumentException("One or more values are null when others are not, or sizes mismatch");
-        }
     }
 
     public static class TemplateItem<T> {

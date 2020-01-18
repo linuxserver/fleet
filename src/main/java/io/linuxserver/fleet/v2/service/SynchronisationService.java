@@ -48,6 +48,8 @@ public class SynchronisationService extends AbstractAppService {
 
         if (repository.isSyncEnabled()) {
 
+            getLogger().info("synchroniseUpstreamRepository checking {} for new images since last sync", repository);
+
             final List<DockerImage> apiImages = getController().getConfiguredDockerDelegate().getImagesForRepository(repository.getKey());
             for (DockerImage apiImage : apiImages) {
 

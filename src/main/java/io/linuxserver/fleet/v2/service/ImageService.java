@@ -28,14 +28,14 @@ import io.linuxserver.fleet.v2.service.util.TemplateMerger;
 import io.linuxserver.fleet.v2.types.*;
 import io.linuxserver.fleet.v2.types.docker.DockerImage;
 import io.linuxserver.fleet.v2.types.docker.DockerTag;
-import io.linuxserver.fleet.v2.types.internal.ImageOutlineRequest;
-import io.linuxserver.fleet.v2.types.internal.ImageTemplateRequest;
-import io.linuxserver.fleet.v2.types.internal.RepositoryOutlineRequest;
-import io.linuxserver.fleet.v2.types.internal.TagBranchOutlineRequest;
+import io.linuxserver.fleet.v2.types.internal.*;
+import io.linuxserver.fleet.v2.types.meta.ImageCoreMeta;
 import io.linuxserver.fleet.v2.types.meta.ItemSyncSpec;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -192,7 +192,7 @@ public class ImageService {
         return getAllRepositories().stream().filter(r -> !r.isHidden()).collect(Collectors.toList());
     }
 
-    public Image applyImageUpdate(final ImageKey imageKey, final DockerImage latestImage) {
+    public Image applyImageUpstreamUpdate(final ImageKey imageKey, final DockerImage latestImage) {
 
         final Image cachedImage = findImage(imageKey);
         final Image cloned      = cachedImage.cloneForUpdate(latestImage.getPullCount(),
@@ -238,6 +238,25 @@ public class ImageService {
         final Image updatableClone = image.cloneForUpdate();
         updatableClone.addTagBranch(outlineResult.getResult());
         storeImage(updatableClone);
+    }
+
+    public void updateImageGeneralInfo(final ImageKey imageKey, final ImageGeneralInfoUpdateRequest generalInfoUpdateRequest) {
+
+        final Image image = findImage(imageKey);
+
+        String appLogoPath = image.getMetaData().getAppImagePath();
+        if (null != generalInfoUpdateRequest.getImageAppLogo()) {
+            // TODO: Write FileManager
+        }
+
+        final ImageCoreMeta coreMeta = new ImageCoreMeta(appLogoPath,
+                                                         generalInfoUpdateRequest.getBaseImage(),
+                                                         generalInfoUpdateRequest.getCategory(),
+                                                         generalInfoUpdateRequest.getSupportUrl(),
+                                                         generalInfoUpdateRequest.getApplicationUrl());
+
+        final Image cloned = image.cloneWithMetaData(image.getMetaData().cloneWithCoreMeta(coreMeta));
+        storeImage(cloned);
     }
 
     public void updateImageTemplate(final ImageKey imageKey, final ImageTemplateRequest imageTemplateUpdateFields) {

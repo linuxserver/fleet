@@ -15,7 +15,7 @@ Reference: https://bulma.io/documentation/form/input/
     requiredHelp:String                     - If "required" is true, some help text to be displayed
     size:enum(small, normal, large)         - The size of the input
 -->
-<#macro input type id value="" label="" title="" placeholder="" extraClasses="" extraAttributes="" icon="" isRequired=false isReadonly=false isDisabled=false isInvalid=false isInline=false requiredHelp="" size="normal">
+<#macro input type id value="" label="" title="" placeholder="" extraClasses="" extraAttributes="" icon="" isRequired=false isReadonly=false isDisabled=false isInvalid=false isInline=false requiredHelp="" infoText="" size="normal">
 
     <div class="field<#if isInline> is-horizontal</#if>">
         <#if isInline>
@@ -37,6 +37,9 @@ Reference: https://bulma.io/documentation/form/input/
             </#if>
             <#if isRequired && requiredHelp?has_content>
                 <p class="help invalid-feedback is-danger">${requiredHelp}</p>
+            </#if>
+            <#if infoText?has_content>
+                <p class="help">${infoText}</p>
             </#if>
         </div>
         <#if isInline>
@@ -64,8 +67,8 @@ Convenience macro to generate a text input
     requiredHelp:String                     - If "required" is true, some help text to be displayed
     size:enum(small, normal, large)         - The size of the input
 -->
-<#macro text id value="" label="" title="" placeholder="" extraClasses="" extraAttributes="" icon="" isRequired=false isReadonly=false isDisabled=false isInvalid=false isInline=false requiredHelp="" size="normal">
-    <@input type="text" id=id value=value title=title label=label placeholder=placeholder extraAttributes=extraAttributes extraClasses=extraClasses icon=icon isRequired=isRequired isReadonly=isReadonly isDisabled=isDisabled isInvalid=isInvalid isInline=isInline requiredHelp=requiredHelp size=size />
+<#macro text id value="" label="" title="" placeholder="" extraClasses="" extraAttributes="" icon="" isRequired=false isReadonly=false isDisabled=false isInvalid=false isInline=false requiredHelp="" infoText="" size="normal">
+    <@input type="text" id=id value=value title=title label=label placeholder=placeholder extraAttributes=extraAttributes extraClasses=extraClasses icon=icon isRequired=isRequired isReadonly=isReadonly isDisabled=isDisabled isInvalid=isInvalid isInline=isInline requiredHelp=requiredHelp infoText=infoText size=size />
 </#macro>
 
 <#--

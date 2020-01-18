@@ -95,7 +95,7 @@
 
                         <div class="columns is-multiline">
 
-                            <div class="column is-full">
+                            <div class="column is-full has-margin-bottom">
 
                                 <h2 class="title is-5">Build Information</h2>
                                 <h3 class="subtitle is-6">General build information for this image</h3>
@@ -109,6 +109,9 @@
                                     <tbody>
                                         <@table.halfDisplayRow title="Repository"   value=image.repositoryName link="/?key=${image.repositoryKey}" />
                                         <@table.halfDisplayRow title="Build Time"   value=image.lastUpdatedAsString />
+                                        <#if image.metaData.baseImage?has_content>
+                                            <@table.halfDisplayRow title="Base Image" value=image.metaData.baseImage?html />
+                                        </#if>
                                         <@table.halfDisplayRow title="Synchronised" value=image.syncEnabled?string("Yes", "No") />
                                         <@table.halfDisplayRow title="Stable"       value=image.stable?string("Yes", "No") />
                                         <@table.halfDisplayRow title="Deprecated"   value=image.deprecated?string("Yes", "No") />
@@ -117,7 +120,35 @@
 
                             </div>
 
-                            <div class="column is-full has-margin-bottom">
+                            <#if image.metaData.populated>
+                                <div class="column is-full has-margin-bottom">
+
+                                    <h2 class="title is-5">Support Information</h2>
+                                    <h3 class="subtitle is-6">External links and support</h3>
+
+                                    <@table.table isFullWidth=true isNarrow=false isStriped=true isScrollable=true>
+                                        <thead>
+                                        <tr>
+                                            <th scope="row" colspan="2"></th>
+                                        </tr>
+                                        </thead>
+                                        <tbody>
+                                            <#if image.metaData.category?has_content>
+                                                <@table.halfDisplayRow title="Category" value=image.metaData.category />
+                                            </#if>
+                                            <#if image.metaData.appUrl?has_content>
+                                                <@table.halfDisplayRow title="Application Home" value=image.metaData.appUrl?html link=image.metaData.appUrl />
+                                            </#if>
+                                            <#if image.metaData.supportUrl?has_content>
+                                                <@table.halfDisplayRow title="Support" value=image.metaData.supportUrl?html link=image.metaData.supportUrl />
+                                            </#if>
+                                        </tbody>
+                                    </@table.table>
+
+                                </div>
+                            </#if>
+
+                            <div class="column is-full">
 
                                 <h2 class="title is-5">Tracked Tags</h2>
                                 <h3 class="subtitle is-6">Known tags which link to a specific branched app version.</h3>

@@ -31,11 +31,11 @@ public class TemplateMerger {
     public final Image mergeTemplateRequestIntoImage(final Image image, final ImageTemplateRequest templateRequest) {
 
         final ImageTemplateHolder templateHolder = makeTemplateHolder(templateRequest);
-        addMisc(templateRequest, templateHolder);
-        addPorts(templateRequest, templateHolder);
-        addVolumes(templateRequest, templateHolder);
+        addMisc(       templateRequest, templateHolder);
+        addPorts(      templateRequest, templateHolder);
+        addVolumes(    templateRequest, templateHolder);
         addEnvironment(templateRequest, templateHolder);
-        addDevices(templateRequest, templateHolder);
+        addDevices(    templateRequest, templateHolder);
 
         final Image cloned = image.cloneWithMetaData(image.getMetaData().cloneWithTemplate(templateHolder));
         return cloned;

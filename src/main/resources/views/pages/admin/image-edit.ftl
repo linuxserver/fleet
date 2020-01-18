@@ -23,6 +23,7 @@
 <#import "../../ui/form/input.ftl"          as input />
 <#import "../../ui/elements/button.ftl"     as button />
 <#import "../../ui/elements/table.ftl"      as table />
+<#import "../../ui/elements/tag.ftl"        as tag />
 <#import "../../ui/components/message.ftl"  as message />
 
 <#import "template-components/image-template-ports.ftl"       as templatePorts />
@@ -71,21 +72,33 @@
                                             <label class="label" for="ImageAppLogo">App Logo</label>
                                         </div>
                                         <div class="field-body">
-                                            <input type="file" name="imageAppLogo" id="ImageAppLogo" />
+                                            <input type="file" name="ImageAppLogo" id="ImageAppLogo" />
                                         </div>
                                     </div>
                                 </div>
                                 <div class="column is-full">
-                                    <@input.text id="ImageBase" label="Base Image" isInline=true />
+
+                                    <@input.text id="ImageBase" label="Base Image" isInline=true value=image.metaData.baseImage
+                                        infoText="The name of the base image this image pulls from." />
+
                                 </div>
                                 <div class="column is-full">
-                                    <@input.text id="ImageCategory" label="Category" isInline=true />
+
+                                    <@input.text id="ImageCategory" label="Category" isInline=true value=image.metaData.category
+                                        infoText="The application category for this image (e.g Home Automation)." />
+
                                 </div>
                                 <div class="column is-full">
-                                    <@input.text id="ImageSupportUrl" label="Support Url" isInline=true />
+
+                                    <@input.text id="ImageSupportUrl" label="Support Url" isInline=true value=image.metaData.supportUrl
+                                        infoText="A link to the primary source of support for this image, such as a forum thread or documentation site." />
+
                                 </div>
                                 <div class="column is-full">
-                                    <@input.text id="ImageAppUrl" label="Application Url" isInline=true />
+
+                                    <@input.text id="ImageApplicationUrl" label="Application Url" isInline=true value=image.metaData.appUrl
+                                        infoText="The primary URL for the application encapsulated by this image." />
+
                                 </div>
                             </div>
                             <div class="columns">
@@ -132,16 +145,14 @@
                                     <td>
                                         <#if !tagBranch.branchProtected>
                                             <@button.buttons isRightAligned=true>
-                                                <@button.button extraClasses="remove-tag-branch" colour="danger" size="small">
-                                                    <i class="fas fa-trash"></i> Remove
+                                                <@button.button extraClasses="remove-tag-branch" colour="white" size="small" title="Stop tracking this branch.">
+                                                    <i class="fas fa-trash has-text-danger is-marginless"></i>
                                                 </@button.button>
                                             </@button.buttons>
                                         <#else>
-                                            <@button.buttons isRightAligned=true>
-                                                <@button.button colour="light" size="small" isDisabled=true>
-                                                    Protected
-                                                </@button.button>
-                                            </@button.buttons>
+                                            <div class="tags is-right">
+                                                <@tag.tag colour="light" value="Protected" extraAttributes='title="This branch can\'t be removed."' />
+                                            </div>
                                         </#if>
                                     </td>
                                 </tr>

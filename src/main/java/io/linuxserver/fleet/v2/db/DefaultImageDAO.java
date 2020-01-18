@@ -28,12 +28,14 @@ import io.linuxserver.fleet.v2.types.*;
 import io.linuxserver.fleet.v2.types.internal.ImageOutlineRequest;
 import io.linuxserver.fleet.v2.types.internal.RepositoryOutlineRequest;
 import io.linuxserver.fleet.v2.types.internal.TagBranchOutlineRequest;
+import io.linuxserver.fleet.v2.types.meta.ImageCoreMeta;
 import io.linuxserver.fleet.v2.types.meta.ImageMetaData;
 import io.linuxserver.fleet.v2.types.meta.ItemSyncSpec;
 import io.linuxserver.fleet.v2.types.meta.history.ImagePullHistory;
 import io.linuxserver.fleet.v2.types.meta.history.ImagePullStatistic;
 import io.linuxserver.fleet.v2.types.meta.template.ImageTemplateHolder;
 
+import java.net.URL;
 import java.sql.*;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -50,7 +52,7 @@ public class DefaultImageDAO extends AbstractDAO implements ImageDAO {
     private static final String CreateRepositoryOutline  = "{CALL Repository_CreateOutline(?,?,?,?,?,?,?,?)}";
     private static final String StoreRepository          = "{CALL Repository_Store(?,?,?,?)}";
 
-    private static final String StoreImage             = "{CALL Image_Store(?,?,?,?,?,?,?,?,?,?,?)}";
+    private static final String StoreImage             = "{CALL Image_Store(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)}";
     private static final String CreateTagBranchOutline = "{CALL Image_CreateTagBranchOutline(?,?)}";
     private static final String StoreTagBranch         = "{CALL Image_StoreTagBranch(?,?,?,?)}";
     private static final String StoreTagDigest         = "{CALL Image_StoreTagDigest(?,?,?,?,?)}";
@@ -102,6 +104,12 @@ public class DefaultImageDAO extends AbstractDAO implements ImageDAO {
                 call.setBoolean(i++, image.isStable());
                 call.setBoolean(i++, image.isSyncEnabled());
                 Utils.setNullableString(call, i++, image.getVersionMask());
+
+                Utils.setNullableString(call, i++, image.getMetaData().getCategory());
+                Utils.setNullableString(call, i++, image.getMetaData().getSupportUrl());
+                Utils.setNullableString(call, i++, image.getMetaData().getAppUrl());
+                Utils.setNullableString(call, i++, image.getMetaData().getBaseImage());
+                Utils.setNullableString(call, i++, image.getMetaData().getAppImagePath());
 
                 call.registerOutParameter(i, Types.VARCHAR);
 
@@ -486,7 +494,7 @@ public class DefaultImageDAO extends AbstractDAO implements ImageDAO {
 
             final Image image = new Image(imageKey,
                                           makeSyncSpec(results),
-                                          makeImageMetaData(connection, imageKey),
+                                          makeImageMetaData(connection, imageKey, results),
                                           makeCountData(results),
                                           results.getString("Description"),
                                           results.getTimestamp("LastUpdated").toLocalDateTime());
@@ -499,10 +507,20 @@ public class DefaultImageDAO extends AbstractDAO implements ImageDAO {
         return null;
     }
 
-    private ImageMetaData makeImageMetaData(final Connection connection, final ImageKey imageKey) throws SQLException {
+    private ImageMetaData makeImageMetaData(final Connection connection, final ImageKey imageKey, final ResultSet mainImageResults) throws SQLException {
 
-        return new ImageMetaData(makePullHistory(connection, imageKey),
+        return new ImageMetaData(makeCoreMeta(mainImageResults),
+                                 makePullHistory(connection, imageKey),
                                  templateFactory.makeTemplateHolder(connection, imageKey));
+    }
+
+    private ImageCoreMeta makeCoreMeta(final ResultSet mainImageResults) throws SQLException {
+
+        return new ImageCoreMeta(mainImageResults.getString("CoreMetaImagePath"),
+                                 mainImageResults.getString("CoreMetaBaseImage"),
+                                 mainImageResults.getString("CoreMetaCategory"),
+                                 mainImageResults.getString("CoreMetaSupportUrl"),
+                                 mainImageResults.getString("CoreMetaAppUrl"));
     }
 
     private ImagePullHistory makePullHistory(final Connection connection, final ImageKey imageKey) throws SQLException {

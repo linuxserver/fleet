@@ -22,7 +22,10 @@ version: "2"
 services:
   ${containerName}:
     image: ${fullName}<#if latest?has_content>:${latest}</#if>
-    container_name: ${containerName}<#if templates.restartPolicy?has_content>
+    container_name: ${containerName}
+<#if templates.hostNetworkingEnabled>    network_mode: host
+</#if>
+<#if templates.restartPolicy?has_content>
     restart: ${templates.restartPolicy}</#if>
 <#if templates.capabilities?has_content>    cap_add:
     <#list templates.capabilities as cap>
@@ -39,7 +42,7 @@ services:
       - /host/path/to${volume.name}:${volume.name}<#if volume.readonly>:ro</#if> <#if volume.description?has_content># ${volume.description}</#if>
   </#list>
 </#if>
-<#if templates.ports?has_content>    ports:
+<#if templates.ports?has_content && !templates.hostNetworkingEnabled>    ports:
   <#list templates.ports as port>
       - ${port.name?string["##0"]}:${port.name?string["##0"]}/${port.protocol} <#if port.description?has_content># ${port.description}</#if>
   </#list>
@@ -57,7 +60,8 @@ services:
 
     <div class="content">
         <pre><code class="language-bash">docker create \
-  --name=${containerName} \<#if templates.env?has_content>
+  --name=${containerName} \<#if templates.hostNetworkingEnabled>
+  --net=host \</#if><#if templates.env?has_content>
 <#list templates.env as env>
   -e ${env.name}=<#if env.description?has_content> `# ${env.description}`</#if> \
 </#list>
@@ -67,7 +71,7 @@ services:
   -v /host/path/to${volume.name}:${volume.name}<#if volume.readonly>:ro</#if><#if volume.description?has_content> `# ${volume.description}`</#if> \
 </#list>
 </#if>
-<#if templates.ports?has_content>
+<#if templates.ports?has_content && !templates.hostNetworkingEnabled>
 <#list templates.ports as port>
   -p ${port.name?string["##0"]}:${port.name?string["##0"]}/${port.protocol}<#if port.description?has_content> `# ${port.description}`</#if> \
 </#list>
