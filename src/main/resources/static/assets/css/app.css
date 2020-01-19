@@ -55,6 +55,10 @@ span.image-title {
     margin-left: 1rem;
 }
 
+.has-margin-right {
+    margin-right: 1rem;
+}
+
 .has-margin-top {
     margin-top: 1rem;
 }

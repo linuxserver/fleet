@@ -17,6 +17,7 @@
 
 package io.linuxserver.fleet.core;
 
+import io.linuxserver.fleet.v2.file.FileManager;
 import io.linuxserver.fleet.v2.service.ImageService;
 import io.linuxserver.fleet.v2.service.ScheduleService;
 import io.linuxserver.fleet.v2.service.SynchronisationService;
@@ -31,4 +32,6 @@ public interface ServiceProvider {
     ScheduleService getScheduleService();
 
     UserService getUserService();
+
+    FileManager getFileManager();
 }

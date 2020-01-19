@@ -22,10 +22,19 @@
     <#if !image.hidden>
 
         <tr class="image-row" data-image-name="${image.name}">
+            <td class="is-vcentered has-text-right is-paddingless" style="width: 16px">
+                <#if image.metaData.appImagePath?has_content>
+                    <figure class="image is-16x16">
+                        <img src="${image.metaData.appImagePath}" alt="Title logo" />
+                    </figure>
+                <#else>
+                    <i class="fas fa-cube"></i>
+                </#if>
+            </td>
             <td class="is-vcentered">
                 <h4 class="title is-6">
                     <a class="has-text-grey-dark" href="/image?name=${image.fullName}">
-                        <i class="fas fa-cube"></i> <span class="has-text-weight-light">${image.repositoryKey.name} / </span><span class="has-text-weight-bold">${image.name}</span>
+                        <span class="has-text-weight-light">${image.repositoryKey.name} / </span><span class="has-text-weight-bold">${image.name}</span>
                     </a>
                 </h4>
             </td>

@@ -101,6 +101,7 @@ public class AdminImageEditController extends AbstractPageHandler {
 
             return new ImageAppLogo(imageKey,
                                     uploadedFile.getContent(),
+                                    uploadedFile.getContentType(),
                                     uploadedFile.getFilename(),
                                     uploadedFile.getSize(),
                                     uploadedFile.getExtension());

@@ -17,6 +17,10 @@
 
 package io.linuxserver.fleet.core.config;
 
+import io.linuxserver.fleet.core.FleetRuntime;
+
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Properties;
 
 public class AppProperties {
@@ -57,6 +61,10 @@ public class AppProperties {
 
     private String getDatabasePassword() {
         return getStringProperty("fleet.database.password");
+    }
+
+    public final Path getStaticFilesPath() {
+        return Paths.get(FleetRuntime.CONFIG_BASE, getStringProperty("fleet.static.dirname")).toAbsolutePath();
     }
 
     public String getAppSecret() {

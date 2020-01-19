@@ -66,6 +66,7 @@
                             <@table.table id="ImageTable" isFullWidth=true isScrollable=true extraClasses="table--sortable">
                                 <thead>
                                 <tr>
+                                    <th></th>
                                     <th>Name</th>
                                     <th></th>
                                     <th>Latest Version</th>

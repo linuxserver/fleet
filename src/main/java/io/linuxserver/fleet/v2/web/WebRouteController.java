@@ -19,12 +19,13 @@ package io.linuxserver.fleet.v2.web;
 
 import io.javalin.Javalin;
 import io.javalin.core.validation.JavalinValidation;
+import io.javalin.http.staticfiles.Location;
 import io.linuxserver.fleet.core.FleetAppController;
 import io.linuxserver.fleet.core.config.WebConfiguration;
 import io.linuxserver.fleet.v2.key.ImageKey;
 import io.linuxserver.fleet.v2.key.ImageLookupKey;
 import io.linuxserver.fleet.v2.key.RepositoryKey;
-import io.linuxserver.fleet.v2.types.meta.history.ImagePullStatistic;
+import io.linuxserver.fleet.v2.types.meta.history.ImagePullStatistic.StatGroupMode;
 import io.linuxserver.fleet.v2.web.routes.*;
 
 import static io.javalin.apibuilder.ApiBuilder.*;
@@ -45,18 +46,19 @@ public class WebRouteController {
 
             config.showJavalinBanner = false;
             config.addStaticFiles(Locations.Static.Static);
+            config.addStaticFiles(app.getAppProperties().getStaticFilesPath().toString(), Location.EXTERNAL);
             config.accessManager(new DefaultAccessManager());
 
         }).start(webConfiguration.getPort());
 
         Javalin.log.info(printBanner());
 
-        JavalinValidation.register(ImagePullStatistic.StatGroupMode.class, ImagePullStatistic.StatGroupMode::valueOf);
-        JavalinValidation.register(ImageKey.class, ImageKey::parse);
+        JavalinValidation.register(StatGroupMode.class,  StatGroupMode::valueOf);
+        JavalinValidation.register(ImageKey.class,       ImageKey::parse);
         JavalinValidation.register(ImageLookupKey.class, ImageLookupKey::new);
-        JavalinValidation.register(RepositoryKey.class, RepositoryKey::parse);
+        JavalinValidation.register(RepositoryKey.class,  RepositoryKey::parse);
 
-        webInstance.exception(ApiException.class, (e, ctx) -> {
+        webInstance.exception(Exception.class, (e, ctx) -> {
 
             ctx.status(400);
             ctx.result(e.getMessage());

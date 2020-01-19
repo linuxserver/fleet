@@ -14,10 +14,17 @@
  You should have received a copy of the GNU General Public License
  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 -->
-<#macro title thinValue="" boldValue="" separator="" icon="" subtitle="">
+<#macro title thinValue="" boldValue="" separator="" icon="" imageIcon="" subtitle="">
 
     <h2 class="title is-size-3-desktop is-size-4-mobile">
-        <#if icon?has_content><i class="fas fa-${icon}"></i> </#if><#if thinValue?has_content><span class="has-text-weight-light">${thinValue}</span>${separator}</#if>${boldValue}<span class="has-text-primary">.</span>
+        <#if imageIcon?has_content>
+            <figure class="image is-32x32 is-pulled-left has-margin-right">
+                <img src="${imageIcon}" alt="Title logo" />
+            </figure>
+        <#elseif icon?has_content>
+            <i class="fas fa-${icon}"></i>
+        </#if>
+        <#if thinValue?has_content><span class="has-text-weight-light">${thinValue}</span>${separator}</#if>${boldValue}<span class="has-text-primary">.</span>
         <#nested />
     </h2>
     <#if subtitle?has_content>

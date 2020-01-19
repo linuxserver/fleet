@@ -29,6 +29,7 @@ import io.linuxserver.fleet.v2.client.docker.queue.DockerApiDelegate;
 import io.linuxserver.fleet.v2.db.DefaultImageDAO;
 import io.linuxserver.fleet.v2.db.DefaultScheduleDAO;
 import io.linuxserver.fleet.v2.db.DefaultUserDAO;
+import io.linuxserver.fleet.v2.file.FileManager;
 import io.linuxserver.fleet.v2.key.ImageKey;
 import io.linuxserver.fleet.v2.service.ImageService;
 import io.linuxserver.fleet.v2.service.ScheduleService;
@@ -53,10 +54,12 @@ public class FleetAppController extends AbstractAppController implements Service
     private final SynchronisationService syncService;
     private final UserService            userService;
     private final AuthenticationDelegate authenticationDelegate;
+    private final FileManager            fileManager;
 
     public FleetAppController() {
 
-        imageService      = new ImageService(new DefaultImageDAO(getDatabaseProvider()));
+        fileManager       = new FileManager(this);
+        imageService      = new ImageService(this, new DefaultImageDAO(getDatabaseProvider()));
         scheduleService   = new ScheduleService(this, new DefaultScheduleDAO(getDatabaseProvider()));
         dockerApiDelegate = new DockerApiDelegate(this);
         syncService       = new SynchronisationService(this);
@@ -154,6 +157,11 @@ public class FleetAppController extends AbstractAppController implements Service
     @Override
     public final UserService getUserService() {
         return userService;
+    }
+
+    @Override
+    public FileManager getFileManager() {
+        return fileManager;
     }
 
     public final AuthenticationResult authenticateUser(final String username, final String password) {

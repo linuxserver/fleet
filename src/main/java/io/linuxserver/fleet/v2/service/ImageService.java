@@ -17,10 +17,12 @@
 
 package io.linuxserver.fleet.v2.service;
 
+import io.linuxserver.fleet.core.FleetAppController;
 import io.linuxserver.fleet.db.query.InsertUpdateResult;
 import io.linuxserver.fleet.dockerhub.util.DockerTagFinder;
 import io.linuxserver.fleet.v2.cache.RepositoryCache;
 import io.linuxserver.fleet.v2.db.ImageDAO;
+import io.linuxserver.fleet.v2.file.FileManager;
 import io.linuxserver.fleet.v2.key.ImageKey;
 import io.linuxserver.fleet.v2.key.ImageLookupKey;
 import io.linuxserver.fleet.v2.key.RepositoryKey;
@@ -34,24 +36,25 @@ import io.linuxserver.fleet.v2.types.meta.ItemSyncSpec;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
-public class ImageService {
+public class ImageService extends AbstractAppService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ImageService.class);
 
     private final ImageDAO        imageDAO;
+    private final FileManager     fileManager;
     private final RepositoryCache repositoryCache;
     private final TemplateMerger  templateMerger;
 
-    public ImageService(final ImageDAO imageDAO) {
+    public ImageService(final FleetAppController controller, final ImageDAO imageDAO) {
+        super(controller);
 
         this.imageDAO        = imageDAO;
+        this.fileManager     = controller.getFileManager();
         this.repositoryCache = new RepositoryCache();
         this.templateMerger  = new TemplateMerger();
 
@@ -246,7 +249,11 @@ public class ImageService {
 
         String appLogoPath = image.getMetaData().getAppImagePath();
         if (null != generalInfoUpdateRequest.getImageAppLogo()) {
-            // TODO: Write FileManager
+
+            final FilePathDetails filePathDetails = fileManager.saveImageLogo(generalInfoUpdateRequest.getImageAppLogo());
+            if (null != filePathDetails) {
+                appLogoPath = filePathDetails.getPublicSafePathWithFileName();
+            }
         }
 
         final ImageCoreMeta coreMeta = new ImageCoreMeta(appLogoPath,

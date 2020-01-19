@@ -18,6 +18,7 @@
 package io.linuxserver.fleet.v2.service;
 
 import io.linuxserver.fleet.core.FleetAppController;
+import io.linuxserver.fleet.core.config.AppProperties;
 import io.linuxserver.fleet.v2.LoggerOwner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,6 +35,10 @@ public class AbstractAppService implements LoggerOwner {
 
     public final FleetAppController getController() {
         return controller;
+    }
+
+    public final AppProperties getProperties() {
+        return getController().getAppProperties();
     }
 
     public final Logger getLogger() {

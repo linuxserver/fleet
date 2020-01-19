@@ -53,6 +53,7 @@ class PropertiesLoader extends BaseRuntimeLoader {
             Properties properties = new Properties();
             properties.load(new FileInputStream(FleetRuntime.CONFIG_BASE + "/fleet.properties"));
             properties.load(Objects.requireNonNull(getClass().getClassLoader().getResourceAsStream("version.properties")));
+            properties.setProperty("fleet.static.dirname", "fleet_static");
 
             this.properties = new AppProperties(properties);
 
@@ -88,7 +89,7 @@ class PropertiesLoader extends BaseRuntimeLoader {
 
     private boolean createStaticFileDirectory() {
 
-        File staticFilesDir = new File(FleetRuntime.CONFIG_BASE + "/fleet_static");
+        File staticFilesDir = new File(properties.getStaticFilesPath().toString());
 
         if (staticFilesDir.exists()) {
             return true;

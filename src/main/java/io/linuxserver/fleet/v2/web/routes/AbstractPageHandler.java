@@ -71,7 +71,7 @@ public abstract class AbstractPageHandler extends AbstractAppService implements 
             injectTopLevelModelAttributes(ctx, spec);
             checkViewForRedirect(ctx, spec);
 
-        } catch (Exception e) {
+        } catch (Throwable e) {
 
             LOGGER.error("Unexpected error occurred when loading page.", e);
             ctx.render("views/pages/error.ftl", model("error", "Something unexepected happened", "exception", e));

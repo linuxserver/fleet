@@ -19,11 +19,13 @@
 <#import "../prebuilt/fleet-title.ftl"    as title />
 <#import "../prebuilt/docker-example.ftl" as dockerExample />
 
-<#import "../ui/layout/section.ftl"     as section />
-<#import "../ui/layout/container.ftl"   as container />
+<#import "../ui/components/message.ftl" as message />
 <#import "../ui/elements/box.ftl"       as box />
+<#import "../ui/elements/button.ftl"    as button />
 <#import "../ui/elements/table.ftl"     as table />
 <#import "../ui/elements/tag.ftl"       as tag />
+<#import "../ui/layout/container.ftl"   as container />
+<#import "../ui/layout/section.ftl"     as section />
 
 <@base.base title="${(image.fullName)!'Unknown Image'}" context="image" hasHero=false>
 
@@ -37,7 +39,12 @@
 
                         <div class="column is-full">
 
-                            <@title.title icon="cube" thinValue=image.repositoryName boldValue=image.name separator="/" subtitle=image.description />
+                            <@title.title
+                                icon="cube"
+                                imageIcon=image.metaData.appImagePath
+                                thinValue=image.repositoryName
+                                boldValue=image.name separator="/"
+                                subtitle=image.description />
 
                             <div class="tags">
 
@@ -191,6 +198,20 @@
                                 <h3 class="subtitle is-6">
                                     Basic examples for getting this image running as a container
                                 </h3>
+
+                                <@message.message colour="info">
+
+                                    These examples <strong>do not</strong> include the relevant values for volume mappings or environment variables. You will
+                                    need to review these snippets and fill in the gaps based on your own needs. If you would like to generate a compose
+                                    block or CLI run command with your mappings included, you can also use the template generator:
+
+                                    <div class="has-text-centered has-margin-top">
+                                        <@button.link id="TemplateGeneratorLink" colour="info">
+                                            <i class="fas fa-layer-group"></i> Template Generator
+                                        </@button.link>
+                                    </div>
+
+                                </@message.message>
                             </div>
 
                             <div class="column is-full has-margin-bottom">

@@ -20,6 +20,11 @@ package io.linuxserver.fleet.core;
 public interface FleetRuntime {
 
     /**
+     * If set will switch specific properties to allow more streamlined development
+     */
+    boolean DEV_MODE                = System.getProperty("enable.dev") != null;
+
+    /**
      * Base directory for the config file.
      */
     String CONFIG_BASE              = System.getProperty("fleet.config.base");

@@ -72,6 +72,15 @@
                                             <label class="label" for="ImageAppLogo">App Logo</label>
                                         </div>
                                         <div class="field-body">
+
+                                            <#if image.metaData.appImagePath?has_content>
+                                                <div class="is-fullwidth">
+                                                    <figure class="image is-128x128">
+                                                        <img src="${image.metaData.appImagePath}" alt="${image.name} logo" />
+                                                    </figure>
+                                                </div>
+                                            </#if>
+
                                             <input type="file" name="ImageAppLogo" id="ImageAppLogo" />
                                         </div>
                                     </div>

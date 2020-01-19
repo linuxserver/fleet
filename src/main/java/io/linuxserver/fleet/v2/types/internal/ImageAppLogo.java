@@ -25,18 +25,21 @@ public class ImageAppLogo {
 
     private final ImageKey    imageKey;
     private final InputStream rawDataStream;
+    private final String      mimeType;
     private final String      logoName;
     private final long        logoSize;
     private final String      fileExtension;
 
     public ImageAppLogo(final ImageKey imageKey,
                         final InputStream rawDataStream,
+                        final String mimeType,
                         final String logoName,
                         final long logoSize,
                         final String fileExtension) {
 
         this.imageKey      = imageKey;
         this.rawDataStream = rawDataStream;
+        this.mimeType      = mimeType;
         this.logoName      = logoName;
         this.logoSize      = logoSize;
         this.fileExtension = fileExtension;
@@ -48,6 +51,10 @@ public class ImageAppLogo {
 
     public final InputStream getRawDataStream() {
         return rawDataStream;
+    }
+
+    public final String getMimeType() {
+        return mimeType;
     }
 
     public final String getLogoName() {
