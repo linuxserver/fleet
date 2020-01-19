@@ -21,7 +21,7 @@
 <#import "../ui/form/input.ftl"         as input />
 <#import "../prebuilt/system-alert.ftl" as systemAlert />
 
-<#macro base title context showTitle=true backgroundColour="white" hasHero=false>
+<#macro base title context showTitle=true showNav=true backgroundColour="white" hasHero=false availableRepositories=[]>
 
 <!DOCTYPE html>
 <html lang="en">
@@ -42,6 +42,7 @@
 
 <body class="has-background-${backgroundColour} has-text-grey-dark">
 
+    <#if showNav>
     <@navbar.navbar id="MainNav" hasShadow=false itemPlacement="end" colour=(hasHero?string('dark', 'normal-colour')) extraClasses=''>
 
         <#if context="home">
@@ -58,28 +59,29 @@
             </div>
         </#if>
 
-        <@navbar.dropdown icon="shield-alt" displayText="Admin" isRight=true>
-            <@navbar.item displayText="Repositories"    icon="cubes" link="/admin/repositories" isActive=(context=='admin_repositories') />
-            <@navbar.item displayText="Schedules"       icon="clock" link="/admin/schedules"    isActive=(context=='admin_schedules') />
-            <@navbar.item displayText="Users"           icon="users" link="/admin/users"        isActive=(context=='admin_users') />
-            <@navbar.item displayText="System Settings" icon="cog"   link="/admin/system"       isActive=(context=='admin_system') />
-        </@navbar.dropdown>
-
         <#if __AuthenticatedUser?has_content>
 
-            <@navbar.dropdown displayText=__AuthenticatedUser.name isRight=true>
-                <@navbar.item displayText="Log Out" icon="sign-out-alt" />
+            <@navbar.dropdown icon="shield-alt" displayText="Admin" isRight=true>
+                <@navbar.item displayText="Repositories"    icon="cubes" link="/admin/repositories" isActive=(context=='admin_repositories') />
+                <@navbar.item displayText="Schedules"       icon="clock" link="/admin/schedules"    isActive=(context=='admin_schedules') />
+                <#-- <@navbar.item displayText="Users"           icon="users" link="/admin/users"        isActive=(context=='admin_users') />-->
+                <#-- <@navbar.item displayText="System Settings" icon="cog"   link="/admin/system"       isActive=(context=='admin_system') />-->
+            </@navbar.dropdown>
+
+            <@navbar.dropdown displayText=__AuthenticatedUser.name isRight=true icon="user">
+                <@navbar.item displayText="Log Out" icon="sign-out-alt" icon="sign-out-alt" link="/login?invalidate=true" />
             </@navbar.dropdown>
 
         <#else>
             <@navbar.buttons size="small">
-                <@button.link id="LogIn" link="/login" size="small" colour="white">
+                <@button.link id="LogIn" link="/login" size="small" colour="light">
                     <i class="fas fa-sign-in-alt"></i> Log In
                 </@button.link>
             </@navbar.buttons>
         </#if>
 
     </@navbar.navbar>
+    </#if>
 
     <div id="NotificationWrapper">
         <div id="Notifications"></div>

@@ -1,11 +1,9 @@
 plugins {
     id 'java'
-    id 'com.eriwen.gradle.js' version '2.14.1'
-    id 'com.eriwen.gradle.css' version '2.14.0'
 }
 
-sourceCompatibility = 1.8
-targetCompatibility = 1.8
+sourceCompatibility = 11
+targetCompatibility = 11
 
 repositories {
     mavenCentral()
@@ -70,48 +68,7 @@ jar {
         configurations.compile.collect { it.isDirectory() ? it : zipTree(it) }
     }
 
-    exclude 'META-INF/*.RSA', 'META-INF/*.SF','META-INF/*.DSA'
-}
-
-combineJs {
-
-    encoding = "UTF-8"
-
-    source = [
-        'src/main/resources/assets/js/jquery-3.3.1.min.js',
-        'src/main/resources/assets/js/bootstrap.bundle.min.js',
-        'src/main/resources/assets/js/fontawesome-all.min.js',
-        'src/main/resources/assets/js/jquery.tablesorter.js',
-        'src/main/resources/assets/js/fleet.js'
-    ]
-
-    dest = file('src/main/resources/assets/js/all.js')
-}
-
-minifyJs {
-
-    source = combineJs
-    dest = file('src/main/resources/assets/js/all.min.js')
-    closure {
-        warningLevel = 'QUIET'
-    }
-}
-
-combineCss {
-
-    source = [
-        'src/main/resources/assets/css/bootstrap.css',
-        'src/main/resources/assets/css/fleet.css',
-        'src/main/resources/assets/css/fontawesome-all.css'
-    ]
-
-    dest = file('src/main/resources/assets/css/all.css')
-}
-
-minifyCss {
-
-    source = combineCss
-    dest = file('src/main/resources/assets/css/all.min.css')
+    exclude 'META-INF/INDEX.LIST', 'META-INF/*.RSA', 'META-INF/*.SF','META-INF/*.DSA'
 }
 
 task configureLogConfiguration(type: Copy) {

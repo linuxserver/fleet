@@ -66,37 +66,40 @@ public class WebRouteController {
 
         webInstance.routes(() -> {
 
-            get(Locations.Login, new LoginController(app),                           roles(AppRole.Anyone));
+            final LoginController loginController = new LoginController(app);
+            get( Locations.Login, loginController, roles(AppRole.Anyone));
+            post(Locations.Login, loginController, roles(AppRole.Anyone));
+
             get(Locations.Home,  new HomeController( app), roles(AppRole.Anyone));
             get(Locations.Image, new ImageController(app), roles(AppRole.Anyone));
 
-            get(Locations.Admin.Repositories, new AdminRepositoryController(app), roles(AppRole.Anyone));
-            get(Locations.Admin.Images,       new AdminImageController(     app), roles(AppRole.Anyone));
-            get(Locations.Admin.Schedules,    new AdminScheduleController(  app), roles(AppRole.Anyone));
+            get(Locations.Admin.Repositories, new AdminRepositoryController(app), roles(AppRole.Admin));
+            get(Locations.Admin.Images,       new AdminImageController(     app), roles(AppRole.Admin));
+            get(Locations.Admin.Schedules,    new AdminScheduleController(  app), roles(AppRole.Admin));
 
             final AdminImageEditController imageEditController = new AdminImageEditController(app);
-            get(Locations.Admin.ImageEdit,  imageEditController, roles(AppRole.Anyone));
-            post(Locations.Admin.ImageEdit, imageEditController, roles(AppRole.Anyone));
+            get( Locations.Admin.ImageEdit, imageEditController, roles(AppRole.Admin));
+            post(Locations.Admin.ImageEdit, imageEditController, roles(AppRole.Admin));
 
             path(Locations.Internal.Api, () -> {
 
                 path(Locations.Internal.Repository, () -> {
 
-                    put(apiController::updateRepositorySpec,  roles(AppRole.Anyone));
-                    post(apiController::addNewRepository, roles(AppRole.Anyone));
-                    delete(apiController::deleteRepository, roles(AppRole.Anyone));
+                    put(   apiController::updateRepositorySpec, roles(AppRole.Admin));
+                    post(  apiController::addNewRepository,     roles(AppRole.Admin));
+                    delete(apiController::deleteRepository,     roles(AppRole.Admin));
 
                     path(Locations.Internal.Sync, () -> {
-                       put(apiController::syncRepository, roles(AppRole.Anyone));
+                       put(apiController::syncRepository, roles(AppRole.Admin));
                     });
                 });
 
                 path(Locations.Internal.Image, () -> {
 
-                    put(apiController::updateImageSpec, roles(AppRole.Anyone));
+                    put(apiController::updateImageSpec, roles(AppRole.Admin));
 
                     path(Locations.Internal.Sync, () -> {
-                        put(apiController::syncImage, roles(AppRole.Anyone));
+                        put(apiController::syncImage, roles(AppRole.Admin));
                     });
 
                     path(Locations.Internal.Stats, () -> {
@@ -104,12 +107,12 @@ public class WebRouteController {
                     });
 
                     path(Locations.Internal.Track, () -> {
-                        put(apiController::trackNewBranch, roles(AppRole.Anyone));
+                        put(apiController::trackNewBranch, roles(AppRole.Admin));
                     });
                 });
 
                 path(Locations.Internal.Schedule, () -> {
-                   put(apiController::runSchedule, roles(AppRole.Anyone));
+                   put(apiController::runSchedule, roles(AppRole.Admin));
                 });
             });
         });

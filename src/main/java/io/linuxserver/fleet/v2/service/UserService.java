@@ -17,21 +17,75 @@
 
 package io.linuxserver.fleet.v2.service;
 
+import io.linuxserver.fleet.auth.AuthenticationDelegate;
+import io.linuxserver.fleet.auth.AuthenticationResult;
+import io.linuxserver.fleet.auth.DefaultAuthenticationDelegate;
+import io.linuxserver.fleet.auth.authenticator.DefaultUserAuthenticator;
+import io.linuxserver.fleet.auth.security.PBKDF2PasswordEncoder;
 import io.linuxserver.fleet.core.FleetAppController;
+import io.linuxserver.fleet.db.query.InsertUpdateResult;
 import io.linuxserver.fleet.v2.db.UserDAO;
+import io.linuxserver.fleet.v2.key.UserKey;
 import io.linuxserver.fleet.v2.types.User;
+import io.linuxserver.fleet.v2.types.internal.UserOutlineRequest;
+
+import java.util.List;
 
 public class UserService extends AbstractAppService {
 
-    private final UserDAO userDAO;
+    private final UserDAO                userDAO;
+    private final AuthenticationDelegate authDelegate;
 
     public UserService(final FleetAppController controller,
                        final UserDAO userDAO) {
         super(controller);
-        this.userDAO = userDAO;
+        this.userDAO      = userDAO;
+        this.authDelegate = new DefaultAuthenticationDelegate(new DefaultUserAuthenticator(this,
+                                                              new PBKDF2PasswordEncoder(getProperties().getAppSecret())));
+        createInitialAdminUser();
+    }
+
+    public final AuthenticationResult authenticateCredentials(final String username, final String password) {
+        return authDelegate.authenticate(username, password);
     }
 
     public final User lookUpUser(final String username) {
         return userDAO.lookUpUser(username);
+    }
+
+    public final User fetchUser(final UserKey userKey) {
+        return userDAO.fetchUser(userKey);
+    }
+
+    public final List<User> fetchAllUsers() {
+        return userDAO.fetchAllUsers();
+    }
+
+    public final User createUser(final UserOutlineRequest userOutlineRequest) {
+
+        final InsertUpdateResult<User> result = userDAO.createUser(userOutlineRequest);
+        if (result.isError()) {
+
+            getLogger().error("Unable to create new user: {}", result.getStatusMessage());
+            throw new RuntimeException("Unable to create new user: " + result.getStatusMessage());
+        }
+        return result.getResult();
+    }
+
+    private void createInitialAdminUser() {
+
+        if (fetchAllUsers().isEmpty()) {
+
+            getLogger().info("There are no users! Creating initial user with default credentials");
+            final UserOutlineRequest encodedUser = UserOutlineRequest.InitialFirstLoadUser.cloneWithPassword(
+                authDelegate.encodePassword(UserOutlineRequest.InitialFirstLoadUser.getPassword())
+            );
+
+            createUser(encodedUser);
+
+            getLogger().warn("!!!!!!!!");
+            getLogger().warn("DEFAULT USER CREATED. CHANGE THE PASSWORD OR CREATE A NEW USER!");
+            getLogger().warn("!!!!!!!!");
+        }
     }
 }

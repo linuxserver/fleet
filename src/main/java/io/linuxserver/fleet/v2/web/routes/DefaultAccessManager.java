@@ -21,7 +21,7 @@ import io.javalin.core.security.AccessManager;
 import io.javalin.core.security.Role;
 import io.javalin.http.Context;
 import io.javalin.http.Handler;
-import io.linuxserver.fleet.v2.types.User;
+import io.linuxserver.fleet.auth.AuthenticatedUser;
 import io.linuxserver.fleet.v2.web.AppRole;
 import io.linuxserver.fleet.v2.web.Locations;
 import io.linuxserver.fleet.v2.web.SessionAttributes;
@@ -38,12 +38,24 @@ public class DefaultAccessManager implements AccessManager {
             handler.handle(ctx);
         } else {
 
-            final User user = ctx.sessionAttribute(SessionAttributes.AuthenticatedUser);
+            final AuthenticatedUser user = ctx.sessionAttribute(SessionAttributes.AuthenticatedUser);
             if (null == user) {
                 ctx.redirect(Locations.Login);
-            } else {
+            } else if (isUserRoleValid(user, permittedRoles)){
                 handler.handle(ctx);
+            } else {
+                ctx.status(401);
             }
         }
+    }
+
+    private boolean isUserRoleValid(final AuthenticatedUser user, final Set<Role> permittedRoles) {
+
+        for (Role role : permittedRoles) {
+            if (user.getRoles().contains(role)) {
+                return true;
+            }
+        }
+        return false;
     }
 }

@@ -34,6 +34,10 @@ public class UserOutlineRequest {
         this.role     = role;
     }
 
+    public final UserOutlineRequest cloneWithPassword(final String password) {
+        return new UserOutlineRequest(getUsername(), password, getRole());
+    }
+
     public final String getUsername() {
         return username;
     }

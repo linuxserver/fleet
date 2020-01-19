@@ -34,7 +34,7 @@ public class DefaultAuthenticationDelegate implements AuthenticationDelegate {
     }
 
     @Override
-    public PasswordEncoder getPasswordEncoder() {
-        return authenticator.getPasswordEncoder();
+    public String encodePassword(final String rawPassword) {
+        return authenticator.getPasswordEncoder().encode(rawPassword);
     }
 }

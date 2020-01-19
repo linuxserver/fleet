@@ -17,12 +17,9 @@
 
 package io.linuxserver.fleet.auth;
 
-import io.linuxserver.fleet.auth.AuthenticationResult;
-import io.linuxserver.fleet.auth.security.PasswordEncoder;
-
 public interface AuthenticationDelegate {
 
     AuthenticationResult authenticate(String username, String password);
 
-    PasswordEncoder getPasswordEncoder();
+    String encodePassword(String rawPassword);
 }

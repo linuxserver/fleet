@@ -26,7 +26,7 @@
 <#import "../ui/elements/table.ftl"        as table />
 <#import "../ui/elements/button.ftl"       as button />
 
-<@base.base title="Images" context="home" showTitle=false>
+<@base.base title="Images" context="home" showTitle=false availableRepositories=availableRepositories>
 
     <section class="section is-paddingless-top">
         <div class="container">

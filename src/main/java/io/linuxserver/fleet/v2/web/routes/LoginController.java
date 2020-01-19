@@ -45,20 +45,32 @@ public class LoginController extends AbstractPageHandler {
         if (null != ctx.formParam("invalidate")) {
             doLogOut(ctx);
         } else {
-            doLogIn(ctx);
+
+            final boolean loggedIn = doLogIn(ctx);
+            if (!loggedIn) {
+
+                final PageModelSpec pageModelSpec = new PageModelSpec("views/pages/login.ftl");
+                pageModelSpec.addModelAttribute("loginFailed", "Username or password was incorrect.");
+                return pageModelSpec;
+            }
         }
 
         return new PageModelSpec("redirect:/");
     }
 
-    private void doLogIn(final Context ctx) {
+    private boolean doLogIn(final Context ctx) {
 
         final String username = ctx.formParam("username");
         final String password = ctx.formParam("password");
 
-        final AuthenticationResult result = getController().authenticateUser(username, password);
+        final AuthenticationResult result = getController().authenticateCredentials(username, password);
         if (result.isAuthenticated()) {
+
             ctx.sessionAttribute(SessionAttributes.AuthenticatedUser, result.getUser());
+            return true;
+
+        } else {
+            return false;
         }
     }
 

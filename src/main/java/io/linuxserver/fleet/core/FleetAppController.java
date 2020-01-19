@@ -17,11 +17,7 @@
 
 package io.linuxserver.fleet.core;
 
-import io.linuxserver.fleet.auth.AuthenticationDelegate;
 import io.linuxserver.fleet.auth.AuthenticationResult;
-import io.linuxserver.fleet.auth.DefaultAuthenticationDelegate;
-import io.linuxserver.fleet.auth.authenticator.DefaultUserAuthenticator;
-import io.linuxserver.fleet.auth.security.PBKDF2PasswordEncoder;
 import io.linuxserver.fleet.core.config.WebConfiguration;
 import io.linuxserver.fleet.v2.client.docker.DockerApiClient;
 import io.linuxserver.fleet.v2.client.docker.dockerhub.DockerHubApiClient;
@@ -53,7 +49,6 @@ public class FleetAppController extends AbstractAppController implements Service
     private final ScheduleService        scheduleService;
     private final SynchronisationService syncService;
     private final UserService            userService;
-    private final AuthenticationDelegate authenticationDelegate;
     private final FileManager            fileManager;
 
     public FleetAppController() {
@@ -64,9 +59,6 @@ public class FleetAppController extends AbstractAppController implements Service
         dockerApiDelegate = new DockerApiDelegate(this);
         syncService       = new SynchronisationService(this);
         userService       = new UserService(this, new DefaultUserDAO(getDatabaseProvider()));
-
-        authenticationDelegate = new DefaultAuthenticationDelegate(new DefaultUserAuthenticator(userService,
-                                                                                                new PBKDF2PasswordEncoder(getAppProperties().getAppSecret())));
     }
 
     private static FleetAppController instance;
@@ -164,8 +156,8 @@ public class FleetAppController extends AbstractAppController implements Service
         return fileManager;
     }
 
-    public final AuthenticationResult authenticateUser(final String username, final String password) {
-        return authenticationDelegate.authenticate(username, password);
+    public final AuthenticationResult authenticateCredentials(final String username, final String password) {
+        return userService.authenticateCredentials(username, password);
     }
 
     public final void trackBranch(final ImageKey imageKey, final String branchName) {

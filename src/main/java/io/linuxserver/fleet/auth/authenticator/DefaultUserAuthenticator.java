@@ -42,7 +42,7 @@ public class DefaultUserAuthenticator implements UserAuthenticator {
         final User user = userService.lookUpUser(userCredentials.getUsername());
 
         if (null != user && getPasswordEncoder().matches(userCredentials.getPassword(), user.getPassword())) {
-            return new AuthenticationResult(true, new AuthenticatedUser(user.getUsername()));
+            return new AuthenticationResult(true, new AuthenticatedUser(user));
         }
 
         return AuthenticationResult.notAuthenticated();
