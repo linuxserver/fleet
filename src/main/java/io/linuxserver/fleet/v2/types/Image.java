@@ -25,10 +25,7 @@ import io.linuxserver.fleet.v2.types.meta.ItemSyncSpec;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 public class Image extends AbstractSyncItem<ImageKey, Image> {
 
@@ -145,7 +142,15 @@ public class Image extends AbstractSyncItem<ImageKey, Image> {
     }
 
     public final void removeTagBranch(final TagBranch tagBranch) {
-        getTagBranches().removeIf(storedTagBranch -> storedTagBranch.equals(tagBranch));
+
+        final Iterator<TagBranch> iterator = tagBranches.iterator();
+        while (iterator.hasNext()) {
+
+            final TagBranch current = iterator.next();
+            if (current.equals(tagBranch) && !current.isBranchProtected()) {
+                iterator.remove();
+            }
+        }
     }
 
     public final long getPullCount() {

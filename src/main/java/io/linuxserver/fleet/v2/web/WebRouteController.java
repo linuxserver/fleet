@@ -107,7 +107,9 @@ public class WebRouteController {
                     });
 
                     path(Locations.Internal.Track, () -> {
-                        put(apiController::trackNewBranch, roles(AppRole.Admin));
+
+                        put(   apiController::trackNewBranch,      roles(AppRole.Admin));
+                        delete(apiController::removeTrackedBranch, roles(AppRole.Admin));
                     });
                 });
 

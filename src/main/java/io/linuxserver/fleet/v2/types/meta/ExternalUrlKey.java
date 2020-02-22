@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 LinuxServer.io
+ * Copyright (c)  2020 LinuxServer.io
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -15,27 +15,16 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package io.linuxserver.fleet.auth;
+package io.linuxserver.fleet.v2.types.meta;
 
-import io.linuxserver.fleet.v2.types.User;
-import io.linuxserver.fleet.v2.web.AppRole;
+import io.linuxserver.fleet.v2.Utils;
+import io.linuxserver.fleet.v2.key.AbstractDatabaseKey;
 
-import java.util.Collections;
-import java.util.Set;
+public class ExternalUrlKey extends AbstractDatabaseKey {
 
-public class AuthenticatedUser {
+    public static final ExternalUrlKey NewNotPersistedYet = new ExternalUrlKey(-1);
 
-    private final User user;
-
-    public AuthenticatedUser(final User user) {
-        this.user = user;
-    }
-
-    public final String getName() {
-        return user.getUsername();
-    }
-
-    public final Set<AppRole> getRoles() {
-        return Collections.singleton(user.getRole());
+    public ExternalUrlKey(final Integer id) {
+        super(Utils.ensureNotNull(id));
     }
 }

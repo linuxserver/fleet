@@ -32,6 +32,7 @@ import io.linuxserver.fleet.v2.types.docker.DockerImage;
 import io.linuxserver.fleet.v2.types.docker.DockerTag;
 import io.linuxserver.fleet.v2.types.internal.*;
 import io.linuxserver.fleet.v2.types.meta.ImageCoreMeta;
+import io.linuxserver.fleet.v2.types.meta.ImageMetaData;
 import io.linuxserver.fleet.v2.types.meta.ItemSyncSpec;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -167,7 +168,7 @@ public class ImageService extends AbstractAppService {
         return storeImage(image, imageDAO::storeImage);
     }
 
-    public final Image storeImageMetaData(final Image image) {
+    public final Image storeImageTemplateMetaData(final Image image) {
         return storeImage(image, imageDAO::storeImageMetaData);
     }
 
@@ -243,11 +244,26 @@ public class ImageService extends AbstractAppService {
         storeImage(updatableClone);
     }
 
+    public void removeTrackedBranch(final ImageKey imageKey, final String branchName) {
+
+        final Image     image  = findImage(imageKey);
+        final TagBranch branch = image.findTagBranchByName(branchName);
+
+        if (branch == null) {
+            throw new IllegalArgumentException("Could not find " + branchName);
+        }
+
+        final Image updatableClone = image.cloneForUpdate();
+        updatableClone.removeTagBranch(branch);
+        storeImage(updatableClone);
+    }
+
     public void updateImageGeneralInfo(final ImageKey imageKey, final ImageGeneralInfoUpdateRequest generalInfoUpdateRequest) {
 
-        final Image image = findImage(imageKey);
+        final Image         image    = findImage(imageKey);
+        final ImageMetaData metaData = image.getMetaData();
 
-        String appLogoPath = image.getMetaData().getAppImagePath();
+        String appLogoPath = metaData.getAppImagePath();
         if (null != generalInfoUpdateRequest.getImageAppLogo()) {
 
             final FilePathDetails filePathDetails = fileManager.saveImageLogo(generalInfoUpdateRequest.getImageAppLogo());
@@ -258,12 +274,12 @@ public class ImageService extends AbstractAppService {
 
         final ImageCoreMeta coreMeta = new ImageCoreMeta(appLogoPath,
                                                          generalInfoUpdateRequest.getBaseImage(),
-                                                         generalInfoUpdateRequest.getCategory(),
-                                                         generalInfoUpdateRequest.getSupportUrl(),
-                                                         generalInfoUpdateRequest.getApplicationUrl());
+                                                         generalInfoUpdateRequest.getCategory());
 
-        final Image cloned = image.cloneWithMetaData(image.getMetaData().cloneWithCoreMeta(coreMeta));
-        storeImage(cloned);
+        metaData.getCoreMeta().enrichOtherWithExternalUrls(coreMeta);
+
+        final Image cloned = image.cloneWithMetaData(metaData.cloneWithCoreMeta(coreMeta));
+        storeImageTemplateMetaData(cloned);
     }
 
     public void updateImageTemplate(final ImageKey imageKey, final ImageTemplateRequest imageTemplateUpdateFields) {
@@ -272,7 +288,7 @@ public class ImageService extends AbstractAppService {
         final Image cloned = templateMerger.mergeTemplateRequestIntoImage(image, imageTemplateUpdateFields);
 
         LOGGER.info("{} merged with new template", cloned);
-        storeImageMetaData(cloned);
+        storeImageTemplateMetaData(cloned);
     }
 
     private synchronized Image storeImage(final Image image, final ImageStorage storageFunction) {

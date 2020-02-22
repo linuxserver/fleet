@@ -97,7 +97,7 @@ public class AdminImageEditController extends AbstractPageHandler {
 
     private ImageAppLogo makeImageLogoIfPresent(final ImageKey imageKey, final UploadedFile uploadedFile) {
 
-        if (null != uploadedFile) {
+        if (null != uploadedFile && uploadedFile.getSize() > 0 && uploadedFile.getFilename().length() > 0) {
 
             return new ImageAppLogo(imageKey,
                                     uploadedFile.getContent(),

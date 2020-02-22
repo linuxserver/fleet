@@ -97,18 +97,6 @@
                                         infoText="The application category for this image (e.g Home Automation)." />
 
                                 </div>
-                                <div class="column is-full">
-
-                                    <@input.text id="ImageSupportUrl" label="Support Url" isInline=true value=image.metaData.supportUrl
-                                        infoText="A link to the primary source of support for this image, such as a forum thread or documentation site." />
-
-                                </div>
-                                <div class="column is-full">
-
-                                    <@input.text id="ImageApplicationUrl" label="Application Url" isInline=true value=image.metaData.appUrl
-                                        infoText="The primary URL for the application encapsulated by this image." />
-
-                                </div>
                             </div>
                             <div class="columns">
                                 <div class="column is-full">
@@ -147,7 +135,7 @@
                             </thead>
                             <tbody>
                             <#list image.tagBranches as tagBranch>
-                                <tr>
+                                <tr class="tracked-branch" data-branch-name="${tagBranch.branchName?html}">
                                     <td class="is-vcentered">
                                         ${tagBranch.branchName?html}
                                     </td>

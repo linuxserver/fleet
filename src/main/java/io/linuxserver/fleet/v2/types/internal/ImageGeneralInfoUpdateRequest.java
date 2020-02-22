@@ -41,12 +41,4 @@ public class ImageGeneralInfoUpdateRequest extends AbstractParamRequest {
     public final String getCategory() {
         return getFirstOrNull("ImageCategory");
     }
-
-    public final String getSupportUrl() {
-        return getFirstOrNull("ImageSupportUrl");
-    }
-
-    public final String getApplicationUrl() {
-        return getFirstOrNull("ImageApplicationUrl");
-    }
 }

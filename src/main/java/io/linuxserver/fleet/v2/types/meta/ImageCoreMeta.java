@@ -17,27 +17,42 @@
 
 package io.linuxserver.fleet.v2.types.meta;
 
-import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
 
 public class ImageCoreMeta {
 
-    private final String appImagePath;
-    private final String baseImage;
-    private final String category;
-    private final String supportUrl;
-    private final String appUrl;
+    private final String           appImagePath;
+    private final String           baseImage;
+    private final String           category;
+    private final Set<ExternalUrl> externalUrls;
 
     public ImageCoreMeta(final String appImagePath,
                          final String baseImage,
-                         final String category,
-                         final String supportUrl,
-                         final String appUrl) {
+                         final String category) {
 
         this.appImagePath = appImagePath;
         this.baseImage    = baseImage;
         this.category     = category;
-        this.supportUrl   = supportUrl;
-        this.appUrl       = appUrl;
+        this.externalUrls = new TreeSet<>();
+    }
+
+    public final void enrichOtherWithExternalUrls(final ImageCoreMeta other) {
+        externalUrls.forEach(other::addExternalUrl);
+    }
+
+    public final void addExternalUrl(final ExternalUrl externalUrl) {
+
+        final boolean added = externalUrls.add(externalUrl);
+        if (!added) {
+            throw new IllegalArgumentException("External Url already present: " + externalUrl);
+        }
+    }
+
+    public final void removeExternalUrl(final ExternalUrlKey externalUrlKey) {
+        externalUrls.removeIf(url -> url.getKey().equals(externalUrlKey));
     }
 
     public final String getAppImagePath() {
@@ -52,11 +67,7 @@ public class ImageCoreMeta {
         return category;
     }
 
-    public final String getSupportUrl() {
-        return supportUrl;
-    }
-
-    public final String getAppUrl() {
-        return appUrl;
+    public final List<ExternalUrl> getExternalUrls() {
+        return new ArrayList<>(externalUrls);
     }
 }

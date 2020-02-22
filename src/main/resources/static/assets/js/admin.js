@@ -118,6 +118,10 @@ var Admin = (function($) {
         Ajax.put('/internalapi/image/track', { 'imageKey': imageKey, 'branchName': branchName }, reload, $TrackNewBranch);
     };
 
+    var removeTrackedBranch = function(branchName, imageKey) {
+        Ajax.del('/internalapi/image/track?imageKey=' + imageKey +'&branchName=' + branchName, reload);
+    };
+
     var makeInput = function(name, type='text', required=false) {
         return '<input type="' + type + '" class="input is-small" name="' + name + '"' + (required ? 'required' : '') + ' />'
     };
@@ -138,16 +142,6 @@ var Admin = (function($) {
 
     var makeButton = function(value, classes, colour) {
         return '<button class="button is-small is-' + colour + ' ' + classes + '">' + value + '</button>';
-    };
-
-    var makeToggle = function(name) {
-
-        return (
-            '<label class="switch is-large is-primary" title="Toggle">' +
-                '<input name="' + name + '" type="checkbox" />' +
-                '<span class="slider round"></span>' +
-            '</label>'
-        );
     };
 
     var addPortRow = function() {
@@ -293,6 +287,12 @@ var Admin = (function($) {
             if (branchName.length > 0) {
                 trackNewBranch(branchName, $ImageKey.val());
             }
+        });
+
+        $('.remove-tag-branch').on('click', function() {
+
+            var branchName = $(this).parents('.tracked-branch').data('branch-name');
+            removeTrackedBranch(branchName, $ImageKey.val());
         });
 
         $AddNewPort.on('click',   addPortRow);

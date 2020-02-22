@@ -37,8 +37,7 @@ public class TemplateMerger {
         addEnvironment(templateRequest, templateHolder);
         addDevices(    templateRequest, templateHolder);
 
-        final Image cloned = image.cloneWithMetaData(image.getMetaData().cloneWithTemplate(templateHolder));
-        return cloned;
+        return image.cloneWithMetaData(image.getMetaData().cloneWithTemplate(templateHolder));
     }
 
     private ImageTemplateHolder makeTemplateHolder(final ImageTemplateRequest templateRequest) {

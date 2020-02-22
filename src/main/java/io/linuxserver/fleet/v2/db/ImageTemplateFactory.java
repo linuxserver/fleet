@@ -17,7 +17,6 @@
 
 package io.linuxserver.fleet.v2.db;
 
-import io.linuxserver.fleet.db.query.InsertUpdateStatus;
 import io.linuxserver.fleet.v2.key.ImageKey;
 import io.linuxserver.fleet.v2.types.Image;
 import io.linuxserver.fleet.v2.types.docker.DockerCapability;

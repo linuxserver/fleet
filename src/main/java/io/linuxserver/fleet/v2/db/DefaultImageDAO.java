@@ -17,10 +17,10 @@
 
 package io.linuxserver.fleet.v2.db;
 
-import freemarker.cache.TemplateConfigurationFactory;
 import io.linuxserver.fleet.core.db.DatabaseProvider;
 import io.linuxserver.fleet.db.query.InsertUpdateResult;
 import io.linuxserver.fleet.db.query.InsertUpdateStatus;
+import io.linuxserver.fleet.v2.key.HasKey;
 import io.linuxserver.fleet.v2.key.ImageKey;
 import io.linuxserver.fleet.v2.key.RepositoryKey;
 import io.linuxserver.fleet.v2.key.TagBranchKey;
@@ -28,20 +28,17 @@ import io.linuxserver.fleet.v2.types.*;
 import io.linuxserver.fleet.v2.types.internal.ImageOutlineRequest;
 import io.linuxserver.fleet.v2.types.internal.RepositoryOutlineRequest;
 import io.linuxserver.fleet.v2.types.internal.TagBranchOutlineRequest;
-import io.linuxserver.fleet.v2.types.meta.ImageCoreMeta;
-import io.linuxserver.fleet.v2.types.meta.ImageMetaData;
-import io.linuxserver.fleet.v2.types.meta.ItemSyncSpec;
+import io.linuxserver.fleet.v2.types.meta.*;
 import io.linuxserver.fleet.v2.types.meta.history.ImagePullHistory;
 import io.linuxserver.fleet.v2.types.meta.history.ImagePullStatistic;
-import io.linuxserver.fleet.v2.types.meta.template.ImageTemplateHolder;
 
-import java.net.URL;
 import java.sql.*;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 public class DefaultImageDAO extends AbstractDAO implements ImageDAO {
 
@@ -52,8 +49,9 @@ public class DefaultImageDAO extends AbstractDAO implements ImageDAO {
     private static final String CreateRepositoryOutline  = "{CALL Repository_CreateOutline(?,?,?,?,?,?,?,?)}";
     private static final String StoreRepository          = "{CALL Repository_Store(?,?,?,?)}";
 
-    private static final String StoreImage             = "{CALL Image_Store(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)}";
+    private static final String StoreImage             = "{CALL Image_Store(?,?,?,?,?,?,?,?,?,?,?)}";
     private static final String CreateTagBranchOutline = "{CALL Image_CreateTagBranchOutline(?,?)}";
+    private static final String RemoveOrphanBranches   = "{CALL Image_RemoveOrphanBranches(?,?)}";
     private static final String StoreTagBranch         = "{CALL Image_StoreTagBranch(?,?,?,?)}";
     private static final String StoreTagDigest         = "{CALL Image_StoreTagDigest(?,?,?,?,?)}";
     private static final String GetTagBranches         = "{CALL Image_GetTagBranches(?)}";
@@ -62,6 +60,10 @@ public class DefaultImageDAO extends AbstractDAO implements ImageDAO {
     private static final String GetImage               = "{CALL Image_Get(?)}";
     private static final String DeleteImage            = "{CALL Image_Delete(?)}";
     private static final String GetImageStats          = "{CALL Image_GetStats(?)}";
+    private static final String GetExternalUrls        = "{CALL Image_GetExternalUrls(?)}";
+    private static final String RemoveOrphanUrls       = "{CALL Image_RemoveOrphanUrls(?, ?)}";
+    private static final String StoreCoreMetaData      = "{CALL Image_StoreCoreMetaData(?,?,?,?,?)}";
+    private static final String StoreExternalUrl       = "{CALL Image_StoreExternalUrl(?,?,?,?,?)}";
 
     private final ImageTemplateFactory templateFactory;
 
@@ -105,12 +107,6 @@ public class DefaultImageDAO extends AbstractDAO implements ImageDAO {
                 call.setBoolean(i++, image.isSyncEnabled());
                 Utils.setNullableString(call, i++, image.getVersionMask());
 
-                Utils.setNullableString(call, i++, image.getMetaData().getCategory());
-                Utils.setNullableString(call, i++, image.getMetaData().getSupportUrl());
-                Utils.setNullableString(call, i++, image.getMetaData().getAppUrl());
-                Utils.setNullableString(call, i++, image.getMetaData().getBaseImage());
-                Utils.setNullableString(call, i++, image.getMetaData().getAppImagePath());
-
                 call.registerOutParameter(i, Types.VARCHAR);
 
                 final ResultSet results = call.executeQuery();
@@ -139,7 +135,11 @@ public class DefaultImageDAO extends AbstractDAO implements ImageDAO {
 
         try (final Connection connection = getConnection()) {
 
+            storeCoreMetaData(connection, image);
+            storeExternalUrls(connection, image);
+
             templateFactory.storeImageTemplates(connection, image);
+
             return new InsertUpdateResult<>(makeImage(image.getKey(), connection));
 
         } catch (SQLException e) {
@@ -194,7 +194,6 @@ public class DefaultImageDAO extends AbstractDAO implements ImageDAO {
 
     @Override
     public InsertUpdateResult<TagBranch> createTagBranchOutline(final TagBranchOutlineRequest request) {
-
 
         try (final Connection connection = getConnection()) {
 
@@ -384,11 +383,57 @@ public class DefaultImageDAO extends AbstractDAO implements ImageDAO {
         }
     }
 
+    private void storeCoreMetaData(final Connection connection, final Image image) throws SQLException {
+
+        try (final CallableStatement call = connection.prepareCall(StoreCoreMetaData)) {
+
+            int i = 1;
+            call.setInt(i++, image.getKey().getId());
+
+            Utils.setNullableString(call, i++, image.getMetaData().getCategory());
+            Utils.setNullableString(call, i++, image.getMetaData().getBaseImage());
+            Utils.setNullableString(call, i++, image.getMetaData().getAppImagePath());
+
+            final int statusIndex = i;
+            call.registerOutParameter(statusIndex, Types.VARCHAR);
+            call.executeUpdate();
+
+            final DbUpdateStatus status = DbUpdateStatus.valueOf(call.getString(statusIndex));
+            getLogger().info("storeCoreMetaData stored with result " + status);
+        }
+    }
+
+    private void storeExternalUrls(final Connection connection, final Image image) throws SQLException {
+
+        final List<ExternalUrl> urls = image.getMetaData().getExternalUrls();
+        removeOrphans(connection, image.getKey(), urls, RemoveOrphanUrls);
+
+        try (final CallableStatement call = connection.prepareCall(StoreExternalUrl)) {
+
+            for (ExternalUrl url : urls) {
+
+                int i = 1;
+                call.setInt(   i++, image.getKey().getId());
+                call.setInt(   i++, url.getKey().getId());
+                call.setString(i++, url.getType().name());
+                call.setString(i++, url.getName());
+                call.setString(i,   url.getAbsoluteUrl());
+
+                call.addBatch();
+            }
+
+            call.executeBatch();
+        }
+    }
+
     private void storeTagBranches(final Connection connection, final Image image) throws SQLException {
+
+        final List<TagBranch> tagBranches = image.getTagBranches();
+        removeOrphans(connection, image.getKey(), tagBranches, RemoveOrphanBranches);
 
         try (final CallableStatement call = connection.prepareCall(StoreTagBranch)) {
 
-            for (TagBranch tagBranch : image.getTagBranches()) {
+            for (TagBranch tagBranch : tagBranches) {
 
                 int i = 1;
                 call.setInt(i++,     tagBranch.getKey().getImageKey().getId());
@@ -402,8 +447,23 @@ public class DefaultImageDAO extends AbstractDAO implements ImageDAO {
             call.executeBatch();
         }
 
-        for (TagBranch tagBranch : image.getTagBranches()) {
+        for (TagBranch tagBranch : tagBranches) {
             storeTagDigests(connection, tagBranch);
+        }
+    }
+
+    private void removeOrphans(final Connection connection,
+                               final ImageKey imageKey,
+                               final List<? extends HasKey<?>> possibleOrphans,
+                               final String sprocSpec) throws SQLException {
+
+        final String ids = possibleOrphans.stream().map(o -> String.valueOf(o.getKey().getId())).collect(Collectors.joining(","));
+
+        try (final CallableStatement call = connection.prepareCall(sprocSpec)) {
+
+            call.setInt(   1, imageKey.getId());
+            call.setString(2, ids);
+            call.executeUpdate();
         }
     }
 
@@ -509,18 +569,40 @@ public class DefaultImageDAO extends AbstractDAO implements ImageDAO {
 
     private ImageMetaData makeImageMetaData(final Connection connection, final ImageKey imageKey, final ResultSet mainImageResults) throws SQLException {
 
-        return new ImageMetaData(makeCoreMeta(mainImageResults),
+        return new ImageMetaData(makeCoreMeta(connection, imageKey, mainImageResults),
                                  makePullHistory(connection, imageKey),
                                  templateFactory.makeTemplateHolder(connection, imageKey));
     }
 
-    private ImageCoreMeta makeCoreMeta(final ResultSet mainImageResults) throws SQLException {
+    private ImageCoreMeta makeCoreMeta(final Connection connection, final ImageKey imageKey, final ResultSet mainImageResults) throws SQLException {
 
-        return new ImageCoreMeta(mainImageResults.getString("CoreMetaImagePath"),
-                                 mainImageResults.getString("CoreMetaBaseImage"),
-                                 mainImageResults.getString("CoreMetaCategory"),
-                                 mainImageResults.getString("CoreMetaSupportUrl"),
-                                 mainImageResults.getString("CoreMetaAppUrl"));
+        final ImageCoreMeta coreMeta = new ImageCoreMeta(mainImageResults.getString("CoreMetaImagePath"),
+                                                         mainImageResults.getString("CoreMetaBaseImage"),
+                                                         mainImageResults.getString("CoreMetaCategory"));
+
+        makeExternalUrls(connection, imageKey).forEach(coreMeta::addExternalUrl);
+        return coreMeta;
+    }
+
+    private List<ExternalUrl> makeExternalUrls(final Connection connection, final ImageKey imageKey) throws SQLException {
+
+        final List<ExternalUrl> externalUrls = new ArrayList<>();
+
+        try (final CallableStatement call = connection.prepareCall(GetExternalUrls)) {
+
+            call.setInt(1, imageKey.getId());
+
+            final ResultSet results = call.executeQuery();
+            while (results.next()) {
+
+                externalUrls.add(new ExternalUrl(new ExternalUrlKey(results.getInt("UrlId")),
+                                                 ExternalUrl.ExternalUrlType.valueOf(results.getString("UrlType")),
+                                                 results.getString("UrlName"),
+                                                 results.getString("UrlPath")));
+            }
+        }
+
+        return externalUrls;
     }
 
     private ImagePullHistory makePullHistory(final Connection connection, final ImageKey imageKey) throws SQLException {

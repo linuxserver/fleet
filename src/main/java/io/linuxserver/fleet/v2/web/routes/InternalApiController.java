@@ -192,4 +192,18 @@ public class InternalApiController extends AbstractAppService {
             throw new ApiException(e.getMessage(), e);
         }
     }
+
+    public void removeTrackedBranch(final Context ctx) {
+
+        try {
+
+            final ImageKey imageKey   = ctx.queryParam("imageKey",   ImageKey.class).get();
+            final String   branchName = ctx.queryParam("branchName", String.class).get();
+
+            getController().getImageService().removeTrackedBranch(imageKey, branchName);
+
+        } catch (IllegalArgumentException e) {
+            throw new ApiException(e.getMessage(), e);
+        }
+    }
 }

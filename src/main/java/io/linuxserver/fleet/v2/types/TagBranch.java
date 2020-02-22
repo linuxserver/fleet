@@ -18,8 +18,6 @@
 package io.linuxserver.fleet.v2.types;
 
 import io.linuxserver.fleet.v2.key.AbstractHasKey;
-import io.linuxserver.fleet.v2.key.HasKey;
-import io.linuxserver.fleet.v2.key.ImageKey;
 import io.linuxserver.fleet.v2.key.TagBranchKey;
 
 import java.util.concurrent.atomic.AtomicReference;

@@ -96,7 +96,7 @@ public class ImageTemplateHolder {
     }
 
     public final String getRestartPolicy() {
-        return restartPolicy;
+        return restartPolicy == null ? "no" : restartPolicy;
     }
 
     public final boolean isHostNetworkingEnabled() {

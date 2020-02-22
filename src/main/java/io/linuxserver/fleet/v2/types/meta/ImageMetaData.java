@@ -38,11 +38,11 @@ public class ImageMetaData {
     }
 
     public final ImageMetaData cloneWithTemplate(final ImageTemplateHolder templateHolder) {
-        return new ImageMetaData(getCoreMeta(), this.pullHistory, templateHolder);
+        return new ImageMetaData(getCoreMeta(), pullHistory, templateHolder);
     }
 
     public final ImageMetaData cloneWithCoreMeta(final ImageCoreMeta coreMeta) {
-        return new ImageMetaData(coreMeta, this.pullHistory, getTemplates());
+        return new ImageMetaData(coreMeta, pullHistory, getTemplates());
     }
 
     public final List<ImagePullStatistic> getHistoryFor(final ImagePullStatistic.StatGroupMode groupMode) {
@@ -69,20 +69,11 @@ public class ImageMetaData {
         return getCoreMeta().getCategory();
     }
 
-    public final String getSupportUrl() {
-        return getCoreMeta().getSupportUrl();
-    }
-
-    public final String getAppUrl() {
-        return getCoreMeta().getAppUrl();
+    public final List<ExternalUrl> getExternalUrls() {
+        return getCoreMeta().getExternalUrls();
     }
 
     public final boolean isPopulated() {
-
-        return (
-            null != getCategory() ||
-            null != getSupportUrl() ||
-            null != getAppUrl()
-        );
+        return (null != getCategory() && !getCategory().isBlank()) || !getExternalUrls().isEmpty();
     }
 }

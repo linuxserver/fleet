@@ -95,14 +95,14 @@ public class FileManager extends AbstractAppService {
 
     private void writeDataToFile(final ImageAppLogo logo, final File logoFile) throws IOException {
 
-        final byte[] buffer = new byte[logo.getRawDataStream().available()];
-        int read = logo.getRawDataStream().read(buffer);
-        if (read != -1) {
-            getLogger().warn("Not all file content has been read! File may be corrupted once saved to disk");
-        }
+        try (final InputStream initialStream = logo.getRawDataStream();
+             final OutputStream out = new FileOutputStream(logoFile)) {
 
-        try (final OutputStream out = new FileOutputStream(logoFile)) {
-            out.write(buffer);
+            byte[] buffer = new byte[8 * 1024];
+            int bytesRead;
+            while ((bytesRead = initialStream.read(buffer)) != -1) {
+                out.write(buffer, 0, bytesRead);
+            }
         }
     }
 

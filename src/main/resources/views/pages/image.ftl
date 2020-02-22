@@ -127,7 +127,7 @@
 
                             </div>
 
-                            <#if image.metaData.populated>
+                            <#if image.metaData.populated || image.metaData.externalUrls?has_content>
                                 <div class="column is-full has-margin-bottom">
 
                                     <h2 class="title is-5">Support Information</h2>
@@ -140,15 +140,20 @@
                                         </tr>
                                         </thead>
                                         <tbody>
+
                                             <#if image.metaData.category?has_content>
                                                 <@table.halfDisplayRow title="Category" value=image.metaData.category />
                                             </#if>
-                                            <#if image.metaData.appUrl?has_content>
-                                                <@table.halfDisplayRow title="Application Home" value=image.metaData.appUrl?html link=image.metaData.appUrl />
-                                            </#if>
-                                            <#if image.metaData.supportUrl?has_content>
-                                                <@table.halfDisplayRow title="Support" value=image.metaData.supportUrl?html link=image.metaData.supportUrl />
-                                            </#if>
+
+                                            <#-- Any set external Urls -->
+                                            <#list image.metaData.externalUrls as url>
+
+                                                <@table.halfDisplayRow
+                                                    title='<i class="fas fa-${url.type.icon}" title="${url.type}"></i> ${url.name}'
+                                                    value=url.absoluteUrl link=url.absoluteUrl />
+
+                                            </#list>
+
                                         </tbody>
                                     </@table.table>
 
