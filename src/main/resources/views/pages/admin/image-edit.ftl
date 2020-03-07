@@ -60,8 +60,8 @@
                     <#--
                     General base information which is to be added manually (data which can't necessarily be inferred from upstream)
                     -->
-                    <form class="needs-validation" novalidate action="/admin/image" method="post" enctype="multipart/form-data">
-                        <div class="column is-full has-margin-top">
+                    <div class="column is-full has-margin-top">
+                        <form class="needs-validation" novalidate action="/admin/image" method="post" enctype="multipart/form-data">
                             <div class="columns is-multiline">
                                 <div class="column is-full">
                                     <h2 class="title is-4">General</h2>
@@ -111,8 +111,80 @@
                                     </@button.buttons>
                                 </div>
                             </div>
-                        </div>
-                    </form>
+                        </form>
+                    </div>
+
+                    <div class="column is-full has-margin-top">
+                        <form class="needs-validation" novalidate action="/admin/image" method="post">
+
+                            <div class="columns is-multiline">
+                                <div class="column is-full">
+                                    <h2 class="title is-4">External Urls</h2>
+                                </div>
+                                <div class="column is-full">
+                                    <@table.table id="ImageExternalUrls">
+                                        <thead>
+                                            <tr>
+                                                <th>Type</th>
+                                                <th>Name</th>
+                                                <th>Absolute Path</th>
+                                                <th></th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                             <#list image.metaData.externalUrls as url>
+                                                <tr>
+                                                    <td>
+                                                        <div class="select is-small">
+                                                            <select title="Url Type" name="imageExternalUrlType" required>
+                                                                <#list imageUrlTypes as imageUrlType>
+                                                                    <option<#if url.type==imageUrlType> selected</#if> title="${imageUrlType.description}" value="${imageUrlType}">${imageUrlType}</option>
+                                                                </#list>
+                                                            </select>
+                                                        </div>
+                                                    </td>
+                                                    <td>
+                                                        <input type="hidden" value="${url.key.id}" name="imageExternalUrlKey" />
+                                                        <input title="Descriptive name of URL" type="text" class="input is-small" name="imageExternalUrlName" value="${url.name?html}" required />
+                                                    </td>
+                                                    <td>
+                                                        <input title="Full path of URL" type="text" class="input is-small" name="imageExternalUrlPath" value="${url.absoluteUrl?html}" required />
+                                                    </td>
+                                                    <td>
+                                                        <@button.buttons isRightAligned=true>
+                                                            <@button.button colour="danger" size="small" extraClasses="remove-image-external-url">
+                                                                <i class="fas fa-trash is-marginless"></i>
+                                                            </@button.button>
+                                                        </@button.buttons>
+                                                    </td>
+                                                </tr>
+                                             </#list>
+                                        </tbody>
+                                    </@table.table>
+
+                                    <@button.buttons isRightAligned=true>
+                                        <@button.button id="AddNewExternalUrl" colour="normal-colour" size="small">
+                                            <i class="fas fa-plus has-text-success"></i> Add Url
+                                        </@button.button>
+                                    </@button.buttons>
+                                </div>
+                            </div>
+
+                            <div class="columns">
+                                <div class="column is-full">
+
+                                    <input type="hidden" name="imageKey" value="${image.key}" />
+                                    <input type="hidden" name="updateType" value="EXTERNAL_URLS" />
+
+                                    <@button.buttons isRightAligned=true>
+                                        <@button.submit colour="success" extraClasses="is-fullwidth-mobile">
+                                            <i class="fas fa-save"></i> Update External Urls
+                                        </@button.submit>
+                                    </@button.buttons>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
 
                     <#--
                     Tag branches
@@ -256,5 +328,9 @@
         </@section.section>
 
     </#if>
+
+    <script type="text/javascript">
+        var externalUrlTypes = [<#list imageUrlTypes as imageUrlType><#if imageUrlType?index &gt; 0>,</#if>'${imageUrlType}'</#list>];
+    </script>
 
 </@base.base>

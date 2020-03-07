@@ -44,7 +44,7 @@ import io.linuxserver.fleet.v2.web.WebRouteController;
  */
 public class FleetAppController extends AbstractAppController implements ServiceProvider {
 
-    public  final DockerApiDelegate      dockerApiDelegate;
+    private final DockerApiDelegate      dockerApiDelegate;
     private final ImageService           imageService;
     private final ScheduleService        scheduleService;
     private final SynchronisationService syncService;

@@ -26,6 +26,8 @@ var Admin = (function($) {
     var $DeleteRepository;
 
     // Image Edit
+    var $ImageExternalUrls;
+    var $AddNewExternalUrl;
     var $TrackNewBranch;
     var $NewTrackedBranch;
     var $ImageKey;
@@ -166,6 +168,29 @@ var Admin = (function($) {
         ));
     };
 
+    var addExternalUrlRow = function() {
+
+        $ImageExternalUrls.find('tbody').append($(
+            '<tr>' +
+                '<td>' +
+                    makeSelect('imageExternalUrlType', externalUrlTypes) +
+                '</td>' +
+                '<td>' +
+                    '<input type="hidden" value="-1" name="imageExternalUrlKey" />' +
+                    makeInput('imageExternalUrlName', 'text', true) +
+                '</td>' +
+                '<td>' +
+                    makeInput('imageExternalUrlPath', 'text', true) +
+                '</td>' +
+                '<td>' +
+                    '<div class="buttons is-right">' +
+                        makeButton('<i class="fas fa-trash is-marginless"></i>', 'remove-image-external-url', 'danger') +
+                    '</div>' +
+                '</td>' +
+            '</tr>'
+        ));
+    };
+
     var addVolumeRow = function() {
 
         $ImageTemplateVolumes.find('tbody').append($(
@@ -244,6 +269,8 @@ var Admin = (function($) {
         $AddNewEnv                 = $('#AddNewEnv');
         $ImageTemplateDevices      = $('#ImageTemplateDevices');
         $AddNewDevice              = $('#AddNewDevice');
+        $ImageExternalUrls         = $('#ImageExternalUrls');
+        $AddNewExternalUrl         = $('#AddNewExternalUrl');
 
         $SubmitNewRepository.on('click', function() {
             addRepository($NewRepositoryName.val());
@@ -295,13 +322,19 @@ var Admin = (function($) {
             removeTrackedBranch(branchName, $ImageKey.val());
         });
 
+        $AddNewExternalUrl.on('click', addExternalUrlRow);
+
+        $ImageExternalUrls.on('click', '.remove-image-external-url', function() {
+            $(this).parents('tr').remove();
+        });
+
         $AddNewPort.on('click',   addPortRow);
         $AddNewVolume.on('click', addVolumeRow);
         $AddNewEnv.on('click',    addEnvRow);
         $AddNewDevice.on('click', addDeviceRow);
 
         $ImageTemplateTabContent.on('click', '.remove-image-template-item', function() {
-           $(this).parents('tr').remove();
+            $(this).parents('tr').remove();
         });
     };
 

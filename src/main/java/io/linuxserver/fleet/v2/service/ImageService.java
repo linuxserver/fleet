@@ -272,13 +272,22 @@ public class ImageService extends AbstractAppService {
             }
         }
 
-        final ImageCoreMeta coreMeta = new ImageCoreMeta(appLogoPath,
-                                                         generalInfoUpdateRequest.getBaseImage(),
-                                                         generalInfoUpdateRequest.getCategory());
-
-        metaData.getCoreMeta().enrichOtherWithExternalUrls(coreMeta);
+        final ImageCoreMeta coreMeta = metaData.getCoreMeta().cloneWithBaseData(appLogoPath,
+                                                                                generalInfoUpdateRequest.getBaseImage(),
+                                                                                generalInfoUpdateRequest.getCategory());
 
         final Image cloned = image.cloneWithMetaData(metaData.cloneWithCoreMeta(coreMeta));
+        storeImageTemplateMetaData(cloned);
+    }
+
+    public void updateImageExternalUrls(final ImageKey imageKey, final ImageUrlsUpdateRequest imageUrlsUpdateFields) {
+
+        final Image         image    = findImage(imageKey);
+        final ImageMetaData metaData = image.getMetaData();
+
+        final ImageCoreMeta coreMeta = metaData.getCoreMeta().cloneWithExternalUrls(imageUrlsUpdateFields.getExternalUrls());
+        final Image         cloned   = image.cloneWithMetaData(metaData.cloneWithCoreMeta(coreMeta));
+
         storeImageTemplateMetaData(cloned);
     }
 

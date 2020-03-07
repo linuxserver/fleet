@@ -26,6 +26,8 @@ import io.linuxserver.fleet.v2.types.docker.DockerCapability;
 import io.linuxserver.fleet.v2.types.internal.ImageAppLogo;
 import io.linuxserver.fleet.v2.types.internal.ImageGeneralInfoUpdateRequest;
 import io.linuxserver.fleet.v2.types.internal.ImageTemplateRequest;
+import io.linuxserver.fleet.v2.types.internal.ImageUrlsUpdateRequest;
+import io.linuxserver.fleet.v2.types.meta.ExternalUrl;
 import io.linuxserver.fleet.v2.web.PageModelSpec;
 
 public class AdminImageEditController extends AbstractPageHandler {
@@ -45,6 +47,7 @@ public class AdminImageEditController extends AbstractPageHandler {
 
             final PageModelSpec modelSpec = new PageModelSpec("views/pages/admin/image-edit.ftl");
             modelSpec.addModelAttribute("image", imageService.getImage(ImageKey.parse(imageKeyParam)));
+            modelSpec.addModelAttribute("imageUrlTypes", ExternalUrl.ExternalUrlType.values());
             modelSpec.addModelAttribute("containerCapabilities", DockerCapability.values());
             return modelSpec;
 
@@ -69,11 +72,19 @@ public class AdminImageEditController extends AbstractPageHandler {
                 handleTemplateUpdate(ctx, imageKey);
                 break;
 
+            case "EXTERNAL_URLS":
+                handleUrlUpdate(ctx, imageKey);
+                break;
+
             default:
                 throw new IllegalArgumentException("Unknown updateType provided: " + updateType);
         }
 
         return new PageModelSpec("redirect:/admin/image?imageKey=" + imageKey);
+    }
+
+    private void handleUrlUpdate(final Context ctx, final ImageKey imageKey) {
+        imageService.updateImageExternalUrls(imageKey, new ImageUrlsUpdateRequest(ctx.formParamMap()));
     }
 
     private void handleGeneralUpdate(final Context ctx, final ImageKey imageKey) {

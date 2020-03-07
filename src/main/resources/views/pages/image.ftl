@@ -167,14 +167,26 @@
 
                                 <@table.table isFullWidth=true isNarrow=false isStriped=true isScrollable=true>
                                     <thead>
-                                    <tr>
-                                        <th scope="row" colspan="2"></th>
-                                    </tr>
+                                        <tr>
+                                            <th class="has-text-small">Branch</th>
+                                            <th class="has-text-small">Version</th>
+                                            <th class="has-text-small">Built</th>
+                                        </tr>
                                     </thead>
                                     <tbody>
-                                    <#list image.tagBranches as tagBranch>
-                                        <@table.halfDisplayRow title=tagBranch.branchName?html value='<i class="fas fa-tag"></i> ${image.getMaskedVersion(tagBranch.latestTag)}' />
-                                    </#list>
+                                        <#list image.tagBranches as tagBranch>
+                                            <tr>
+                                                <th scope="row">
+                                                    ${tagBranch.branchName?html}
+                                                </th>
+                                                <td>
+                                                    <i class="fas fa-tag"></i> ${image.getMaskedVersion(tagBranch.latestTag)}
+                                                </td>
+                                                <td>
+                                                    ${formatDate(tagBranch.latestTag.buildDate, "dd MMM yyyy 'at' HH:mm:ss")}
+                                                </td>
+                                            </tr>
+                                        </#list>
                                     </tbody>
                                 </@table.table>
 
@@ -204,6 +216,8 @@
                                     Basic examples for getting this image running as a container
                                 </h3>
 
+                                <#--
+                                This is not ready yet
                                 <@message.message colour="info">
 
                                     These examples <strong>do not</strong> include the relevant values for volume mappings or environment variables. You will
@@ -217,6 +231,8 @@
                                     </div>
 
                                 </@message.message>
+                                -->
+
                             </div>
 
                             <div class="column is-full has-margin-bottom">

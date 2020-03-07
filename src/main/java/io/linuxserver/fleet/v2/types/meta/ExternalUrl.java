@@ -18,6 +18,7 @@
 package io.linuxserver.fleet.v2.types.meta;
 
 import io.linuxserver.fleet.v2.key.AbstractHasKey;
+import io.linuxserver.fleet.v2.key.HasKey;
 
 public class ExternalUrl extends AbstractHasKey<ExternalUrlKey> {
 
@@ -50,6 +51,20 @@ public class ExternalUrl extends AbstractHasKey<ExternalUrlKey> {
     @Override
     public final String toString() {
         return type + "[" + name + "]{" + absoluteUrl + "}";
+    }
+
+    @Override
+    public final int compareTo(final HasKey<ExternalUrlKey> o) {
+
+        if (isNonPersisted(getKey()) && isNonPersisted(o.getKey())) {
+            return -1;
+        }
+
+        return getKey().getId().compareTo(o.getKey().getId());
+    }
+
+    private boolean isNonPersisted(final ExternalUrlKey key) {
+        return key.getId().equals(ExternalUrlKey.NewNotPersistedYet.getId());
     }
 
     public enum ExternalUrlType {

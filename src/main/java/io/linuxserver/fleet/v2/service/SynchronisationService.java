@@ -30,6 +30,7 @@ import io.linuxserver.fleet.v2.types.docker.DockerImage;
 import io.linuxserver.fleet.v2.types.internal.ImageOutlineRequest;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class SynchronisationService extends AbstractAppService {
 

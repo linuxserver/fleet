@@ -39,8 +39,26 @@ public class ImageCoreMeta {
         this.externalUrls = new TreeSet<>();
     }
 
-    public final void enrichOtherWithExternalUrls(final ImageCoreMeta other) {
-        externalUrls.forEach(other::addExternalUrl);
+    public final ImageCoreMeta cloneWithBaseData(final String appImagePath,
+                                                 final String baseImage,
+                                                 final String category) {
+
+        final ImageCoreMeta cloned = new ImageCoreMeta(appImagePath,
+                                                       baseImage,
+                                                       category);
+        externalUrls.forEach(cloned::addExternalUrl);
+
+        return cloned;
+    }
+
+    public final ImageCoreMeta cloneWithExternalUrls(final List<ExternalUrl> externalUrls) {
+
+        final ImageCoreMeta cloned = new ImageCoreMeta(appImagePath,
+                                                       baseImage,
+                                                       category);
+
+        externalUrls.forEach(cloned::addExternalUrl);
+        return cloned;
     }
 
     public final void addExternalUrl(final ExternalUrl externalUrl) {

@@ -44,19 +44,6 @@
                     </div>
 
                 </div>
-                <div class="columns has-margin-top">
-
-                    <div class="column is-12">
-                        <@button.buttons isGrouped=true isRightAligned=true>
-                            <@button.button id="DisplayImageTable" colour="normal-colour" size="small" title="Display as table" extraClasses="is-active">
-                                <i class="fas fa-table is-marginless"></i>
-                            </@button.button>
-                            <@button.button id="DisplayImageGrid" colour="normal-colour" size="small" title="Display as grid">
-                                <i class="fas fa-th-large is-marginless"></i>
-                            </@button.button>
-                        </@button.buttons>
-                    </div>
-                </div>
 
                 <#if selectedRepository.images?has_content>
 
@@ -70,9 +57,9 @@
                                     <th>Name</th>
                                     <th></th>
                                     <th>Latest Version</th>
-                                    <th class="sorter-pullCount">Pulls</th>
-                                    <th>Stars</th>
-                                    <th>Build Time</th>
+                                    <th class="sorter-pullCount is-hidden-mobile">Pulls</th>
+                                    <th class="is-hidden-mobile">Stars</th>
+                                    <th class="is-hidden-mobile">Build Time</th>
                                 </tr>
                                 </thead>
                                 <tbody>
@@ -83,12 +70,6 @@
                             </@table.table>
                         </div>
 
-                    </div>
-
-                    <div id="ImageGridHolder" class="columns is-multiline is-hidden">
-                        <#list selectedRepository.images as image>
-                            <@imageListBoxItem.imageListItem image=image />
-                        </#list>
                     </div>
 
                 <#else>

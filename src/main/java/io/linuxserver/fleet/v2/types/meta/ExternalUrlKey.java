@@ -19,6 +19,7 @@ package io.linuxserver.fleet.v2.types.meta;
 
 import io.linuxserver.fleet.v2.Utils;
 import io.linuxserver.fleet.v2.key.AbstractDatabaseKey;
+import io.linuxserver.fleet.v2.key.Key;
 
 public class ExternalUrlKey extends AbstractDatabaseKey {
 
@@ -26,5 +27,21 @@ public class ExternalUrlKey extends AbstractDatabaseKey {
 
     public ExternalUrlKey(final Integer id) {
         super(Utils.ensureNotNull(id));
+    }
+
+    @Override
+    public boolean equals(Object o) {
+
+        final boolean keysMath = super.equals(o);
+
+        final Key other = (Key) o;
+        if (keysMath && areBothNonPersistedKeys(other)) {
+            return false;
+        }
+        return keysMath;
+    }
+
+    private boolean areBothNonPersistedKeys(Key other) {
+        return other.getId().equals(NewNotPersistedYet.getId()) && getId().equals(NewNotPersistedYet.getId());
     }
 }

@@ -38,6 +38,8 @@ import io.linuxserver.fleet.v2.web.request.json.NewRepositoryRequest;
 import io.linuxserver.fleet.v2.web.request.json.UpdateImageSpecRequest;
 import io.linuxserver.fleet.v2.web.request.json.UpdateRepositoryRequest;
 
+import java.sql.Connection;
+
 public class InternalApiController extends AbstractAppService {
 
     public InternalApiController(final FleetAppController controller) {

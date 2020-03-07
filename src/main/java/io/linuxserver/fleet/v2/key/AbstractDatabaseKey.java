@@ -21,7 +21,7 @@ public abstract class AbstractDatabaseKey implements Key {
 
     private final Integer id;
 
-    AbstractDatabaseKey(final Integer id) {
+    public AbstractDatabaseKey(final Integer id) {
         this.id = id;
     }
 
