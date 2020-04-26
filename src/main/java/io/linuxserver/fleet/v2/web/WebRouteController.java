@@ -25,6 +25,7 @@ import io.linuxserver.fleet.core.config.WebConfiguration;
 import io.linuxserver.fleet.v2.key.ImageKey;
 import io.linuxserver.fleet.v2.key.ImageLookupKey;
 import io.linuxserver.fleet.v2.key.RepositoryKey;
+import io.linuxserver.fleet.v2.key.UserKey;
 import io.linuxserver.fleet.v2.types.meta.history.ImagePullStatistic.StatGroupMode;
 import io.linuxserver.fleet.v2.web.routes.*;
 
@@ -57,6 +58,7 @@ public class WebRouteController {
         JavalinValidation.register(ImageKey.class,       ImageKey::parse);
         JavalinValidation.register(ImageLookupKey.class, ImageLookupKey::new);
         JavalinValidation.register(RepositoryKey.class,  RepositoryKey::parse);
+        JavalinValidation.register(UserKey.class,        s -> new UserKey(Integer.parseInt(s)));
 
         webInstance.exception(Exception.class, (e, ctx) -> {
 
@@ -80,6 +82,10 @@ public class WebRouteController {
             final AdminImageEditController imageEditController = new AdminImageEditController(app);
             get( Locations.Admin.ImageEdit, imageEditController, roles(AppRole.Admin));
             post(Locations.Admin.ImageEdit, imageEditController, roles(AppRole.Admin));
+
+            final AdminUserController userController = new AdminUserController(app);
+            get( Locations.Admin.Users, userController, roles(AppRole.Admin));
+            post(Locations.Admin.Users, userController, roles(AppRole.Admin));
 
             path(Locations.Internal.Api, () -> {
 

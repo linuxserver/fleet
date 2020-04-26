@@ -64,8 +64,7 @@
             <@navbar.dropdown icon="shield-alt" displayText="Admin" isRight=true>
                 <@navbar.item displayText="Repositories"    icon="cubes" link="/admin/repositories" isActive=(context=='admin_repositories') />
                 <@navbar.item displayText="Schedules"       icon="clock" link="/admin/schedules"    isActive=(context=='admin_schedules') />
-                <#-- <@navbar.item displayText="Users"           icon="users" link="/admin/users"        isActive=(context=='admin_users') />-->
-                <#-- <@navbar.item displayText="System Settings" icon="cog"   link="/admin/system"       isActive=(context=='admin_system') />-->
+                <@navbar.item displayText="Users"           icon="users" link="/admin/users"        isActive=(context=='admin_users') />
             </@navbar.dropdown>
 
             <@navbar.dropdown displayText=__AuthenticatedUser.name isRight=true icon="user">

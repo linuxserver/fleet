@@ -35,4 +35,6 @@ public interface UserDAO {
     List<User> fetchAllUsers();
 
     InsertUpdateResult<Void> removeUser(User user);
+
+    InsertUpdateResult<User> updateUser(User updatedUser);
 }

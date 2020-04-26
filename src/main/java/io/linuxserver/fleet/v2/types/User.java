@@ -63,4 +63,8 @@ public class User extends AbstractHasKey<UserKey> {
 
         return null;
     }
+
+    public final User cloneWithPassword(final String hashedPassword) {
+        return new User(getKey(), username, hashedPassword, LocalDateTime.now(), role);
+    }
 }

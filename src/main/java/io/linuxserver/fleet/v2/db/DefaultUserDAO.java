@@ -35,6 +35,8 @@ public class DefaultUserDAO extends AbstractDAO implements UserDAO {
     private static final String GetUserByName = "{CALL User_GetByName(?)}";
     private static final String GetAllUsers   = "{CALL User_GetAll()}";
     private static final String CreateUser    = "{CALL User_CreateOutline(?,?,?,?)}";
+    private static final String UpdateUser    = "{CALL User_Save(?,?,?,?,?)}";
+    private static final String DeleteUser    = "{CALL User_Delete(?)}";
 
     public DefaultUserDAO(DatabaseProvider databaseProvider) {
         super(databaseProvider);
@@ -150,15 +152,67 @@ public class DefaultUserDAO extends AbstractDAO implements UserDAO {
 
     @Override
     public InsertUpdateResult<Void> removeUser(final User user) {
-        return null;
+
+        try (final Connection connection = getConnection()) {
+
+            try (final CallableStatement call = connection.prepareCall(DeleteUser)) {
+
+                call.setInt(1, user.getKey().getId());
+                call.executeUpdate();
+            }
+
+            return new InsertUpdateResult<>(InsertUpdateStatus.OK, "OK");
+
+        } catch (SQLException e) {
+
+            getLogger().error("updateUser unable to complete request", e);
+            throw new RuntimeException("updateUser", e);
+        }
+    }
+
+    @Override
+    public InsertUpdateResult<User> updateUser(final User updatedUser) {
+
+        try (final Connection connection = getConnection()) {
+
+            try (final CallableStatement call = connection.prepareCall(UpdateUser)) {
+
+                int i = 1;
+                call.setInt(   i++, updatedUser.getKey().getId());
+                call.setString(i++, updatedUser.getUsername());
+                call.setString(i++, updatedUser.getPassword());
+                call.setString(i++, updatedUser.getRole().name());
+
+                final int statusIndex = i;
+                call.registerOutParameter(statusIndex, Types.VARCHAR);
+
+                final ResultSet results = call.executeQuery();
+
+                final DbUpdateStatus status = DbUpdateStatus.valueOf(call.getString(statusIndex));
+                if (results.next() && status.isUpdated()) {
+                    return new InsertUpdateResult<>(makeOneUser(results));
+                }
+
+                if (status.isNoChange()) {
+                    return new InsertUpdateResult<>(InsertUpdateStatus.FAILED, "No user found");
+                }
+            }
+
+            return new InsertUpdateResult<>(InsertUpdateStatus.FAILED, "Unknown error");
+
+        } catch (SQLException e) {
+
+            getLogger().error("updateUser unable to complete request", e);
+            throw new RuntimeException("updateUser", e);
+        }
     }
 
     private User makeOneUser(final ResultSet results) throws SQLException {
 
         return new User(new UserKey(results.getInt("UserId")),
-                                    results.getString("Username"),
-                                    results.getString("UserPassword"),
-                                    results.getTimestamp("ModifiedTime").toLocalDateTime(),
-                                    AppRole.valueOf(results.getString("UserRole")));
+                        results.getString("Username"),
+                        results.getString("UserPassword"),
+                        results.getTimestamp("ModifiedTime").toLocalDateTime(),
+                        AppRole.valueOf(results.getString("UserRole")));
     }
 }

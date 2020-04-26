@@ -61,6 +61,27 @@ public class UserService extends AbstractAppService {
         return userDAO.fetchAllUsers();
     }
 
+    public final void removeUser(final User user) {
+        userDAO.removeUser(user);
+    }
+
+    public final User updateUserPassword(final User user, final String password) {
+
+        final User updatedUser = user.cloneWithPassword(authDelegate.encodePassword(password));
+
+        final InsertUpdateResult<User> result = userDAO.updateUser(updatedUser);
+        if (result.isError()) {
+
+            getLogger().error("Unable to update user: {}", result.getStatusMessage());
+            throw new RuntimeException("Unable to update user: " + result.getStatusMessage());
+        }
+        return result.getResult();
+    }
+
+    public final User createUserAndHashPassword(final UserOutlineRequest userOutlineRequest) {
+        return createUser(userOutlineRequest.cloneWithPassword(authDelegate.encodePassword(userOutlineRequest.getPassword())));
+    }
+
     public final User createUser(final UserOutlineRequest userOutlineRequest) {
 
         final InsertUpdateResult<User> result = userDAO.createUser(userOutlineRequest);
@@ -77,11 +98,7 @@ public class UserService extends AbstractAppService {
         if (fetchAllUsers().isEmpty()) {
 
             getLogger().info("There are no users! Creating initial user with default credentials");
-            final UserOutlineRequest encodedUser = UserOutlineRequest.InitialFirstLoadUser.cloneWithPassword(
-                authDelegate.encodePassword(UserOutlineRequest.InitialFirstLoadUser.getPassword())
-            );
-
-            createUser(encodedUser);
+            createUserAndHashPassword(UserOutlineRequest.InitialFirstLoadUser);
 
             getLogger().warn("!!!!!!!!");
             getLogger().warn("DEFAULT USER CREATED. CHANGE THE PASSWORD OR CREATE A NEW USER!");
