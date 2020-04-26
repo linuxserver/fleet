@@ -123,6 +123,9 @@ public class WebRouteController {
                    put(apiController::runSchedule, roles(AppRole.Admin));
                 });
             });
+
+            final LegacyExternalApiController externalApiController = new LegacyExternalApiController(app);
+            get(Locations.Api.Images, externalApiController::fetchAllImages, roles(AppRole.Anyone));
         });
 
         Runtime.getRuntime().addShutdownHook(new Thread(webInstance::stop));
