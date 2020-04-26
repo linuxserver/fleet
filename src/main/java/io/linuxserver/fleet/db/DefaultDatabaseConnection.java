@@ -17,15 +17,11 @@
 
 package io.linuxserver.fleet.db;
 
-import io.linuxserver.fleet.core.FleetProperties;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import io.linuxserver.fleet.core.config.DatabaseConnectionProperties;
 
 public class DefaultDatabaseConnection extends PoolingDatabaseConnection {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(DefaultDatabaseConnection.class);
-
-    public DefaultDatabaseConnection(FleetProperties properties) {
+    public DefaultDatabaseConnection(final DatabaseConnectionProperties properties) {
         super(properties);
     }
 }

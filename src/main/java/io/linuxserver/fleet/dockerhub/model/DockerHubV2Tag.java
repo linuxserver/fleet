@@ -19,6 +19,7 @@ package io.linuxserver.fleet.dockerhub.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import java.util.List;
 import java.util.Objects;
 
 public class DockerHubV2Tag {
@@ -32,6 +33,9 @@ public class DockerHubV2Tag {
     @JsonProperty("last_updated")
     private String lastUpdated;
 
+    @JsonProperty("images")
+    private List<DockerHubV2TagDigest> images;
+
     public String getName() {
         return name;
     }
@@ -42,6 +46,10 @@ public class DockerHubV2Tag {
 
     public String getLastUpdated() {
         return lastUpdated;
+    }
+
+    public List<DockerHubV2TagDigest> getImages() {
+        return images;
     }
 
     @Override

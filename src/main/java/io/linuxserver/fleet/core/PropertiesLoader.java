@@ -17,12 +17,14 @@
 
 package io.linuxserver.fleet.core;
 
+import io.linuxserver.fleet.core.config.AppProperties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.util.Objects;
 import java.util.Properties;
 
 /**
@@ -38,7 +40,7 @@ class PropertiesLoader extends BaseRuntimeLoader {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(PropertiesLoader.class);
 
-    private final FleetProperties properties;
+    private final AppProperties properties;
 
     PropertiesLoader() {
 
@@ -50,8 +52,10 @@ class PropertiesLoader extends BaseRuntimeLoader {
 
             Properties properties = new Properties();
             properties.load(new FileInputStream(FleetRuntime.CONFIG_BASE + "/fleet.properties"));
+            properties.load(Objects.requireNonNull(getClass().getClassLoader().getResourceAsStream("version.properties")));
+            properties.setProperty("fleet.static.dirname", "fleet_static");
 
-            this.properties = new FleetProperties(properties);
+            this.properties = new AppProperties(properties);
 
             printProperties();
 
@@ -85,7 +89,7 @@ class PropertiesLoader extends BaseRuntimeLoader {
 
     private boolean createStaticFileDirectory() {
 
-        File staticFilesDir = new File(FleetRuntime.CONFIG_BASE + "/fleet_static");
+        File staticFilesDir = new File(properties.getStaticFilesPath().toString());
 
         if (staticFilesDir.exists()) {
             return true;
@@ -113,7 +117,7 @@ class PropertiesLoader extends BaseRuntimeLoader {
      * @return
      *      All application properties.
      */
-    FleetProperties getProperties() {
+    AppProperties getProperties() {
         return properties;
     }
 
@@ -125,12 +129,10 @@ class PropertiesLoader extends BaseRuntimeLoader {
     private void printProperties() {
 
         LOGGER.info("fleet.app.port           : " + properties.getAppPort());
-        LOGGER.info("fleet.refresh.interval   : " + properties.getRefreshIntervalInMinutes());
-        LOGGER.info("fleet.database.url       : " + properties.getDatabaseUrl());
-        LOGGER.info("fleet.database.username  : " + properties.getDatabaseUsername());
-        LOGGER.info("fleet.database.password  : " + (showPasswords() ? properties.getDatabasePassword() : "***"));
-        LOGGER.info("fleet.dockerhub.username : " + properties.getDockerHubCredentials().getUsername());
-        LOGGER.info("fleet.dockerhub.password : " + (showPasswords() ? properties.getDockerHubCredentials().getPassword() : "***"));
+        LOGGER.info("fleet.database.url       : " + properties.getDatabaseProperties().getDatabaseUrl());
+        LOGGER.info("fleet.database.username  : " + properties.getDatabaseProperties().getDatabaseUsername());
+        LOGGER.info("fleet.database.password  : " + (showPasswords() ? properties.getDatabaseProperties().getDatabasePassword() : "***"));
+        LOGGER.info("app.version              : " + getProperties().getVersionProperties());
     }
 
     /**

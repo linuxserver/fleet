@@ -28,6 +28,7 @@ build/
 out/
 *.iml
 config/fleet.properties
+/config/fleet_static/*
 src/main/resources/assets/js/all*.js
 src/main/resources/assets/css/all*.css
 src/main/resources/log4j2.xml

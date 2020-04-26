@@ -36,5 +36,6 @@ abstract class BaseRuntimeLoader {
         LOGGER.info("Initalising...");
         LOGGER.info("Config base    : " + FleetRuntime.CONFIG_BASE);
         LOGGER.info("Show Passwords : " + FleetRuntime.SHOW_PASSWORDS);
+        LOGGER.info("Nuke database  : " + FleetRuntime.NUKE_DATABASE);
     }
 }

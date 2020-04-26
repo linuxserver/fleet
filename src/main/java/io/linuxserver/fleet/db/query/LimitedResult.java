@@ -31,9 +31,9 @@ public class LimitedResult<T> {
 
     public LimitedResult(List<T> results, int totalCount, LimitOffset next) {
 
-        this.results = results;
+        this.results    = results;
         this.totalCount = totalCount;
-        this.next = next;
+        this.next       = next;
     }
 
     public List<T> getResults() {

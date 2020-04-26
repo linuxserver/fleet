@@ -1,0 +1,260 @@
+@media screen and (max-width: 768px) {
+
+    button.is-wide-mobile {
+        width: 100%;
+    }
+}
+
+.title {
+    font-family: 'Nunito', sans-serif !important;
+    font-weight: 600;
+    letter-spacing: .01rem;
+}
+
+.has-text-small {
+    font-size: 0.85rem;
+}
+
+.card  {
+    box-shadow: 0 2px 3px rgba(10,10,10,.1),0 0 0 1px rgba(10,10,10,.05);
+}
+
+.has-text-weight-500 {
+    font-weight: 500 !important;
+}
+
+.has-text-weight-600 {
+    font-weight: 600 !important;
+}
+
+span.icon i.fas, span.icon i.far, span.icon i.fab {
+    margin: 0;
+}
+
+i.fas, i.far, i.fab {
+    margin-right: .5rem;
+}
+
+.navbar-title {
+    font-size: 1.8rem;
+}
+
+.has-icon-large i.fas, .has-icon-large i.far, .has-icon-large i.fab {
+    font-size: 3rem;
+}
+
+.media-content {
+    overflow-x: inherit !important;
+}
+
+span.image-title {
+    font-size: 1.2rem;
+}
+
+.has-margin-left {
+    margin-left: 1rem;
+}
+
+.has-margin-right {
+    margin-right: 1rem;
+}
+
+.has-margin-top {
+    margin-top: 1rem;
+}
+
+.has-margin-bottom {
+    margin-bottom: 1rem;
+}
+
+.is-paddingless-top {
+    padding-top: 0 !important;
+}
+
+.is-paddingless-bottom {
+    padding-bottom: 0 !important;
+}
+
+/* The switch - the box around the slider */
+.switch {
+    position: relative;
+    display: inline-block;
+    width: 30px;
+    height: 20px;
+    margin: 0;
+}
+
+.switch.switch.is-large {
+    height: 26px;
+    width: 40px;
+}
+
+/* Hide default HTML checkbox */
+.switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+/* The slider */
+.slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #e0e0e0;
+    -webkit-transition: .4s;
+    transition: .4s;
+}
+
+.slider:before {
+    position: absolute;
+    content: "";
+    height: 16px;
+    width: 16px;
+    left: 2px;
+    bottom: 2px;
+    background-color: white;
+    -webkit-transition: .4s;
+    transition: .4s;
+    box-shadow: 1px 1px 2px #98a0a6;
+}
+
+.switch.is-primary input:checked + .slider {
+    background-color: #00d1b2;
+}
+
+.switch.is-danger input:checked + .slider {
+    background-color: #ff3860;
+}
+
+.switch.is-warning input:checked + .slider {
+    background-color: #ffdd57;
+}
+
+.switch.is-info input:checked + .slider {
+    background-color: #209cee;
+}
+
+.switch.is-link input:checked + .slider {
+    background-color: #3273dc;
+}
+
+.switch.is-success input:checked + .slider {
+    background-color: #23d160
+}
+
+.switch.is-large .slider:before {
+
+    height: 22px;
+    width: 22px;
+    left: 2px;
+    bottom: 2px;
+}
+
+input:disabled + .slider {
+    background-color: #f7f7f7;
+}
+
+input:disabled + .slider:before {
+    box-shadow: none;
+}
+
+input:checked + .slider:before {
+    -webkit-transform: translateX(10px);
+    -ms-transform: translateX(10px);
+    transform: translateX(10px);
+}
+
+.switch.is-large input:checked + .slider:before {
+    -webkit-transform: translateX(14px);
+    -ms-transform: translateX(14px);
+    transform: translateX(14px);
+}
+
+.slider.round {
+    border-radius: 26px;
+}
+
+.slider.round:before {
+    border-radius: 50%;
+}
+
+table tbody .is-half {
+    width: 50%;
+}
+
+table tbody tr td.is-vcentered {
+    vertical-align: middle;
+}
+
+#ImageTable tr td {
+    white-space: nowrap;
+}
+
+table tr th.tablesorter-header {
+    outline: none;
+    cursor: pointer;
+}
+
+.has-switchable .switchable.plaintext {
+    border-bottom: dotted 2px;
+}
+
+.has-switchable .switchable.field {
+    display: none;
+}
+
+.has-switchable.is-active .switchable.plaintext {
+    display: none;
+}
+
+.has-switchable.is-active .switchable.field {
+    display: flex;
+}
+
+.is-pointer {
+    cursor: pointer;
+}
+
+.is-borderless {
+    border: 0 !important;
+}
+
+#NotificationWrapper {
+    position: relative;
+    margin: 0 10px 0 10px;
+    z-index: 1000;
+}
+
+#Notifications {
+    position: absolute;
+    right: 0;
+    max-width: 100%;
+}
+
+.columns.has-tabs-content > .column {
+    display: none;
+}
+
+.columns.has-tabs-content > .column.is-active {
+    display: block;
+}
+
+#ImageTemplatePorts .template-port {
+    width: 200px !important;
+}
+
+#ImageTemplatePorts .template-port-protocol {
+    width: 150px !important;
+}
+
+#ImageTemplatePorts .template-port-description {
+    min-width: 300px !important;
+}
+
+#ImageTemplatePorts .template-port-delete {
+    width: 50px !important;
+}

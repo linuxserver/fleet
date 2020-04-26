@@ -23,6 +23,10 @@ public class InsertUpdateResult<T> {
     private final int       status;
     private final String    statusMessage;
 
+    public InsertUpdateResult(T result) {
+        this(result, InsertUpdateStatus.OK, "OK");
+    }
+
     public InsertUpdateResult(T result, int status, String statusMessage) {
 
         this.result = result;
@@ -34,15 +38,19 @@ public class InsertUpdateResult<T> {
         this(null, status, statusMessage);
     }
 
-    public T getResult() {
+    public final T getResult() {
         return result;
     }
 
-    public int getStatus() {
+    public final int getStatus() {
         return status;
     }
 
-    public String getStatusMessage() {
+    public final String getStatusMessage() {
         return statusMessage;
+    }
+
+    public final boolean isError() {
+        return status != InsertUpdateStatus.OK;
     }
 }

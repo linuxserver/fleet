@@ -17,26 +17,26 @@
 
 package io.linuxserver.fleet.dockerhub.util;
 
-import io.linuxserver.fleet.model.docker.DockerTag;
+import io.linuxserver.fleet.v2.types.docker.DockerTag;
 
 import java.util.List;
 import java.util.Optional;
 
 public class DockerTagFinder {
 
-    public DockerTag findVersionedTagMatchingBranch(List<DockerTag> tags, String namedBranch) {
+    public static DockerTag findVersionedTagMatchingBranch(List<DockerTag> tags, String namedBranch) {
 
-        Optional<DockerTag> trueLatest = tags.stream().filter(tag -> namedBranch.equals(tag.getName())).findFirst();
+        Optional<DockerTag> tagBranchName = tags.stream().filter(tag -> namedBranch.equals(tag.getName())).findFirst();
 
-        if (trueLatest.isPresent()) {
+        if (tagBranchName.isPresent()) {
 
-            DockerTag trueLatestTag = trueLatest.get();
+            DockerTag namedTagForBranch = tagBranchName.get();
             Optional<DockerTag> versionedLatestTag = tags.stream()
-                .filter(tag -> !tag.equals(trueLatestTag) && tag.getSize() == trueLatestTag.getSize()).findFirst();
+                .filter(tag -> !tag.equals(namedTagForBranch) && tag.getSize() == namedTagForBranch.getSize()).findFirst();
 
-            return versionedLatestTag.orElse(trueLatestTag);
+            return versionedLatestTag.orElse(namedTagForBranch);
         }
 
-        return tags.get(0);
+        return tags.isEmpty() ? null : tags.get(0);
     }
 }

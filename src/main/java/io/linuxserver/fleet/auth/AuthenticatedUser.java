@@ -17,15 +17,25 @@
 
 package io.linuxserver.fleet.auth;
 
+import io.linuxserver.fleet.v2.types.User;
+import io.linuxserver.fleet.v2.web.AppRole;
+
+import java.util.Collections;
+import java.util.Set;
+
 public class AuthenticatedUser {
 
-    private final String name;
+    private final User user;
 
-    public AuthenticatedUser(String name) {
-        this.name = name;
+    public AuthenticatedUser(final User user) {
+        this.user = user;
     }
 
-    public String getName() {
-        return name;
+    public final String getName() {
+        return user.getUsername();
+    }
+
+    public final Set<AppRole> getRoles() {
+        return Collections.singleton(user.getRole());
     }
 }

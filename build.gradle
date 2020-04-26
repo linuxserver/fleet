@@ -1,17 +1,15 @@
 plugins {
     id 'java'
-    id 'com.eriwen.gradle.js' version '2.14.1'
-    id 'com.eriwen.gradle.css' version '2.14.0'
 }
 
-sourceCompatibility = 1.8
-targetCompatibility = 1.8
+sourceCompatibility = 11
+targetCompatibility = 11
 
 repositories {
     mavenCentral()
 }
 
-version = '1.4.4'
+version = '2.0.0'
 
 sourceSets {
 
@@ -38,8 +36,8 @@ dependencies {
     compile 'org.apache.logging.log4j:log4j-slf4j-impl:2.11.1'
 
     // HTTP Framework
-    compile 'com.sparkjava:spark-core:2.7.2'
-    compile 'com.sparkjava:spark-template-freemarker:2.7.1'
+    compile 'io.javalin:javalin:3.6.0'
+    compile 'org.freemarker:freemarker:2.3.28'
     compile 'org.apache.httpcomponents:httpclient:4.5.7'
 
     // JSON Mapping/Marshalling
@@ -50,7 +48,7 @@ dependencies {
     // Database
     compile 'com.zaxxer:HikariCP:3.3.1'
     compile 'org.mariadb.jdbc:mariadb-java-client:2.4.0'
-    compile 'org.flywaydb:flyway-core:6.0.0-beta'
+    compile 'org.flywaydb:flyway-core:6.1.0'
 
     // MISC
     compile 'org.apache.commons:commons-lang3:3.7'
@@ -70,48 +68,7 @@ jar {
         configurations.compile.collect { it.isDirectory() ? it : zipTree(it) }
     }
 
-    exclude 'META-INF/*.RSA', 'META-INF/*.SF','META-INF/*.DSA'
-}
-
-combineJs {
-
-    encoding = "UTF-8"
-
-    source = [
-        'src/main/resources/assets/js/jquery-3.3.1.min.js',
-        'src/main/resources/assets/js/bootstrap.bundle.min.js',
-        'src/main/resources/assets/js/fontawesome-all.min.js',
-        'src/main/resources/assets/js/jquery.tablesorter.js',
-        'src/main/resources/assets/js/fleet.js'
-    ]
-
-    dest = file('src/main/resources/assets/js/all.js')
-}
-
-minifyJs {
-
-    source = combineJs
-    dest = file('src/main/resources/assets/js/all.min.js')
-    closure {
-        warningLevel = 'QUIET'
-    }
-}
-
-combineCss {
-
-    source = [
-        'src/main/resources/assets/css/bootstrap.css',
-        'src/main/resources/assets/css/fleet.css',
-        'src/main/resources/assets/css/fontawesome-all.css'
-    ]
-
-    dest = file('src/main/resources/assets/css/all.css')
-}
-
-minifyCss {
-
-    source = combineCss
-    dest = file('src/main/resources/assets/css/all.min.css')
+    exclude 'META-INF/INDEX.LIST', 'META-INF/*.RSA', 'META-INF/*.SF','META-INF/*.DSA'
 }
 
 task configureLogConfiguration(type: Copy) {
@@ -123,4 +80,21 @@ task configureLogConfiguration(type: Copy) {
     rename "log4j2.${logFile}.xml", 'log4j2.xml'
 }
 
-build.dependsOn minifyCss, minifyJs, configureLogConfiguration
+task buildVersionProperties() {
+
+    doFirst {
+
+        def versionProperties = new Properties()
+        def propFile          = new File("src/main/resources/version.properties")
+
+        versionProperties.load(propFile.newDataInputStream());
+        versionProperties.setProperty("app.version", project.version.toString())
+        versionProperties.setProperty("app.build.user", System.getProperty("user.name"))
+        versionProperties.setProperty("app.build.date", new Date().format("yyyy-MM-dd'T'HH:mm:ss"))
+        versionProperties.setProperty("app.build.os", System.getProperty("os.name"))
+
+        versionProperties.store(propFile.newWriter(), null)
+    }
+}
+
+build.dependsOn configureLogConfiguration, buildVersionProperties

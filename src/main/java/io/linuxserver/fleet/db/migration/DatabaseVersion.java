@@ -18,7 +18,7 @@
 package io.linuxserver.fleet.db.migration;
 
 import io.linuxserver.fleet.core.FleetRuntime;
-import io.linuxserver.fleet.db.PoolingDatabaseConnection;
+import io.linuxserver.fleet.core.db.DatabaseConnection;
 import org.flywaydb.core.Flyway;
 import org.flywaydb.core.api.FlywayException;
 import org.slf4j.Logger;
@@ -35,8 +35,10 @@ public class DatabaseVersion {
 
     private final Flyway flyway;
 
-    public DatabaseVersion(PoolingDatabaseConnection databaseConnection) {
+    public DatabaseVersion(final DatabaseConnection databaseConnection) {
+
         flyway = Flyway.configure().dataSource(databaseConnection.getDataSource()).load();
+        migrate();
     }
 
     /**

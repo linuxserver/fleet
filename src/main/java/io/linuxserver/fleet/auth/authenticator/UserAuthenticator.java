@@ -19,6 +19,7 @@ package io.linuxserver.fleet.auth.authenticator;
 
 import io.linuxserver.fleet.auth.AuthenticationResult;
 import io.linuxserver.fleet.auth.UserCredentials;
+import io.linuxserver.fleet.auth.security.PasswordEncoder;
 
 /**
  * <p>
@@ -35,4 +36,6 @@ public interface UserAuthenticator {
      * </p>
      */
     AuthenticationResult authenticate(UserCredentials userCredentials);
+
+    PasswordEncoder getPasswordEncoder();
 }
