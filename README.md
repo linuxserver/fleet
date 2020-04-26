@@ -27,3 +27,6 @@ A specific version mask can be applied to an image, which will override the defa
 ## Documentation
 
 Full documentation can be found here: https://docs.linuxserver.io/general/fleet
+
+# Thanks
+A huge thank you to JetBrains who kindly provided us with a license for IntelliJ Ultimate. It is without question the best IDE for Java application development.
