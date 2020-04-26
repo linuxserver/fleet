@@ -29,6 +29,6 @@ public class DockerImageMissingUpdateResponse extends DockerImageUpdateResponse 
 
     @Override
     public final void handleDockerApiResponse() {
-        // Remove image.
+        // Do nothing. Let schedule handle this.
     }
 }

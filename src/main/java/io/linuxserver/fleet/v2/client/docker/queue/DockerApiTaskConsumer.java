@@ -19,6 +19,7 @@ package io.linuxserver.fleet.v2.client.docker.queue;
 
 import io.linuxserver.fleet.v2.service.SynchronisationService;
 import io.linuxserver.fleet.v2.thread.AbstractTaskQueueConsumer;
+import io.linuxserver.fleet.v2.thread.TaskExecutionException;
 
 public final class DockerApiTaskConsumer extends AbstractTaskQueueConsumer<DockerApiDelegate, DockerImageUpdateResponse, DockerImageUpdateRequest> {
 
@@ -32,6 +33,13 @@ public final class DockerApiTaskConsumer extends AbstractTaskQueueConsumer<Docke
 
     @Override
     protected void handleTaskResponse(final DockerImageUpdateResponse response) {
-        response.handleDockerApiResponse();
+
+        try {
+            response.handleDockerApiResponse();
+        } catch (Exception e) {
+
+            getLogger().error("handleTaskResponse caught unhandled error, but not something worthy of stalling thread", e);
+            throw new TaskExecutionException(e);
+        }
     }
 }
