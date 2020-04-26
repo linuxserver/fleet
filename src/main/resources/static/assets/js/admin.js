@@ -43,6 +43,12 @@ var Admin = (function($) {
     var $ImageTemplateDevices;
     var $AddNewDevice;
 
+    // Users
+    var $UserNamePendingDeletion;
+    var $UserPendingDeletion;
+    var $UserPendingPasswordChange;
+    var $UserNamePendingPasswordChange;
+
     var reload = function() {
         window.location.reload();
     };
@@ -253,24 +259,28 @@ var Admin = (function($) {
 
     var init = function() {
 
-        $SubmitNewRepository       = $('#SubmitNewRepository');
-        $NewRepositoryName         = $('#NewRepositoryName');
-        $TrackNewBranch            = $('#TrackNewBranch');
-        $NewTrackedBranch          = $('#NewTrackedBranch');
-        $RepositoryPendingDeletion = $('#RepositoryPendingDeletion');
-        $DeleteRepository          = $('#DeleteRepository');
-        $ImageKey                  = $('#ImageKey');
-        $ImageTemplateTabContent   = $('#ImageTemplateTabContent');
-        $ImageTemplatePorts        = $('#ImageTemplatePorts');
-        $AddNewPort                = $('#AddNewPort');
-        $ImageTemplateVolumes      = $('#ImageTemplateVolumes');
-        $AddNewVolume              = $('#AddNewVolume');
-        $ImageTemplateEnv          = $('#ImageTemplateEnv');
-        $AddNewEnv                 = $('#AddNewEnv');
-        $ImageTemplateDevices      = $('#ImageTemplateDevices');
-        $AddNewDevice              = $('#AddNewDevice');
-        $ImageExternalUrls         = $('#ImageExternalUrls');
-        $AddNewExternalUrl         = $('#AddNewExternalUrl');
+        $SubmitNewRepository           = $('#SubmitNewRepository');
+        $NewRepositoryName             = $('#NewRepositoryName');
+        $TrackNewBranch                = $('#TrackNewBranch');
+        $NewTrackedBranch              = $('#NewTrackedBranch');
+        $RepositoryPendingDeletion     = $('#RepositoryPendingDeletion');
+        $DeleteRepository              = $('#DeleteRepository');
+        $ImageKey                      = $('#ImageKey');
+        $ImageTemplateTabContent       = $('#ImageTemplateTabContent');
+        $ImageTemplatePorts            = $('#ImageTemplatePorts');
+        $AddNewPort                    = $('#AddNewPort');
+        $ImageTemplateVolumes          = $('#ImageTemplateVolumes');
+        $AddNewVolume                  = $('#AddNewVolume');
+        $ImageTemplateEnv              = $('#ImageTemplateEnv');
+        $AddNewEnv                     = $('#AddNewEnv');
+        $ImageTemplateDevices          = $('#ImageTemplateDevices');
+        $AddNewDevice                  = $('#AddNewDevice');
+        $ImageExternalUrls             = $('#ImageExternalUrls');
+        $AddNewExternalUrl             = $('#AddNewExternalUrl');
+        $UserPendingDeletion           = $('#UserPendingDeletion');
+        $UserNamePendingDeletion       = $('#UserNamePendingDeletion');
+        $UserNamePendingPasswordChange = $('#UserNamePendingPasswordChange');
+        $UserPendingPasswordChange     = $('#UserPendingPasswordChange');
 
         $SubmitNewRepository.on('click', function() {
             addRepository($NewRepositoryName.val());
@@ -298,6 +308,22 @@ var Admin = (function($) {
 
             $RepositoryPendingDeletion.text($trigger.data('repository-name'));
             $DeleteRepository.data('repository-key', $trigger.data('repository-key'))
+        });
+
+        $('.delete-user').on('click', function() {
+
+            var $triggerParent = $(this).parents('tr');
+
+            $UserPendingDeletion.val($triggerParent.data('user-key'));
+            $UserNamePendingDeletion.text($triggerParent.data('user-name'));
+        });
+
+        $('.edit-password').on('click', function() {
+
+            var $triggerParent = $(this).parents('tr');
+
+            $UserPendingPasswordChange.val($triggerParent.data('user-key'));
+            $UserNamePendingPasswordChange.text($triggerParent.data('user-name'));
         });
 
         $('.update-image-trigger').on('click', function() {
