@@ -387,7 +387,7 @@ var PullChart = (function($) {
                             data: history.pullDifferential.pulls,
                             pointRadius: 0,
                             pointHitRadius: 6,
-                            borderWidth: 1,
+                            borderWidth: 1.5,
                             borderColor: 'rgba(33, 96, 196, 0.7)',
                             backgroundColor : 'rgba(33, 96, 196, 0.1)'
                         }

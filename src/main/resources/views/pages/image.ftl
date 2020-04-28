@@ -114,7 +114,7 @@
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        <@table.halfDisplayRow title="Repository"   value=image.repositoryName link="/?key=${image.repositoryKey}" />
+                                        <@table.halfDisplayRow title="Docker Hub"   value='<i class="fab fa-docker"></i> ${image.fullName}' link="https://hub.docker.com/r/${image.fullName}" />
                                         <@table.halfDisplayRow title="Build Time"   value=image.lastUpdatedAsString />
                                         <#if image.metaData.baseImage?has_content>
                                             <@table.halfDisplayRow title="Base Image" value=image.metaData.baseImage?html />
