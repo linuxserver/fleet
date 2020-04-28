@@ -69,7 +69,7 @@ public class AdminUserController extends AbstractPageHandler {
         } else if ("create".equalsIgnoreCase(action)) {
 
             final String username = ctx.formParam("NewUserName", String.class).get();
-            final String password = ctx.formParam("NewUserName", String.class).get();
+            final String password = ctx.formParam("NewUserPassword", String.class).get();
 
             final UserOutlineRequest request = new UserOutlineRequest(username, password, AppRole.Admin);
             userService.createUserAndHashPassword(request);
