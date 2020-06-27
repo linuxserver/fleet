@@ -48,4 +48,8 @@ public class DockerTagManifestDigest {
         return archVariant;
     }
 
+    @Override
+    public final String toString() {
+        return architecture + "/" + archVariant + "[" + digest + "]";
+    }
 }

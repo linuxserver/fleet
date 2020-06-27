@@ -18,8 +18,11 @@
 package io.linuxserver.fleet.dockerhub.util;
 
 import io.linuxserver.fleet.v2.types.docker.DockerTag;
+import io.linuxserver.fleet.v2.types.docker.DockerTagManifestDigest;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 public class DockerTagFinder {
@@ -32,11 +35,46 @@ public class DockerTagFinder {
 
             DockerTag namedTagForBranch = tagBranchName.get();
             Optional<DockerTag> versionedLatestTag = tags.stream()
-                .filter(tag -> !tag.equals(namedTagForBranch) && tag.getSize() == namedTagForBranch.getSize()).findFirst();
+                .filter(tag -> !tag.equals(namedTagForBranch) && allManifestsMatch(namedTagForBranch, tag)).findFirst();
 
             return versionedLatestTag.orElse(namedTagForBranch);
         }
 
         return tags.isEmpty() ? null : tags.get(0);
+    }
+
+    private static boolean allManifestsMatch(final DockerTag namedTag, final DockerTag toCheck) {
+
+        final List<DockerTagManifestDigest> namedDigests   = namedTag.getDigests();
+        final List<DockerTagManifestDigest> digestsToCheck = toCheck.getDigests();
+
+        boolean allMatch = true;
+
+        if (namedDigests.size() == digestsToCheck.size()) {
+
+            final Map<String, String> namedDigestsAsMap = toMapKeyedByArch(namedDigests);
+
+            for (DockerTagManifestDigest digestToCheck : digestsToCheck) {
+
+                final String archPlusVariant = digestToCheck.getArchitecture() + digestToCheck.getArchVariant();
+                final String foundDigest     = namedDigestsAsMap.get(archPlusVariant);
+
+                allMatch = allMatch && (null != foundDigest) && foundDigest.equals(digestToCheck.getDigest());
+            }
+
+        } else {
+            allMatch = false;
+        }
+
+        return allMatch;
+    }
+
+    private static Map<String, String> toMapKeyedByArch(final List<DockerTagManifestDigest> initialList) {
+
+        final Map<String, String> map = new HashMap<>();
+        for (DockerTagManifestDigest digest : initialList) {
+            map.put(digest.getArchitecture() + digest.getArchVariant(), digest.getDigest());
+        }
+        return map;
     }
 }

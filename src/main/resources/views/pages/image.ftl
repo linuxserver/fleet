@@ -116,12 +116,19 @@
                                     <tbody>
                                         <@table.halfDisplayRow title="Docker Hub"   value='<i class="fab fa-docker"></i> ${image.fullName}' link="https://hub.docker.com/r/${image.fullName}" />
                                         <@table.halfDisplayRow title="Build Time"   value=image.lastUpdatedAsString />
+
                                         <#if image.metaData.baseImage?has_content>
                                             <@table.halfDisplayRow title="Base Image" value=image.metaData.baseImage?html />
                                         </#if>
+
+                                        <#if image.metaData.category?has_content>
+                                            <@table.halfDisplayRow title="Category" value=image.metaData.category?html />
+                                        </#if>
+
                                         <@table.halfDisplayRow title="Synchronised" value=image.syncEnabled?string("Yes", "No") />
                                         <@table.halfDisplayRow title="Stable"       value=image.stable?string("Yes", "No") />
                                         <@table.halfDisplayRow title="Deprecated"   value=image.deprecated?string("Yes", "No") />
+
                                     </tbody>
                                 </@table.table>
 
@@ -140,10 +147,6 @@
                                         </tr>
                                         </thead>
                                         <tbody>
-
-                                            <#if image.metaData.category?has_content>
-                                                <@table.halfDisplayRow title="Category" value=image.metaData.category />
-                                            </#if>
 
                                             <#-- Any set external Urls -->
                                             <#list image.metaData.externalUrls as url>
