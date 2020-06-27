@@ -25,6 +25,7 @@
         <thead>
             <tr>
                 <th>Environment Variable</th>
+                <th>Example Value</th>
                 <th>Description</th>
                 <th></th>
             </tr>
@@ -36,7 +37,10 @@
                         <input title="Environment mapping" type="text" class="input is-small" value="${env.env}" name="imageTemplateEnv" required />
                     </td>
                     <td>
-                        <input title="Environment mapping description" type="text" class="input is-small" value="${env.description!""}" name="imageTemplateEnvDescription" required />
+                        <input title="Environment mapping example value" type="text" class="input is-small" value="${env.exampleValue!""}" name="imageTemplateEnvExample" />
+                    </td>
+                    <td>
+                        <input title="Environment mapping description" type="text" class="input is-small" value="${env.description!""}" name="imageTemplateEnvDescription" />
                     </td>
                     <td>
                         <@button.buttons isRightAligned=true>

@@ -19,11 +19,18 @@ package io.linuxserver.fleet.v2.types.meta.template;
 
 public class EnvironmentTemplateItem extends AbstractTemplateItem<String, EnvironmentTemplateItem> {
 
-    public EnvironmentTemplateItem(final String name, final String description) {
+    private final String exampleValue;
+
+    public EnvironmentTemplateItem(final String name, final String description, final String exampleValue) {
         super(name, description);
+        this.exampleValue = exampleValue;
     }
 
     public final String getEnv() {
         return getName();
+    }
+
+    public final String getExampleValue() {
+        return exampleValue;
     }
 }

@@ -95,20 +95,21 @@ public class ImageTemplateRequest extends AbstractParamRequest {
         return volumes;
     }
 
-    public final List<TemplateItem<Void>> getEnvironment() {
+    public final List<TemplateItem<String>> getEnvironment() {
 
         final List<String> envNames        = getParams("imageTemplateEnv");
         final List<String> envDescriptions = getParams("imageTemplateEnvDescription");
+        final List<String> envExamples     = getParams("imageTemplateEnvExample");
 
-        checkLists(envNames, envDescriptions);
+        checkLists(envNames, envDescriptions, envExamples);
 
-        final List<TemplateItem<Void>> env = new ArrayList<>();
+        final List<TemplateItem<String>> env = new ArrayList<>();
 
         if (null != envNames) {
 
             int i = 0;
             for (; i < envNames.size(); i++) {
-                env.add(new TemplateItem<>(envNames.get(i), getOrNull(envDescriptions.get(i)),null));
+                env.add(new TemplateItem<>(envNames.get(i), getOrNull(envDescriptions.get(i)), getOrNull(envExamples.get(i))));
             }
         }
 

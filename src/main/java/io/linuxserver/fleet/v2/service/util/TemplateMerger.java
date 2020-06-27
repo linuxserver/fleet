@@ -70,8 +70,8 @@ public class TemplateMerger {
 
     private void addEnvironment(final ImageTemplateRequest request, final ImageTemplateHolder holder) {
 
-        for (ImageTemplateRequest.TemplateItem<Void> env : request.getEnvironment()) {
-            holder.addEnvironment(new EnvironmentTemplateItem(env.getName(), env.getDescription()));
+        for (ImageTemplateRequest.TemplateItem<String> env : request.getEnvironment()) {
+            holder.addEnvironment(new EnvironmentTemplateItem(env.getName(), env.getDescription(), env.getSecondaryField()));
         }
     }
     private void addDevices(final ImageTemplateRequest request, final ImageTemplateHolder holder) {

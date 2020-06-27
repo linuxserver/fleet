@@ -34,7 +34,7 @@ services:
 </#if>
 <#if templates.env?has_content>    environment:
   <#list templates.env as env>
-      - ${env.name}=<#if env.description?has_content> # ${env.description}</#if>
+      - ${env.name}<#if env.exampleValue?has_content>=${env.exampleValue}</#if><#if env.description?has_content> # ${env.description}</#if>
   </#list>
 </#if>
 <#if templates.volumes?has_content>    volumes:
@@ -63,7 +63,7 @@ services:
   --name=${containerName} \<#if templates.hostNetworkingEnabled>
   --net=host \</#if><#if templates.env?has_content>
 <#list templates.env as env>
-  -e ${env.name}=<#if env.description?has_content> `# ${env.description}`</#if> \
+  -e ${env.name}<#if env.exampleValue?has_content>=${env.exampleValue}</#if><#if env.description?has_content> `# ${env.description}`</#if> \
 </#list>
 </#if>
 <#if templates.volumes?has_content>

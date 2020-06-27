@@ -37,7 +37,7 @@ public class ImageTemplateFactory {
     private static final String StoreTemplateBase      = "{CALL Image_StoreTemplateBase(?,?,?,?,?,?)}";
     private static final String StoreTemplatePort      = "{CALL Image_StoreTemplatePort(?,?,?,?)}";
     private static final String StoreTemplateVolume    = "{CALL Image_StoreTemplateVolume(?,?,?,?)}";
-    private static final String StoreTemplateEnv       = "{CALL Image_StoreTemplateEnv(?,?,?)}";
+    private static final String StoreTemplateEnv       = "{CALL Image_StoreTemplateEnv(?,?,?,?)}";
     private static final String StoreTemplateDevice    = "{CALL Image_StoreTemplateDevice(?,?,?)}";
     private static final String StoreTemplateExtra     = "{CALL Image_StoreTemplateExtra(?,?,?)}";
 
@@ -152,7 +152,7 @@ public class ImageTemplateFactory {
                         break;
 
                     case "Env":
-                        templateHolder.addEnvironment(new EnvironmentTemplateItem(itemName, itemDesc));
+                        templateHolder.addEnvironment(new EnvironmentTemplateItem(itemName, itemDesc, itemSec));
                         break;
 
                     case "Device":
@@ -245,7 +245,8 @@ public class ImageTemplateFactory {
             int i = 1;
             storeEnvCall.setInt(   i++, image.getKey().getId());
             storeEnvCall.setString(i++, env.getEnv());
-            storeEnvCall.setString(i,   env.getDescription());
+            storeEnvCall.setString(i++, env.getDescription());
+            storeEnvCall.setString(i,   env.getExampleValue());
             storeEnvCall.addBatch();
         }
 

@@ -227,6 +227,9 @@ var Admin = (function($) {
                     makeInput('imageTemplateEnv', 'text', true) +
                 '</td>' +
                 '<td>' +
+                    makeInput('imageTemplateEnvExample') +
+                '</td>' +
+                '<td>' +
                     makeInput('imageTemplateEnvDescription') +
                 '</td>' +
                 '<td>' +
