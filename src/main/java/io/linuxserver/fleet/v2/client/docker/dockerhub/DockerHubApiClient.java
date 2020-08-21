@@ -55,7 +55,7 @@ public class DockerHubApiClient implements DockerApiClient {
 
         try {
 
-            String url = DockerHubApiUrl + "/repositories/" + repositoryName + "?page_size=" + DefaultPageSize;
+            String url = DockerHubApiUrl + "/repositories/" + repositoryName + "/?page_size=" + DefaultPageSize;
             while (url != null) {
 
                 final RestResponse<DockerHubV2ImageListResult> response = doCall(url, DockerHubV2ImageListResult.class);
@@ -97,7 +97,7 @@ public class DockerHubApiClient implements DockerApiClient {
 
         try {
 
-            final  String absoluteUrl = DockerHubApiUrl + "/repositories/" + imageName;
+            final  String absoluteUrl = DockerHubApiUrl + "/repositories/" + imageName + "/";
 
             final RestResponse<DockerHubV2Image> restResponse = doCall(absoluteUrl, DockerHubV2Image.class);
 
@@ -119,7 +119,7 @@ public class DockerHubApiClient implements DockerApiClient {
 
             List<DockerTag> tags = new ArrayList<>();
 
-            String absoluteUrl = DockerHubApiUrl + "/repositories/" + imageName + "/tags?page_size=" + DefaultPageSize;
+            String absoluteUrl = DockerHubApiUrl + "/repositories/" + imageName + "/tags/?page_size=" + DefaultPageSize;
             while (absoluteUrl != null) {
 
                 final RestResponse<DockerHubV2TagListResult> response = doCall(absoluteUrl, DockerHubV2TagListResult.class);
