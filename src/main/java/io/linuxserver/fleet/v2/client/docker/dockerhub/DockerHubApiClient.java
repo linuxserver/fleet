@@ -20,38 +20,62 @@ package io.linuxserver.fleet.v2.client.docker.dockerhub;
 import io.linuxserver.fleet.dockerhub.DockerHubException;
 import io.linuxserver.fleet.dockerhub.model.DockerHubV2Image;
 import io.linuxserver.fleet.dockerhub.model.DockerHubV2ImageListResult;
+import io.linuxserver.fleet.dockerhub.model.DockerHubV2Tag;
 import io.linuxserver.fleet.dockerhub.model.DockerHubV2TagListResult;
-import io.linuxserver.fleet.v2.client.docker.DockerApiClient;
+import io.linuxserver.fleet.v2.client.docker.AbstractDockerApiClient;
 import io.linuxserver.fleet.v2.client.rest.HttpException;
 import io.linuxserver.fleet.v2.client.rest.RestClient;
 import io.linuxserver.fleet.v2.client.rest.RestResponse;
-import io.linuxserver.fleet.v2.types.docker.DockerImage;
-import io.linuxserver.fleet.v2.types.docker.DockerTag;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class DockerHubApiClient implements DockerApiClient {
+public class DockerHubApiClient extends AbstractDockerApiClient<DockerHubV2Image, DockerHubV2Tag, DockerHubImageConverter, DockerHubTagConverter> {
 
     private static final String DockerHubApiUrl = "https://hub.docker.com/v2";
     private static final int    DefaultPageSize = 1000;
 
     private final RestClient restClient;
 
-    private final DockerHubImageConverter imageConverter;
-    private final DockerHubTagConverter   tagConverter;
-
     public DockerHubApiClient() {
-
+        super(new DockerHubImageConverter(), new DockerHubTagConverter());
         restClient     = new RestClient();
-        imageConverter = new DockerHubImageConverter();
-        tagConverter   = new DockerHubTagConverter();
     }
 
     @Override
-    public List<DockerImage> fetchAllImages(String repositoryName) {
+    public final boolean isRepositoryValid(String repositoryName) {
 
-        final List<DockerImage> images = new ArrayList<>();
+        try {
+            return !fetchAllImages(repositoryName).isEmpty();
+        } catch (HttpException e) {
+            throw new DockerHubException("Unable to verify repository " + repositoryName, e);
+        }
+    }
+
+    @Override
+    protected final DockerHubV2Image fetchImageFromApi(String imageName) {
+
+        try {
+
+            final  String absoluteUrl = DockerHubApiUrl + "/repositories/" + imageName + "/";
+
+            final RestResponse<DockerHubV2Image> restResponse = doCall(absoluteUrl, DockerHubV2Image.class);
+
+            if (isResponseOK(restResponse)) {
+                return restResponse.getPayload();
+            }
+
+            return null;
+
+        } catch (HttpException e) {
+            throw new DockerHubException("Unable to get images for " + imageName, e);
+        }
+    }
+
+    @Override
+    protected final List<DockerHubV2Image> fetchAllImagesFromApi(String repositoryName) {
+
+        final List<DockerHubV2Image> images = new ArrayList<>();
 
         try {
 
@@ -63,13 +87,7 @@ public class DockerHubApiClient implements DockerApiClient {
                 if (isResponseOK(response)) {
 
                     DockerHubV2ImageListResult payload = response.getPayload();
-                    payload.getResults().forEach(i -> {
-
-                        final DockerImage converted = imageConverter.convert(i);
-                        if (null != converted) {
-                            images.add(converted);
-                        }
-                    });
+                    images.addAll(payload.getResults());
 
                     url = payload.getNext();
                 }
@@ -83,41 +101,11 @@ public class DockerHubApiClient implements DockerApiClient {
     }
 
     @Override
-    public boolean isRepositoryValid(String repositoryName) {
-
-        try {
-            return !fetchAllImages(repositoryName).isEmpty();
-        } catch (HttpException e) {
-            throw new DockerHubException("Unable to verify repository " + repositoryName, e);
-        }
-    }
-
-    @Override
-    public DockerImage fetchImage(String imageName) {
+    protected final List<DockerHubV2Tag> fetchTagsFromApi(String imageName) {
 
         try {
 
-            final  String absoluteUrl = DockerHubApiUrl + "/repositories/" + imageName + "/";
-
-            final RestResponse<DockerHubV2Image> restResponse = doCall(absoluteUrl, DockerHubV2Image.class);
-
-            if (isResponseOK(restResponse)) {
-                return imageConverter.convert(restResponse.getPayload());
-            }
-
-            return null;
-
-        } catch (HttpException e) {
-            throw new DockerHubException("Unable to get images for " + imageName, e);
-        }
-    }
-
-    @Override
-    public List<DockerTag> fetchImageTags(String imageName) {
-
-        try {
-
-            List<DockerTag> tags = new ArrayList<>();
+            List<DockerHubV2Tag> tags = new ArrayList<>();
 
             String absoluteUrl = DockerHubApiUrl + "/repositories/" + imageName + "/tags/?page_size=" + DefaultPageSize;
             while (absoluteUrl != null) {
@@ -127,13 +115,7 @@ public class DockerHubApiClient implements DockerApiClient {
                 if (isResponseOK(response)) {
 
                     final DockerHubV2TagListResult payload = response.getPayload();
-                    payload.getResults().forEach(t -> {
-
-                        final DockerTag converted = tagConverter.convert(t);
-                        if (null != converted) {
-                            tags.add(converted);
-                        }
-                    });
+                    tags.addAll(payload.getResults());
 
                     absoluteUrl = payload.getNext();
                 }

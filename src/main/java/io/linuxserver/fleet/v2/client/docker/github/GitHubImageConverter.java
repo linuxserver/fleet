@@ -1,5 +1,5 @@
 /*
- * Copyright (c)  2019 LinuxServer.io
+ * Copyright (c)  2020 LinuxServer.io
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -15,27 +15,21 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package io.linuxserver.fleet.v2.client.docker.dockerhub;
+package io.linuxserver.fleet.v2.client.docker.github;
 
-import io.linuxserver.fleet.dockerhub.model.DockerHubV2Image;
 import io.linuxserver.fleet.v2.client.docker.converter.AbstractDockerResponseConverter;
+import io.linuxserver.fleet.v2.client.docker.github.model.GitHubImage;
 import io.linuxserver.fleet.v2.types.docker.DockerImage;
 
-public class DockerHubImageConverter extends AbstractDockerResponseConverter<DockerHubV2Image, DockerImage> {
+public class GitHubImageConverter extends AbstractDockerResponseConverter<GitHubImage, DockerImage> {
 
     @Override
-    protected final DockerImage doPlainConvert(final DockerHubV2Image dockerApiImage) {
-
-        return new DockerImage(dockerApiImage.getName(),
-                               dockerApiImage.getNamespace(),
-                               dockerApiImage.getDescription(),
-                               dockerApiImage.getStarCount(),
-                               dockerApiImage.getPullCount(),
-                               parseDockerHubDate(dockerApiImage.getLastUpdated()));
+    protected final DockerImage doPlainConvert(final GitHubImage dockerApiImage) {
+        return null;
     }
 
     @Override
-    public Class<DockerHubV2Image> getConverterClass() {
-        return DockerHubV2Image.class;
+    public final Class<GitHubImage> getConverterClass() {
+        return GitHubImage.class;
     }
 }

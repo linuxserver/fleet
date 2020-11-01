@@ -19,19 +19,20 @@ package io.linuxserver.fleet.v2.client.docker.dockerhub;
 
 import io.linuxserver.fleet.dockerhub.model.DockerHubV2Tag;
 import io.linuxserver.fleet.dockerhub.model.DockerHubV2TagDigest;
+import io.linuxserver.fleet.v2.client.docker.converter.AbstractDockerResponseConverter;
 import io.linuxserver.fleet.v2.types.docker.DockerTag;
 import io.linuxserver.fleet.v2.types.docker.DockerTagManifestDigest;
 
-public class DockerHubTagConverter extends AbstractDockerHubConverter<DockerHubV2Tag, DockerTag> {
+public class DockerHubTagConverter extends AbstractDockerResponseConverter<DockerHubV2Tag, DockerTag> {
 
     @Override
-    protected final DockerTag doPlainConvert(final DockerHubV2Tag dockerHubV2Tag) {
+    protected final DockerTag doPlainConvert(final DockerHubV2Tag dockerApiImage) {
 
-        final DockerTag dockerTag = new DockerTag(dockerHubV2Tag.getName(),
-                                                  dockerHubV2Tag.getFullSize(),
-                                                  parseDockerHubDate(dockerHubV2Tag.getLastUpdated()));
+        final DockerTag dockerTag = new DockerTag(dockerApiImage.getName(),
+                                                  dockerApiImage.getFullSize(),
+                                                  parseDockerHubDate(dockerApiImage.getLastUpdated()));
 
-        for (DockerHubV2TagDigest tagImageDigest : dockerHubV2Tag.getImages()) {
+        for (DockerHubV2TagDigest tagImageDigest : dockerApiImage.getImages()) {
 
             dockerTag.addDigest(new DockerTagManifestDigest(tagImageDigest.getSize(),
                                                             tagImageDigest.getDigest(),

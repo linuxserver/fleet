@@ -15,28 +15,27 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package io.linuxserver.fleet.v2.client.docker.dockerhub;
+package io.linuxserver.fleet.v2.client.docker.converter;
 
-import io.linuxserver.fleet.v2.client.docker.converter.DockerResponseConverter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeParseException;
 
-public abstract class AbstractDockerHubConverter<DOCKER_HUB, INTERNAL> implements DockerResponseConverter<DOCKER_HUB, INTERNAL> {
+public abstract class AbstractDockerResponseConverter<D, I> implements DockerResponseConverter<D, I> {
 
     private final Logger LOGGER = LoggerFactory.getLogger(getClass());
 
     @Override
-    public final INTERNAL convert(final DOCKER_HUB dockerHubV2Image) {
+    public final I convert(final D dockerModel) {
 
         try {
 
-            if (null == dockerHubV2Image) {
+            if (null == dockerModel) {
                 LOGGER.warn("Attempted to convert null image");
             } else {
-                return doPlainConvert(dockerHubV2Image);
+                return doPlainConvert(dockerModel);
             }
 
         } catch (Exception e) {
@@ -46,7 +45,7 @@ public abstract class AbstractDockerHubConverter<DOCKER_HUB, INTERNAL> implement
         return null;
     }
 
-    protected abstract INTERNAL doPlainConvert(final DOCKER_HUB dockerHubV2Image);
+    protected abstract I doPlainConvert(final D dockerApiImage);
 
     protected final LocalDateTime parseDockerHubDate(String date) {
 
