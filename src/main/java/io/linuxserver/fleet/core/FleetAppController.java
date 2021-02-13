@@ -21,7 +21,11 @@ import io.linuxserver.fleet.auth.AuthenticationResult;
 import io.linuxserver.fleet.core.config.WebConfiguration;
 import io.linuxserver.fleet.v2.client.docker.DockerApiClient;
 import io.linuxserver.fleet.v2.client.docker.dockerhub.DockerHubApiClient;
+import io.linuxserver.fleet.v2.client.docker.dockerhub.DockerHubAuthenticator;
+import io.linuxserver.fleet.v2.client.docker.dockerhub.IDockerHubAuthenticator;
+import io.linuxserver.fleet.v2.client.docker.dockerhub.NoOpDockerHubAuthenticator;
 import io.linuxserver.fleet.v2.client.docker.queue.DockerApiDelegate;
+import io.linuxserver.fleet.v2.client.rest.RestClient;
 import io.linuxserver.fleet.v2.db.DefaultImageDAO;
 import io.linuxserver.fleet.v2.db.DefaultScheduleDAO;
 import io.linuxserver.fleet.v2.db.DefaultUserDAO;
@@ -56,7 +60,7 @@ public class FleetAppController extends AbstractAppController implements Service
         fileManager       = new FileManager(this);
         imageService      = new ImageService(this, new DefaultImageDAO(getDatabaseProvider()));
         scheduleService   = new ScheduleService(this, new DefaultScheduleDAO(getDatabaseProvider()));
-        dockerApiDelegate = new DockerApiDelegate(this);
+        dockerApiDelegate = new DockerApiDelegate(this, configureDockerApiClient());
         syncService       = new SynchronisationService(this);
         userService       = new UserService(this, new DefaultUserDAO(getDatabaseProvider()));
     }
@@ -95,10 +99,6 @@ public class FleetAppController extends AbstractAppController implements Service
 
     public final void handleException(final Exception e) {
 
-    }
-
-    public final DockerApiClient getDockerClient() {
-        return new DockerHubApiClient();
     }
 
     public final boolean synchroniseImage(final ImageKey imageKey) {
@@ -164,5 +164,17 @@ public class FleetAppController extends AbstractAppController implements Service
 
         getImageService().trackBranchOnImage(imageKey, branchName);
         synchroniseImage(imageKey);
+    }
+
+    private DockerApiClient configureDockerApiClient() {
+
+        final RestClient dockerHubApiRestClient = new RestClient();
+        final IDockerHubAuthenticator dockerHubAuthenticator;
+        if (getAppProperties().isDockerHubAuthEnabled()) {
+            dockerHubAuthenticator = new DockerHubAuthenticator(getAppProperties().getDockerHubCredentials(), dockerHubApiRestClient);
+        } else {
+            dockerHubAuthenticator = new NoOpDockerHubAuthenticator();
+        }
+        return new DockerHubApiClient(dockerHubApiRestClient, dockerHubAuthenticator);
     }
 }

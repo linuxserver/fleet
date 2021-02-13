@@ -22,6 +22,7 @@ import io.linuxserver.fleet.dockerhub.model.DockerHubV2Image;
 import io.linuxserver.fleet.dockerhub.model.DockerHubV2ImageListResult;
 import io.linuxserver.fleet.dockerhub.model.DockerHubV2Tag;
 import io.linuxserver.fleet.dockerhub.model.DockerHubV2TagListResult;
+import io.linuxserver.fleet.v2.Utils;
 import io.linuxserver.fleet.v2.client.docker.AbstractDockerApiClient;
 import io.linuxserver.fleet.v2.client.rest.HttpException;
 import io.linuxserver.fleet.v2.client.rest.RestClient;
@@ -32,14 +33,17 @@ import java.util.List;
 
 public class DockerHubApiClient extends AbstractDockerApiClient<DockerHubV2Image, DockerHubV2Tag, DockerHubImageConverter, DockerHubTagConverter> {
 
-    private static final String DockerHubApiUrl = "https://hub.docker.com/v2";
+    public static final String  DockerHubApiUrl = "https://hub.docker.com/v2";
     private static final int    DefaultPageSize = 1000;
 
-    private final RestClient restClient;
+    private final RestClient              restClient;
+    private final IDockerHubAuthenticator authenticator;
 
-    public DockerHubApiClient() {
+    public DockerHubApiClient(final RestClient restClient,
+                              final IDockerHubAuthenticator authenticator) {
         super(new DockerHubImageConverter(), new DockerHubTagConverter());
-        restClient     = new RestClient();
+        this.restClient    = Utils.ensureNotNull(restClient);
+        this.authenticator = Utils.ensureNotNull(authenticator);
     }
 
     @Override
@@ -135,10 +139,21 @@ public class DockerHubApiClient extends AbstractDockerApiClient<DockerHubV2Image
      * </p>
      */
     private <T> RestResponse<T> doCall(String url, Class<T> responseType) {
-        return restClient.executeGet(url, null, null, responseType);
+
+        RestResponse<T> restResponse = restClient.executeGet(url, null, authenticator.buildAuthHeaders(), responseType);
+        if (isResponseUnauthorised(restResponse)) {
+
+            authenticator.refreshToken();
+            restResponse = restClient.executeGet(url, null, authenticator.buildAuthHeaders(), responseType);
+        }
+        return restResponse;
     }
 
     private boolean isResponseOK(final RestResponse<?> restResponse) {
         return restResponse.getStatusCode() == 200;
+    }
+
+    private boolean isResponseUnauthorised(RestResponse restResponse) {
+        return restResponse.getStatusCode() == 401;
     }
 }

@@ -18,6 +18,7 @@
 package io.linuxserver.fleet.v2.client.docker.queue;
 
 import io.linuxserver.fleet.core.FleetAppController;
+import io.linuxserver.fleet.v2.Utils;
 import io.linuxserver.fleet.v2.client.docker.DockerApiClient;
 import io.linuxserver.fleet.v2.client.docker.DockerImageNotFoundException;
 import io.linuxserver.fleet.v2.key.ImageKey;
@@ -33,9 +34,10 @@ public class DockerApiDelegate implements AsyncTaskDelegate {
     private final FleetAppController controller;
     private final DockerApiClient    apiClient;
 
-    public DockerApiDelegate(final FleetAppController controller) {
+    public DockerApiDelegate(final FleetAppController controller,
+                             final DockerApiClient dockerApiClient) {
         this.controller = controller;
-        this.apiClient  = controller.getDockerClient();
+        this.apiClient  = Utils.ensureNotNull(dockerApiClient);
     }
 
     public final boolean isRepositoryValid(final String repositoryName) {

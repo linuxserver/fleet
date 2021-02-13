@@ -18,6 +18,7 @@
 package io.linuxserver.fleet.core.config;
 
 import io.linuxserver.fleet.core.FleetRuntime;
+import io.linuxserver.fleet.v2.client.docker.dockerhub.DockerHubCredentials;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -75,6 +76,18 @@ public class AppProperties {
 
     public int getAppPort() {
         return Integer.parseInt(getStringProperty("fleet.app.port"));
+    }
+
+    public boolean isDockerHubAuthEnabled() {
+        return "true".equalsIgnoreCase(getStringProperty("fleet.dockerhub.auth.enabled"));
+    }
+
+    public DockerHubCredentials getDockerHubCredentials() {
+
+        final String username = getStringProperty("fleet.dockerhub.username");
+        final String password = getStringProperty("fleet.dockerhub.password");
+
+        return new DockerHubCredentials(username, password);
     }
 
     /**
