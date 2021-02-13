@@ -17,7 +17,9 @@
 
 package io.linuxserver.fleet.v2.types;
 
-public class TagDigest {
+import java.util.Objects;
+
+public class TagDigest implements Comparable<TagDigest> {
 
     private final long   size;
     private final String digest;
@@ -46,5 +48,42 @@ public class TagDigest {
 
     public final String getArchVariant() {
         return archVariant;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(digest, architecture, archVariant);
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+
+        if (null == obj) {
+            return false;
+        }
+
+        if (!(obj instanceof TagDigest)) {
+            return false;
+        }
+
+        final TagDigest other = (TagDigest) obj;
+
+        return Objects.equals(digest,       other.digest) &&
+               Objects.equals(architecture, other.architecture) &&
+               Objects.equals(archVariant,  other.archVariant);
+    }
+
+    @Override
+    public String toString() {
+        return "DIGEST:" + digest + "--" + architecture + "/" + archVariant;
+    }
+
+    @Override
+    public int compareTo(TagDigest o) {
+
+        if (null == o) {
+            return 1;
+        }
+        return toString().compareTo(o.toString());
     }
 }
