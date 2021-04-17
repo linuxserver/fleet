@@ -17,17 +17,23 @@
 
 package io.linuxserver.fleet.v2.types.api.external;
 
+import io.linuxserver.fleet.v2.types.api.external.templates.ApiTemplateHolder;
+
 public class ExternalApiImage {
 
-    private String  name;
-    private long    pullCount;
-    private String  version;
-    private boolean stable;
+    private final String  name;
+    private final long    pullCount;
+    private final String  version;
+    private final String  category;
+    private final boolean stable;
 
-    public ExternalApiImage(final String name, final long pullCount, final String version, final boolean stable) {
+    private ApiTemplateHolder templateSpec;
+
+    public ExternalApiImage(final String name, final long pullCount, final String version, final String category, final boolean stable) {
         this.name      = name;
         this.pullCount = pullCount;
         this.version   = version;
+        this.category  = category;
         this.stable    = stable;
     }
 
@@ -43,7 +49,19 @@ public class ExternalApiImage {
         return version;
     }
 
+    public final String getCategory() {
+        return category;
+    }
+
     public final boolean isStable() {
         return stable;
+    }
+
+    public final void setTemplateSpec(final ApiTemplateHolder templateHolder) {
+        this.templateSpec = templateHolder;
+    }
+
+    public final ApiTemplateHolder getTemplateSpec() {
+        return templateSpec;
     }
 }

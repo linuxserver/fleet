@@ -30,17 +30,20 @@ public class AllImagesExternalApiResponse {
         this.repositories   = new HashMap<>();
     }
 
-    public final void addImage(final String repositoryName,
-                               final String imageName,
-                               final long pullCount,
-                               final String version,
-                               final boolean stable) {
+    public final ExternalApiImage addImage(final String repositoryName,
+                                           final String imageName,
+                                           final long pullCount,
+                                           final String version,
+                                           final String category,
+                                           final boolean stable) {
 
         if (!repositories.containsKey(repositoryName)) {
             repositories.put(repositoryName, new ArrayList<>());
         }
 
-        repositories.get(repositoryName).add(new ExternalApiImage(imageName, pullCount, version, stable));
+        final ExternalApiImage apiImage = new ExternalApiImage(imageName, pullCount, version, category, stable);
+        repositories.get(repositoryName).add(apiImage);
+        return apiImage;
     }
 
     public final long getTotalPullCount() {

@@ -23,7 +23,11 @@ import io.linuxserver.fleet.v2.service.AbstractAppService;
 import io.linuxserver.fleet.v2.types.Image;
 import io.linuxserver.fleet.v2.types.Repository;
 import io.linuxserver.fleet.v2.types.api.external.AllImagesExternalApiResponse;
+import io.linuxserver.fleet.v2.types.api.external.ExternalApiImage;
 import io.linuxserver.fleet.v2.types.api.external.ExternalApiResponse;
+import io.linuxserver.fleet.v2.types.api.external.templates.*;
+import io.linuxserver.fleet.v2.types.docker.DockerCapability;
+import io.linuxserver.fleet.v2.types.meta.template.*;
 import io.linuxserver.fleet.v2.web.ApiException;
 
 import java.util.List;
@@ -36,6 +40,8 @@ public class LegacyExternalApiController extends AbstractAppService {
 
     public final void fetchAllImages(final Context ctx) {
 
+        final boolean verboseOutput = ctx.queryParam("verbose", Boolean.class, "false").get();
+
         try {
 
             final AllImagesExternalApiResponse responseData = new AllImagesExternalApiResponse();
@@ -45,11 +51,15 @@ public class LegacyExternalApiController extends AbstractAppService {
 
                 for (Image image : repository.getImages()) {
 
-                    responseData.addImage(image.getRepositoryName(),
-                                          image.getName(),
-                                          image.getPullCount(),
-                                          image.getLatestTag().getVersion(),
-                                          image.isStable());
+                    final ExternalApiImage apiImage = responseData.addImage(image.getRepositoryName(),
+                                                                            image.getName(),
+                                                                            image.getPullCount(),
+                                                                            image.getLatestTag().getVersion(),
+                                                                            image.getMetaData().getCategory(),
+                                                                            image.isStable());
+                    if (verboseOutput) {
+                        enrichImageWithTemplateData(apiImage, image.getMetaData().getTemplates());
+                    }
                 }
             }
 
@@ -58,5 +68,33 @@ public class LegacyExternalApiController extends AbstractAppService {
         } catch (IllegalArgumentException e) {
             throw new ApiException(e.getMessage(), e);
         }
+    }
+
+    private void enrichImageWithTemplateData(final ExternalApiImage apiImage, final ImageTemplateHolder templateHolder) {
+
+        final ApiTemplateHolder apiTemplateHolder = new ApiTemplateHolder(templateHolder.isHostNetworkingEnabled(),
+                                                                          templateHolder.isPrivilegedMode());
+
+        for (PortTemplateItem port : templateHolder.getPorts()) {
+            apiTemplateHolder.addPort(new ApiPortTemplate(port.getPort(), port.getProtocol(), port.getDescription()));
+        }
+
+        for (VolumeTemplateItem volume : templateHolder.getVolumes()) {
+            apiTemplateHolder.addVolume(new ApiVolumeTemplate(volume.getVolume(), volume.isReadonly(), volume.getDescription()));
+        }
+
+        for (EnvironmentTemplateItem env : templateHolder.getEnv()) {
+            apiTemplateHolder.addEnv(new ApiEnvTemplate(env.getEnv(), env.getExampleValue(), env.getDescription()));
+        }
+
+        for (DeviceTemplateItem device : templateHolder.getDevices()) {
+            apiTemplateHolder.addDevice(new ApiDeviceTemplate(device.getDevice(), device.getDescription()));
+        }
+
+        for (DockerCapability capability : templateHolder.getCapabilities()) {
+            apiTemplateHolder.addCapability(capability.name());
+        }
+
+        apiImage.setTemplateSpec(apiTemplateHolder);
     }
 }
