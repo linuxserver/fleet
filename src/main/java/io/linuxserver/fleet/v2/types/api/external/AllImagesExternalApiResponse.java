@@ -35,13 +35,14 @@ public class AllImagesExternalApiResponse {
                                            final long pullCount,
                                            final String version,
                                            final String category,
-                                           final boolean stable) {
+                                           final boolean stable,
+                                           final boolean deprecated) {
 
         if (!repositories.containsKey(repositoryName)) {
             repositories.put(repositoryName, new ArrayList<>());
         }
 
-        final ExternalApiImage apiImage = new ExternalApiImage(imageName, pullCount, version, category, stable);
+        final ExternalApiImage apiImage = new ExternalApiImage(imageName, pullCount, version, category, stable, deprecated);
         repositories.get(repositoryName).add(apiImage);
         return apiImage;
     }

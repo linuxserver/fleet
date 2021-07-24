@@ -56,7 +56,8 @@ public class LegacyExternalApiController extends AbstractAppService {
                                                                             image.getPullCount(),
                                                                             image.getLatestTag().getVersion(),
                                                                             image.getMetaData().getCategory(),
-                                                                            image.isStable());
+                                                                            image.isStable(),
+                                                                            image.isDeprecated());
                     if (verboseOutput) {
                         enrichImageWithTemplateData(apiImage, image.getMetaData().getTemplates());
                     }

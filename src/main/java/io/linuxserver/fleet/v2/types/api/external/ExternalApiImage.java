@@ -26,15 +26,17 @@ public class ExternalApiImage {
     private final String  version;
     private final String  category;
     private final boolean stable;
+    private final boolean deprecated;
 
     private ApiTemplateHolder templateSpec;
 
-    public ExternalApiImage(final String name, final long pullCount, final String version, final String category, final boolean stable) {
-        this.name      = name;
-        this.pullCount = pullCount;
-        this.version   = version;
-        this.category  = category;
-        this.stable    = stable;
+    public ExternalApiImage(final String name, final long pullCount, final String version, final String category, final boolean stable, final boolean deprecated) {
+        this.name       = name;
+        this.pullCount  = pullCount;
+        this.version    = version;
+        this.category   = category;
+        this.stable     = stable;
+        this.deprecated = deprecated;
     }
 
     public final String getName() {
@@ -55,6 +57,10 @@ public class ExternalApiImage {
 
     public final boolean isStable() {
         return stable;
+    }
+
+    public final boolean isDeprecated() {
+        return deprecated;
     }
 
     public final void setTemplateSpec(final ApiTemplateHolder templateHolder) {
