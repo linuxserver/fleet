@@ -31,9 +31,9 @@ sourceSets {
 dependencies {
 
     // Logging
-    runtime 'org.apache.logging.log4j:log4j-api:2.11.1'
-    runtime 'org.apache.logging.log4j:log4j-core:2.11.1'
-    compile 'org.apache.logging.log4j:log4j-slf4j-impl:2.11.1'
+    runtime 'org.apache.logging.log4j:log4j-api:2.15.0'
+    runtime 'org.apache.logging.log4j:log4j-core:2.15.0'
+    compile 'org.apache.logging.log4j:log4j-slf4j-impl:2.15.0'
 
     // HTTP Framework
     compile 'io.javalin:javalin:3.6.0'
