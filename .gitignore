@@ -38,3 +38,5 @@ src/main/resources/log4j2.xml
 .project
 .settings/
 .vscode/
+
+**/.DS_Store

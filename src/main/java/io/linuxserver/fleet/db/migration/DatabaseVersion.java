@@ -36,7 +36,6 @@ public class DatabaseVersion {
     private final Flyway flyway;
 
     public DatabaseVersion(final DatabaseConnection databaseConnection) {
-
         flyway = Flyway.configure().dataSource(databaseConnection.getDataSource()).load();
         migrate();
     }

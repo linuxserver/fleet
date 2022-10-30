@@ -2,60 +2,43 @@ plugins {
     id 'java'
 }
 
-sourceCompatibility = 11
-targetCompatibility = 11
+sourceCompatibility = JavaVersion.VERSION_11
+targetCompatibility = JavaVersion.VERSION_11
 
 repositories {
     mavenCentral()
 }
 
-version = '2.3.2'
-
-sourceSets {
-
-    main {
-
-        java {
-            srcDir 'src/main/java'
-        }
-    }
-
-    test {
-
-        java {
-            srcDir 'src/test/java'
-        }
-    }
-}
+version = '2.3.3'
 
 dependencies {
 
     // Logging
-    runtime 'org.apache.logging.log4j:log4j-api:2.16.0'
-    runtime 'org.apache.logging.log4j:log4j-core:2.16.0'
-    compile 'org.apache.logging.log4j:log4j-slf4j-impl:2.16.0'
+    implementation 'org.apache.logging.log4j:log4j-api:2.19.0'
+    implementation 'org.apache.logging.log4j:log4j-core:2.19.0'
+    implementation 'org.apache.logging.log4j:log4j-slf4j-impl:2.19.0'
 
     // HTTP Framework
-    compile 'io.javalin:javalin:3.6.0'
-    compile 'org.freemarker:freemarker:2.3.28'
-    compile 'org.apache.httpcomponents:httpclient:4.5.7'
+    implementation 'io.javalin:javalin:3.6.0'
+    implementation 'org.freemarker:freemarker:2.3.31'
+    implementation 'org.apache.httpcomponents:httpclient:4.5.13'
 
     // JSON Mapping/Marshalling
-    compile 'com.fasterxml.jackson.core:jackson-databind:2.9.6'
-    compile 'com.fasterxml.jackson.core:jackson-core:2.9.6'
-    compile 'com.fasterxml.jackson.core:jackson-annotations:2.9.6'
+    implementation 'com.fasterxml.jackson.core:jackson-databind:2.9.6'
+    implementation 'com.fasterxml.jackson.core:jackson-core:2.9.6'
+    implementation 'com.fasterxml.jackson.core:jackson-annotations:2.9.6'
 
     // Database
-    compile 'com.zaxxer:HikariCP:3.3.1'
-    compile 'org.mariadb.jdbc:mariadb-java-client:2.4.0'
-    compile 'org.flywaydb:flyway-core:6.1.0'
+    runtimeOnly    'org.mariadb.jdbc:mariadb-java-client:3.0.6'
+    implementation 'org.flywaydb:flyway-core:8.2.0'
+    implementation 'com.zaxxer:HikariCP:5.0.1'
 
     // MISC
-    compile 'org.apache.commons:commons-lang3:3.7'
+    implementation 'org.apache.commons:commons-lang3:3.12.0'
 
     // Unit Testing
-    testCompile 'junit:junit:4.11'
-    testCompile 'org.mockito:mockito-core:1.10.19'
+    testImplementation 'junit:junit:4.11'
+    testImplementation 'org.mockito:mockito-core:4.8.0'
 }
 
 jar {
@@ -65,8 +48,10 @@ jar {
     }
 
     from {
-        configurations.compile.collect { it.isDirectory() ? it : zipTree(it) }
+        configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }
     }
+
+    duplicatesStrategy = DuplicatesStrategy.INCLUDE
 
     exclude 'META-INF/INDEX.LIST', 'META-INF/*.RSA', 'META-INF/*.SF','META-INF/*.DSA'
 }
@@ -97,4 +82,4 @@ task buildVersionProperties() {
     }
 }
 
-build.dependsOn configureLogConfiguration, buildVersionProperties
+processResources.dependsOn configureLogConfiguration, buildVersionProperties
